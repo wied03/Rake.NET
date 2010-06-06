@@ -2,9 +2,16 @@ require "spec"
 require "../lib/properties"
 require 'rake'
 
+class Props
+  def Props.reset
+    @@config = nil
+  end
+end
+
 describe "Properties" do
   before(:each) do
     @current = pwd
+    Props.reset
   end
 
   after(:each) do
