@@ -1,12 +1,16 @@
-class Props
+class YAMLConfig
   attr_accessor :props
   private_class_method :new
 
-  @@config = nil
+  @@instance = nil
   
-  def Props.it
-    @@config = new unless @@config
-    @@config
+  def YAMLConfig.singleton
+    @@instance = new unless @@instance
+    @@instance
+  end
+  
+  def YAMLConfig.Items
+    YAMLConfig.singleton.props
   end
 
   def initialize
