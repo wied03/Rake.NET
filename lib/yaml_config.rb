@@ -1,18 +1,6 @@
 module BW
   class YAMLConfig
     attr_accessor :props
-    private_class_method :new
-
-    @@instance = nil
-
-    def YAMLConfig.singleton
-      @@instance = new unless @@instance
-      @@instance
-    end
-
-    def YAMLConfig.Items
-      YAMLConfig.singleton.props
-    end
 
     def initialize
         default_props = YAML::load(File.read('local_properties_default.yml'))
