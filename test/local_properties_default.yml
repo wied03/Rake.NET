@@ -1,0 +1,33 @@
+project:
+ prefix: BSW
+
+db:
+ hostname: localhost
+ name: &dbName @prefix@-@thismachinehostname@ 
+
+ create:
+  # winauth or sqlauth
+  mode: sqlauth
+  user: user
+  password: password
+ 
+ use:
+  # winauth or sqlauth
+  mode: sqlauth
+  password: password
+  user: *dbName
+  data-dir: D:\Data
+
+ connect-strings:
+  winauth: Data Source=%s;Initial Catalog=%s;Persist Security Info=True;Min Pool Size=20;Max Pool Size=500;Connection Timeout=15;Trusted_Connection=Yes	  
+  sqlauth: Data Source=%s;Initial Catalog=%s;Persist Security Info=True;User ID=%s;Password=%s;Min Pool Size=20;Max Pool Size=500;Connection Timeout=15;
+
+build:
+ type: Debug
+ 
+test:
+ javascript:
+   port: 9876
+   browsers:
+    - "D:\Program Files\Mozilla Firefox\firefox.exe"
+	- "C:\Users\brady\AppData\Local\Google\Chrome\Application\chrome.exe"
