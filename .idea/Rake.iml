@@ -3,7 +3,7 @@
   <component name="GemRequirementsHolder" version="2">
     <requirement>
       <requirement>
-        <dependency name="yamlconfig" version="0" bound="GREATER_OR_EQUAL" git="false" />
+        <dependency name="bwyamlconfig" version="0" bound="GREATER_OR_EQUAL" git="false" />
       </requirement>
       <source manual="true" />
     </requirement>
@@ -12,7 +12,7 @@
     <content url="file://$MODULE_DIR$" />
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" scope="PROVIDED" name="[gem] yamlconfig (v1.0.0, D:/Ruby/lib/ruby/gems/1.8/gems/yamlconfig-1.0.0)" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="[gem] bwyamlconfig (v1.0.0, D:/Ruby/lib/ruby/gems/1.8/gems/bwyamlconfig-1.0.0)" level="application" />
   </component>
 </module>
 
