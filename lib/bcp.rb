@@ -69,6 +69,28 @@ module BW
 				@default_delim = true
 				"|d3l1m1t3r|"
 			end
-		end
+        end
+
+      # Prefix to use with BCP
+      # BCP doesn't allow initial catalogs for SQL auth, but does for winauth and we need them
+      # since winauth users might use several schemas
+      def bcp_prefix
+          if dbprops['use']['mode'] == "winauth"
+              "%s.dbo." % [db_name]
+          else
+              ""
+          end
+      end
+
+
+      def connect_bcp
+        if dbprops['auth-windows-normal']
+            "-T -S %s" % [host]
+        else
+            "-U %s -P %s /S%s" % [db_user,
+                                  dbprops['password'],
+                                  host]
+        end
+      end
 	end
 end
