@@ -5,21 +5,23 @@ module BW
 	class BaseTask < Rake::TaskLib
 		attr_accessor :name, :unless	
 		
-		def initialize(params=:task)
-			parseParams(params)
+		def initialize(parameters = :task)
+			parseParams parameters
 			yield self if block_given?
 			task @name => @dependencies if @dependencies unless @unless	
 			define
 		end
-		
-		def parseParams(hash)
-			@name = case hash
+
+        private
+        
+		def parseParams parameters 
+			@name = case parameters
 						when Hash
-							n = hash.keys[0]
-							@dependencies = hash[n]
+							n = parameters.keys[0]
+							@dependencies = parameters[n]
 							n
 						else
-							hash
+							parameters
 					end		
 		end
     
@@ -27,13 +29,17 @@ module BW
 		def define
 			task name do
 				if not @unless
-					puts "Running task #{@name}"
+					log "Running task: #{@name}"
 					exectask
 				else
-					puts "Skipping task: #{@name} due to unless condition specified in rakefile"
+					log "Skipping task: #{@name} due to unless condition specified in rakefile"
 				end
 			end
 			self
-		end
+        end
+
+      def log text
+        puts text
+      end
 	end
 end
