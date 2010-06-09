@@ -1,19 +1,15 @@
 require "base"
 require "basetask"
+require "basetaskmisc"
 
 # Need to get access to our private dependencies property
 module BW
 	class BaseTask < Rake::TaskLib
-		attr_accessor :dependencies, :testdiditrun, :testoutput
-
+		attr_accessor :testdiditrun
+        
         def exectask
           @testdiditrun = true
-        end
-
-        def log text
-          @testoutput = text
-          puts text
-        end
+        end        
     end
 end
 

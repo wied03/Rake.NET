@@ -1,10 +1,16 @@
-require 'bwbuild/basetask'
+require 'basetask'
+require 'windowspaths'
 
 module BW
 	class MSBuild < BaseTask
-		attr_accessor :target, :dotnet_bin_version, :solution, :compile_version, :properties, :release
+        include WindowsPaths
+        
+		attr_accessor :targets, :dotnet_bin_version, :solution, :compile_version, :properties, :release
+
+        private
+        
 		def exectask
-			sh2 "#{path}\\msbuild.exe /target:#{t} /property:#{propstr} #{@solution}"
+			sh2 "#{path}\\msbuild.exe#{targets}#{propstr}#{solution}"
 		end
 		
 		def compile
@@ -13,13 +19,17 @@ module BW
 			else
 				"v4.0"
 			end
-		end
+        end
+
+        def solution
+          if @solution
+            " "+@solution
+          end
+        end
 		
-		def t
-			if @target
-				@target
-			else
-				"build"
+		def targets
+			if @targets
+				" /target:#{@targets}"
 			end
 		end
 		
@@ -39,14 +49,14 @@ module BW
 			@properties.each do |prop, set|
 				keyvalue << "#{prop}=#{set}"
 			end
-			keyvalue.join(";")
+			" /property:"+keyvalue.join(";")
 		end		
 		
 		def path
 			if @dotnet_bin_version
-				"C:\\Windows\\Microsoft.NET\\Framework\\v#{@dotnet_bin_version}"
+				dotnet @dotnet_bin_version
 			else
-				"C:\\Windows\\Microsoft.NET\\Framework\\v4.0.21006"
+				dotnet "4.0"
 			end
 		end
 	end

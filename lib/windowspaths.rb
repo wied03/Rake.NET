@@ -2,13 +2,17 @@ require 'win32/registry'
 
 module BW
 	module WindowsPaths
-		def sql_tool_path
+		def sql_tool
 			regvalue "SOFTWARE\\Microsoft\\Microsoft SQL Server\\#{version}\\Tools\\ClientSetup", 'Path'
 		end
 		
-		def visual_studio_path			
+		def visual_studio
 			regvalue "SOFTWARE\\Microsoft\\VisualStudio\\#{version}", 'InstallDir'
-		end
+        end
+
+        def dotnet version
+            regvalue "SOFTWARE\\Microsoft\\NET Framework Setup\\NDP\\v#{version}", "InstallPath"
+        end
 		
 		def regvalue(key, value)		
 			Win32::Registry::HKEY_LOCAL_MACHINE.open(key) do |reg|

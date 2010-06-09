@@ -21,6 +21,7 @@ spec = Gem::Specification.new do |s|
   s.email = "brady@wied.us"
   s.add_dependency('fastercsv', '>= 1.5.0')
   s.add_dependency('yamlconfig')
+  s.add_dependency('windows-pr')
   s.platform = 'mswin32'
 end
 
