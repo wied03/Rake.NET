@@ -1,12 +1,20 @@
-require 'bwbuild/basetask'
+require 'basetask'
 require 'fastercsv'
-require 'bwbuild/windowspaths'
+require 'windowspaths'
+require 'db'
 
 module BW
 	class BCP < BaseTask
-		attr_accessor :prefix, :delimiter, :connect_string, :files, :version
+		attr_accessor :delimiter, :files, :version
 		include BW::WindowsPaths
-		
+
+        def initialize (parameters = :task)
+          super parameters
+          @dbprops = DB.new
+        end
+
+		private
+
 		def exectask
 			# use the registry to figure out where the SQL Server binaries are (less configuration)
 			tmp = "#{ENV['tmp']}/bcp"
@@ -23,8 +31,8 @@ module BW
 				# need to trim off both the extension and the leading 2 numbers/hyphen
 				sequenceAndTable = File.basename(csv, ".csv")				
 				tableName = sequenceAndTable.match(/\d+-(.*)/)[1]				
-				args = "\"#{@prefix}#{tableName}\" in #{fileName} #{@connect_string} -t \"#{delimiter}\" /c -m 1 -F 2"
-				sh2 "\"#{sql_tool_path}bcp.exe\" " + args				
+				args = "\"#{prefix}#{tableName}\" in #{fileName} #{connect_string} -t \"#{delimiter}\" /c -m 1 -F 2"
+				sh2 "\"#{path}bcp.exe\" " + args				
 				cd currentdir				
 			end
 			
@@ -52,15 +60,15 @@ module BW
 			end
 			file.close
 		end
-		
-		def version
-			if @version
-				@version
-			else
-				"100"
-			end
-		end
-		
+
+        def path
+          if @version
+            sql_tool @version
+          else
+            sql_tool "100"
+          end
+        end
+
 		def delimiter
 			if @delimiter
 				@default_delim = false
@@ -71,25 +79,24 @@ module BW
 			end
         end
 
-      # Prefix to use with BCP
       # BCP doesn't allow initial catalogs for SQL auth, but does for winauth and we need them
       # since winauth users might use several schemas
-      def bcp_prefix
-          if dbprops['use']['mode'] == "winauth"
-              "%s.dbo." % [db_name]
+      def prefix
+          if @dbprops.dbprops['use']['mode'] == "winauth"
+              "%s.dbo." % [@dbprops.name]
           else
               ""
           end
       end
 
 
-      def connect_bcp
-        if dbprops['auth-windows-normal']
-            "-T -S %s" % [host]
+      def connect_string
+        if @dbprops.dbprops['use']['mode'] == "winauth"
+            "-T -S %s" % [@dbprops.host]
         else
-            "-U %s -P %s /S%s" % [db_user,
-                                  dbprops['password'],
-                                  host]
+            "-U %s -P %s /S%s" % [@dbprops.user,
+                                  @dbprops.dbprops['use']['password'],
+                                  @dbprops.host]
         end
       end
 	end

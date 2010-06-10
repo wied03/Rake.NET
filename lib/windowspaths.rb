@@ -2,7 +2,7 @@ require 'win32/registry'
 
 module BW
 	module WindowsPaths
-		def sql_tool
+		def sql_tool version
 			regvalue "SOFTWARE\\Microsoft\\Microsoft SQL Server\\#{version}\\Tools\\ClientSetup", 'Path'
 		end
 		

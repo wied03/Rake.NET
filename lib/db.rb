@@ -11,13 +11,13 @@ module BW
 
       def prefix
         @props['project']['prefix']
-      end
+      end      
+
+    public
 
       def dbprops
         @props['db']
       end
-
-    public
 
       # The hostname where the database lives
       def host

@@ -47,5 +47,5 @@ describe "Database Utilities" do
     @props['db']["connect-strings"] =
              {"winauth" => "host @host@ db @initialcatalog@"}
     @db.connect_code.should == "host myhostname db regulardb"
-  end  
+  end
 end

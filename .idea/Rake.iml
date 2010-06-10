@@ -49,5 +49,6 @@
     <orderEntry type="library" scope="PROVIDED" name="[gem] windows-api (v0.4.0, D:/Ruby/lib/ruby/gems/1.8/gems/windows-api-0.4.0)" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="[gem] windows-pr (v1.0.8, D:/Ruby/lib/ruby/gems/1.8/gems/windows-pr-1.0.8)" level="application" />
   </component>
+  <component name="RModuleSettingsStorage" number="1" string0="$MODULE_DIR$/lib" />
 </module>
 
