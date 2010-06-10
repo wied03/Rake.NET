@@ -16,6 +16,16 @@ describe "MSBuild Rake Task" do
   end
 
   it "should build OK with everything customized" do
-    false.should == true
+    @task = BW::MSBuild.new do |t|
+      t.targets = ['t1', 't2']
+      t.dotnet_bin_version = "3.5"
+      t.solution = "solutionhere"
+      t.compile_version = "1.0"
+      t.properties = {'prop1' => 'prop1val',
+                      'prop2' => 'prop2val'}
+      t.release = true
+    end
+    @task.exectaskpublic
+    @task.sh.should == "C:\\Windows\\Microsoft.NET\\Framework\\v3.5\\msbuild.exe /target:t1,t2 /property:TargetFrameworkVersion=v1.0;Configuration=Release;prop1=prop1val;prop2=prop2val solutionhere"
   end
 end

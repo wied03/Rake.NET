@@ -10,12 +10,12 @@ module BW
         private
         
 		def exectask
-			sh2 "#{path}\\msbuild.exe#{targets}#{propstr}#{solution}"
+			sh2 "#{path}msbuild.exe#{targets}#{propstr}#{solution}"
 		end
 		
 		def compile
 			if @compile_version
-				@compile_version
+				"v#{@compile_version}"
 			else
 				"v4.0"
 			end
@@ -29,7 +29,7 @@ module BW
 		
 		def targets
 			if @targets
-				" /target:#{@targets}"
+				" /target:#{@targets.join(",")}"
 			end
 		end
 		
