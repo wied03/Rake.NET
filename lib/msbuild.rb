@@ -14,16 +14,12 @@ module BW
 		end
 		
 		def compile
-			if @compile_version
-				"v#{@compile_version}"
-			else
-				"v4.0"
-			end
+			@compile_version ? "v#{@compile_version}" : "v4.0"
         end
 
         def solution
           if @solution
-            " "+@solution
+            " " + @solution
           end
         end
 		
@@ -34,11 +30,7 @@ module BW
 		end
 		
 		def debugOrRelease
-			if @release
-				"Release"
-			else
-				"Debug"
-			end
+			@release ? "Release" : "Debug"
 		end
 		
 		def propstr
@@ -53,11 +45,8 @@ module BW
 		end		
 		
 		def path
-			if @dotnet_bin_version
-				dotnet @dotnet_bin_version
-			else
-				dotnet "4.0"
-			end
+          ver = @dotnet_bin_version || "4.0"
+		  dotnet ver
 		end
 	end
 end

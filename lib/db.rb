@@ -27,7 +27,8 @@ module BW
       # The name of the database/catalog
       def name
           dbprops['name'].gsub(/@thismachinehostname@/, Socket.gethostname).
-                               gsub(/@prefix@/, prefix)    end
+                               gsub(/@prefix@/, prefix)
+      end
 
       # The name of the database user
       def user

@@ -6,7 +6,7 @@ require 'db'
 module BW
 	class BCP < BaseTask
 		attr_accessor :delimiter, :files, :version
-		include BW::WindowsPaths
+		include WindowsPaths
 
         def initialize (parameters = :task)
           super parameters
@@ -62,21 +62,12 @@ module BW
 		end
 
         def path
-          if @version
-            sql_tool @version
-          else
-            sql_tool "100"
-          end
+          p = @version || "100"
+          sql_tool p
         end
 
 		def delimiter
-			if @delimiter
-				@default_delim = false
-				@delimiter
-			else
-				@default_delim = true
-				"|d3l1m1t3r|"
-			end
+          @delimiter || "|d3l1m1t3r|"
         end
 
       # BCP doesn't allow initial catalogs for SQL auth, but does for winauth and we need them
