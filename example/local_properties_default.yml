@@ -29,5 +29,5 @@ test:
  javascript:
    port: 9876
    browsers:
-    - "D:\Program Files\Mozilla Firefox\firefox.exe"
-	- "C:\Users\brady\AppData\Local\Google\Chrome\Application\chrome.exe"
+    - '"D:\Program Files\Mozilla Firefox\firefox.exe"'
+    - '"C:\Users\brady\AppData\Local\Google\Chrome\Application\chrome.exe"'

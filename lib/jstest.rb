@@ -13,8 +13,11 @@ module BW
     end
 	
 	def genConfigFile
+        # This will include internal Rake FileList exclusion stuff if we don't do this
+        onlyFiles = []
+        @files.each { |f| onlyFiles << f}
 		config = {"server" => "http://#{server}:#{port}",
-				  "load" => @files}
+				  "load" => onlyFiles}
 		File.open configFile, 'w' do |file|
 			YAML.dump config, file
 		end

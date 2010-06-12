@@ -6,7 +6,9 @@ with('Distribution') do |dist|
 	end
 end
 
+@props = BW::Config.Props
 BW::JsTest.new "jstest" do |j|
+	j.files = FileList['src/**/*.js', 'test/**/*.js']
 	j.browsers = @props['test']['javascript']['browsers']
 	j.port = @props['test']['javascript']['port']
 end

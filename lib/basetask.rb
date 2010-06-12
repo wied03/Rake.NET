@@ -17,7 +17,10 @@ module BW
         # Setup here for mocking purposes and also to stop verbose messages from ending up
         # in stderr and causing CruiseControl.net to display errors        
         def shell(*cmd, &block)
-          sh cmd, :verbose => false, &block
+          options = (Hash === cmd.last) ? cmd.pop : {}
+		  options[:verbose] = false
+		  command = cmd.first
+          sh command, options, &block
         end
         
         private

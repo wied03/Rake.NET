@@ -2,6 +2,10 @@ require "base"
 require "jstest"
 require "basetaskmisc"
 
+def jspath
+  FileList["data/jstest/path/**/*.js"]
+end
+
 describe "Task: JSTest" do
 
   before(:each) do
@@ -17,7 +21,7 @@ describe "Task: JSTest" do
   it "Standard Test With Browsers and Files" do
     task = BW::JsTest.new do |js|
       js.browsers = ["iexplore.exe", "firefox.exe"]
-      js.files = ["src1.js", "test1.js"]
+      js.files = jspath
     end
 
     task.exectaskpublic
@@ -34,7 +38,7 @@ it "Standard Test With Browsers and Files In CI tool" do
     ENV["CI"] = "yes"
     task = BW::JsTest.new do |js|
       js.browsers = ["iexplore.exe", "firefox.exe"]
-      js.files = ["src1.js", "test1.js"]
+      js.files = jspath
     end
 
     task.exectaskpublic
@@ -51,7 +55,7 @@ it "Standard Test With Browsers and Files In CI tool" do
     ENV["CI"] = "yes"
     task = BW::JsTest.new do |js|
       js.browsers = ["iexplore.exe"]
-      js.files = ["src1.js", "test1.js"]
+      js.files = jspath
       js.jarpath = "newpath/"
       js.port = "1234"
       js.server = "anotherbox"
