@@ -2,7 +2,7 @@ require "base"
 require "minifyjs"
 require "basetaskmisc"
 
-describe "Minify JS Testing" do
+describe "Task: Minify JS" do
 
   it "Should work with default settings" do
     task = BW::MinifyJs.new do |task|

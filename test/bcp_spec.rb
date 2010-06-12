@@ -2,7 +2,7 @@ require "base"
 require "bcp"
 require "basetaskmisc"
 
-describe "BCP Data Loading" do
+describe "Task: BCP Data Loading" do
   before(:each) do
     @props = {}
     BW::Config.stub!(:Props).and_return(@props)

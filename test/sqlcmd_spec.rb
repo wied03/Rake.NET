@@ -15,13 +15,7 @@ def testdata
   FileList["data/sqlcmd/input/**/*"]
 end
 
-class DummyProcessStatus
-  def exitstatus
-    return "BW Rake Task Problem"
-  end
-end
-
-describe "SQLCMD Testing" do
+describe "Task: SQLCMD" do
   before(:each) do
     @props = {}
     BW::Config.stub!(:Props).and_return(@props)
@@ -151,8 +145,7 @@ describe "SQLCMD Testing" do
     task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
     task.stub!(:sh).and_yield(nil, DummyProcessStatus.new)
     
-    lambda {task.exectaskpublic}.should raise_exception(RuntimeError,
-                                                         "Command failed with status (BW Rake Task Problem):")
+    lambda {task.exectaskpublic}.should raise_exception("Command failed with status (BW Rake Task Problem):")
 
     # This means our temporary file was correctly cleaned up
     File.exist?(@basepath+"/tempfile.sql").should_not == true

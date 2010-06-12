@@ -35,6 +35,12 @@ module BW
     end
 end
 
+class DummyProcessStatus
+  def exitstatus
+    return "BW Rake Task Problem"
+  end
+end
+
 def rm_rf directory
   # Before we delete the files, copy them to a place where we can verify their correctness
   if File.exist? directory

@@ -2,7 +2,7 @@ require "base"
 require "msbuild"
 require "basetaskmisc"
 
-describe "MSBuild Rake Task" do
+describe "Task: MSBuild" do
 
   it "should build OK vanilla" do
     task = BW::MSBuild.new

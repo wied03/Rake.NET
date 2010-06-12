@@ -13,7 +13,7 @@ module BW
     end
 end
 
-describe "Base Rake Task" do
+describe "Base Task" do
   before(:each) do
     Rake::Task.clear
   end
