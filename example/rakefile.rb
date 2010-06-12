@@ -1,4 +1,4 @@
-require 'bwbuild/package'
+require 'msbuild'
 
 with('Distribution') do |dist|
 	BW::MinifyJs.new "minify_js" do |js|
@@ -13,10 +13,22 @@ end
 
 with('Database') do |d|
 	BW::BCP.new "db_data" do |bcp|
-		bcp.prefix = bcp_prefix
-		bcp.connect_string = db_connectstring_bcp
 		bcp.files = FileList["#{d}/data/*.csv"]
-	end
+    end
+
+    BW::Sqlcmd.new "db_schema" do |db|
+      db.usecreatecredentials = true
+      db.files = FileList["#{d}/schema/create_database.sql"]
+    end
+
+    BW::Sqlcmd.new "db_drop" do |db|
+      db.usecreatecredentials = true
+      db.files = FileList["#{d}/schema/drop_database.sql"]
+    end
+
+    BW::Sqlcmd.new "db_objects" do |db|
+      db.files = FileList["#{d}/objects/**/*"]
+    end
 end
 
 with('MvcApplication1.sln') do |solution|

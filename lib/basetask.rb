@@ -14,8 +14,8 @@ module BW
 
         protected
 
-        def sh
-          FileUtils::sh cmd, :verbose => false
+        def sh(*cmd, &block)
+          FileUtils::sh cmd, :verbose => false, &block
         end
         
         private

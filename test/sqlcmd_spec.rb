@@ -42,14 +42,14 @@ describe "SQLCMD Testing" do
   end
 
   it "Should work with default version and default (non create) credentials in SQL auth mode" do
-    @task = BW::Sqlcmd.new do |sql|
+    task = BW::Sqlcmd.new do |sql|
       sql.files = testdata
     end
 
-    @task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
+    task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
     
-    @task.exectaskpublic
-    @task.excecutedPop.should == "\"z:\\sqlcmd.exe\" -U theuser -P thepassword -S myhostname -e -v "+
+    task.exectaskpublic
+    task.excecutedPop.should == "\"z:\\sqlcmd.exe\" -U theuser -P thepassword -S myhostname -e -v "+
             "sqlserverdatadirectory=\"F:\\\" dbname=regulardb dbpassword=thepassword dbuser=theuser "+
             "-i tempfile.sql"
 
@@ -62,15 +62,15 @@ describe "SQLCMD Testing" do
   it "Should work with a custom version and default (non create) credentials in Win auth mode" do
     @props['db']["use"]["mode"] = "winauth"
 
-    @task = BW::Sqlcmd.new do |sql|
+    task = BW::Sqlcmd.new do |sql|
       sql.files = testdata
       sql.version = "902"
     end
 
-    @task.should_receive(:sql_tool).any_number_of_times.with("902").and_return("z:\\")
+    task.should_receive(:sql_tool).any_number_of_times.with("902").and_return("z:\\")
 
-    @task.exectaskpublic
-    @task.excecutedPop.should == "\"z:\\sqlcmd.exe\" -E -S myhostname -e -v "+
+    task.exectaskpublic
+    task.excecutedPop.should == "\"z:\\sqlcmd.exe\" -E -S myhostname -e -v "+
             "sqlserverdatadirectory=\"F:\\\" dbname=regulardb dbpassword=thepassword dbuser=theuser "+
             "-i tempfile.sql"
 
@@ -85,15 +85,15 @@ describe "SQLCMD Testing" do
                               "user" => "createuser",
                               "password" => "createpassword"}
 
-    @task = BW::Sqlcmd.new do |sql|
+    task = BW::Sqlcmd.new do |sql|
       sql.files = testdata
       sql.usecreatecredentials = true
     end
 
-    @task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
+    task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
 
-    @task.exectaskpublic
-    @task.excecutedPop.should == "\"z:\\sqlcmd.exe\" -U createuser -P createpassword -S myhostname -e -v "+
+    task.exectaskpublic
+    task.excecutedPop.should == "\"z:\\sqlcmd.exe\" -U createuser -P createpassword -S myhostname -e -v "+
             "sqlserverdatadirectory=\"F:\\\" dbname=regulardb dbpassword=thepassword dbuser=theuser "+
             "-i tempfile.sql"
 
@@ -106,15 +106,15 @@ describe "SQLCMD Testing" do
   it "Works fine with create credentials in Win auth mode" do
     @props['db']["create"] = {"mode" => "winauth"}
 
-    @task = BW::Sqlcmd.new do |sql|
+    task = BW::Sqlcmd.new do |sql|
       sql.files = testdata
       sql.usecreatecredentials = true
     end
 
-    @task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
+    task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
 
-    @task.exectaskpublic
-    @task.excecutedPop.should == "\"z:\\sqlcmd.exe\" -E -S myhostname -e -v "+
+    task.exectaskpublic
+    task.excecutedPop.should == "\"z:\\sqlcmd.exe\" -E -S myhostname -e -v "+
             "sqlserverdatadirectory=\"F:\\\" dbname=regulardb dbpassword=thepassword dbuser=theuser "+
             "-i tempfile.sql"
 
@@ -125,15 +125,15 @@ describe "SQLCMD Testing" do
   end
 
   it "Works fine with additional variables" do
-    @task = BW::Sqlcmd.new do |sql|
+    task = BW::Sqlcmd.new do |sql|
       sql.files = testdata
       sql.variables = { "var1" => "val1"}
     end
 
-    @task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
+    task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
 
-    @task.exectaskpublic
-    @task.excecutedPop.should == "\"z:\\sqlcmd.exe\" -U theuser -P thepassword -S myhostname -e -v "+
+    task.exectaskpublic
+    task.excecutedPop.should == "\"z:\\sqlcmd.exe\" -U theuser -P thepassword -S myhostname -e -v "+
             "sqlserverdatadirectory=\"F:\\\" dbname=regulardb var1=val1 dbpassword=thepassword "+
             "dbuser=theuser -i tempfile.sql"
 
@@ -144,14 +144,14 @@ describe "SQLCMD Testing" do
   end
   
   it "Fails the build properly (and gracefully) if sqlcmd has an error" do
-    @task = BW::Sqlcmd.new do |sql|
+    task = BW::Sqlcmd.new do |sql|
       sql.files = testdata
     end
 
-    @task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
-    @task.stub!(:sh).and_yield(nil, DummyProcessStatus.new)
+    task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
+    task.stub!(:sh).and_yield(nil, DummyProcessStatus.new)
     
-    lambda {@task.exectaskpublic}.should raise_exception(RuntimeError,
+    lambda {task.exectaskpublic}.should raise_exception(RuntimeError,
                                                          "Command failed with status (BW Rake Task Problem):")
 
     # This means our temporary file was correctly cleaned up
