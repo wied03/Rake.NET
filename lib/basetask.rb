@@ -10,8 +10,14 @@ module BW
 			yield self if block_given?
 			task @name => @dependencies if @dependencies unless @unless	
 			define
-		end
+        end
 
+        protected
+
+        def sh
+          FileUtils::sh cmd, :verbose => false
+        end
+        
         private
         
 		def parseParams parameters 

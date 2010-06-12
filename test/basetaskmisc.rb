@@ -15,22 +15,23 @@ module BW
           puts text
         end
 
-        @@sh2 = []
-        
-        def BaseTask.sh2command cmd
-          @@sh2 << cmd
+        def sh cmd
+          puts cmd
+          # We aren't testing concurrent tasks here, so no thread safety worries
+          if !@sh
+            @sh = []
+          end
+
+          @sh << cmd
+          
+          # Make it look like it went OK
+          yield true, nil
         end
 
-        def sh
-          @@sh2.pop()
+        def excecutedPop
+          @sh.pop()
         end
     end
-end
-
-def sh2 cmd
-  puts cmd
-  # We aren't testing concurrent tasks here, so no thread safety worries
-  BW::BaseTask.sh2command cmd
 end
 
 def rm_rf directory

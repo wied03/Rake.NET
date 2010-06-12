@@ -32,7 +32,7 @@ module BW
 				sequenceAndTable = File.basename(csv, ".csv")				
 				tableName = sequenceAndTable.match(/\d+-(.*)/)[1]				
 				args = "\"#{prefix}#{tableName}\" in #{fileName} #{connect_string} -t \"#{delimiter}\" /c -m 1 -F 2"
-				sh2 "\"#{path}bcp.exe\" " + args				
+				sh "\"#{path}bcp.exe\" " + args				
 				cd currentdir				
 			end
 			
@@ -43,22 +43,22 @@ module BW
 		end
 		
 		def csvtoCustomDelim(oldfile, newfile)
-			file = File.open(newfile, "a")
-			FasterCSV.foreach(oldfile) do |row|
-				d = delimiter
-				row.each { |f| if f.include? d
-									puts "Your data contains the crazy delimiter that's currently configured, which is "
-									puts "#{d} "
-									puts " (the default one) " unless !d
-									puts "Pass in the 'delimiter' attribute from your rakefile with a different random value."
-									puts "Hopefully then it will not exist in your data and can be used with bcp to import"
-									puts "data into the database."
-									fail
-							   end}
-				newRow = row.join(d)
-				file.puts newRow
+			File.open(newfile, "a") do |file|
+              FasterCSV.foreach(oldfile) do |row|
+                  d = delimiter
+                  row.each { |f| if f.include? d
+                                      puts "Your data contains the crazy delimiter that's currently configured, which is "
+                                      puts "#{d} "
+                                      puts " (the default one) " unless !d
+                                      puts "Pass in the 'delimiter' attribute from your rakefile with a different random value."
+                                      puts "Hopefully then it will not exist in your data and can be used with bcp to import"
+                                      puts "data into the database."
+                                      fail
+                                 end}
+                  newRow = row.join(d)
+                  file.puts newRow
+              end
 			end
-			file.close
 		end
 
         def path

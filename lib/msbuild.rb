@@ -10,7 +10,7 @@ module BW
         private
         
 		def exectask
-			sh2 "#{path}msbuild.exe#{targets}#{propstr}#{solution}"
+			sh "#{path}msbuild.exe#{targets}#{propstr}#{solution}"
 		end
 		
 		def compile

@@ -4,16 +4,11 @@ require "basetaskmisc"
 
 describe "MSBuild Rake Task" do
 
-  before(:each) do
-    # This resets our recorded output
-    sh2 "---new test---"    
-  end
-  
   it "should build OK vanilla" do
     @task = BW::MSBuild.new
     @task.should_receive(:dotnet).with("4.0").and_return("C:\\yespath\\")
     @task.exectaskpublic
-    @task.sh.should == "C:\\yespath\\msbuild.exe /property:TargetFrameworkVersion=v4.0;Configuration=Debug"
+    @task.excecutedPop.should == "C:\\yespath\\msbuild.exe /property:TargetFrameworkVersion=v4.0;Configuration=Debug"
   end
 
   it "should build OK with everything customized" do
@@ -28,6 +23,6 @@ describe "MSBuild Rake Task" do
     end
     @task.should_receive(:dotnet).with("3.5").and_return("C:\\yespath2\\")
     @task.exectaskpublic
-    @task.sh.should == "C:\\yespath2\\msbuild.exe /target:t1,t2 /property:TargetFrameworkVersion=v1.0;Configuration=Release;prop1=prop1val;prop2=prop2val solutionhere"
+    @task.excecutedPop.should == "C:\\yespath2\\msbuild.exe /target:t1,t2 /property:TargetFrameworkVersion=v1.0;Configuration=Release;prop1=prop1val;prop2=prop2val solutionhere"
   end
 end
