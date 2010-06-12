@@ -1,25 +1,30 @@
-require 'bwbuild/basetask'
+require 'basetask'
 require 'yaml'
 
 module BW
   class JsTest < BaseTask   
-    attr_accessor :browsers, :version, :testoutput, :path, :port, :jspath
+    attr_accessor :browsers, :version, :testoutput, :jarpath, :port, :files, :server
     
-    # Create the tasks defined by this task lib.
+    private
     def exectask
-		puts "Google JS Test Run"
 		genConfigFile
-		sh2 "java -jar #{path}jsTestDriver-#{version}.jar --port #{port} --browser #{browsers} --tests all"
-		rm configFile
+		sh "java -jar #{jarpath}jsTestDriver-#{version}.jar --port #{port} --browser #{browsers} --tests all#{testoutput}"
+		rm_rf configFile
     end
 	
 	def genConfigFile
-		config = ["server" => "http://localhost:#{port}",
-				  "load" => @jspath]
-		File.open (configFile, 'w') do |out|
-			YAML.dump config, out
+		config = {"server" => "http://#{server}:#{port}",
+				  "load" => @files}
+		File.open (configFile, 'w') do |file|
+			YAML.dump config, file
 		end
-	end
+    end
+
+    def testoutput
+      if ENV['CI']
+        " --testOutput " + (@testoutput || ".")
+      end
+    end
 	
 	def configFile
 		"jsTestDriver.conf"
@@ -30,27 +35,19 @@ module BW
 	end
 	
 	def version
-		if @version
-			@version
-		else
-			"1.2.1"
-		end
-	end
+      @version || "1.2.1"
+    end
+
+    def server
+      @server || "localhost"
+    end
 	
-	def path
-		if @path
-			@path
-		else
-			"bwbuild/lib/"
-		end
+	def jarpath
+      @jarpath || "lib/"
 	end
 	
 	def port
-		if @port
-			@port
-		else
-			"9876"
-		end
+      @port || "9876"
 	end
   end
 end
