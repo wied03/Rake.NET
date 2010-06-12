@@ -14,6 +14,8 @@ module BW
 
         protected
 
+        # Setup here for mocking purposes and also to stop verbose messages from ending up
+        # in stderr and causing CruiseControl.net to display errors        
         def sh(*cmd, &block)
           FileUtils::sh cmd, :verbose => false, &block
         end
