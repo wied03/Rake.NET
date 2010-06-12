@@ -9,7 +9,7 @@ module BW
     def exectask		
 	  puts "YUI Javscript Minify:  Minifying these files: #{files}"
 	  files.each do |j|
-        sh "java -jar #{path}yuicompressor-#{version}.jar --charset #{charset} #{j} -o #{j}"
+        shell "java -jar #{path}yuicompressor-#{version}.jar --charset #{charset} #{j} -o #{j}"
 	  end
     end	
 	

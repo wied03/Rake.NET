@@ -32,7 +32,7 @@ module BW
 				sequenceAndTable = File.basename(csv, ".csv")				
 				tableName = sequenceAndTable.match(/\d+-(.*)/)[1]				
 				args = "\"#{prefix}#{tableName}\" in #{fileName} #{connect_string} -t \"#{delimiter}\" /c -m 1 -F 2"
-				sh "\"#{path}bcp.exe\" " + args				
+				shell "\"#{path}bcp.exe\" " + args
 				cd currentdir				
 			end
 			

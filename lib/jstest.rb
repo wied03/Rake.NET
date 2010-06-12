@@ -8,14 +8,14 @@ module BW
     private
     def exectask
 		genConfigFile
-		sh "java -jar #{jarpath}jsTestDriver-#{version}.jar --port #{port} --browser #{browsers} --tests all#{testoutput}"
+		shell "java -jar #{jarpath}jsTestDriver-#{version}.jar --port #{port} --browser #{browsers} --tests all#{testoutput}"
 		rm_rf configFile
     end
 	
 	def genConfigFile
 		config = {"server" => "http://#{server}:#{port}",
 				  "load" => @files}
-		File.open (configFile, 'w') do |file|
+		File.open configFile, 'w' do |file|
 			YAML.dump config, file
 		end
     end

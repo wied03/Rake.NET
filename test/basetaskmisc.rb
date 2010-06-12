@@ -15,7 +15,7 @@ module BW
           puts text
         end
 
-        def sh(*cmd, &block)
+        def shell(*cmd, &block)
           command = cmd.first
           puts command
           # We aren't testing concurrent tasks here, so no thread safety worries

@@ -24,7 +24,7 @@ module BW
       args = "#{connect} -e #{variables_flat} -i #{@tempfile}"
       cmd = "#{exe} #{args}"
       puts cmd
-      sh cmd do |ok,status|
+      shell cmd do |ok,status|
         # We want to clean up our temp file in case we fail
         removetempfile
         ok or

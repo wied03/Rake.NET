@@ -12,7 +12,7 @@ module BW
 			puts "Starting/Stopping IIS Service"
 			cmd = "net.exe #{@command} #{service}"
 			puts cmd
-			sh cmd do |ok,status|
+			shell cmd do |ok,status|
 				ok or
 				if @command == :stop
 					puts "Ignoring failure since we're stopping"
