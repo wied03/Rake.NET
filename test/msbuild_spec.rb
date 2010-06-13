@@ -1,6 +1,6 @@
 require "base"
 require "msbuild"
-require "basetaskmisc"
+require "basetaskmocking"
 
 describe "Task: MSBuild" do
 

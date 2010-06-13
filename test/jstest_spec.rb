@@ -1,21 +1,19 @@
 require "base"
 require "jstest"
-require "basetaskmisc"
+require "basetaskmocking"
 
 def jspath
   FileList["data/jstest/path/**/*.js"]
 end
 
 describe "Task: JSTest" do
-
   before(:each) do
     ENV["CI"] = nil
-    @basepath = File.expand_path(File.dirname(__FILE__))
   end
 
   after(:each) do
     # Remove our generated test data
-    FileUtils::rm_rf @basepath + "/data/output/jsTestDriver.conf"
+    FileUtils::rm_rf "data/output/jsTestDriver.conf"
   end
 
   it "Standard Test With Browsers and Files" do
@@ -28,8 +26,8 @@ describe "Task: JSTest" do
     task.excecutedPop.should == "java -jar lib/jsTestDriver-1.2.1.jar --port 9876 "+
             "--browser iexplore.exe,firefox.exe --tests all"
 
-    expected = IO.readlines(@basepath+"/data/jstest/jsTestDriver_expected.conf")
-    actual = IO.readlines(@basepath+"/data/output/jsTestDriver.conf")
+    expected = IO.readlines("data/jstest/jsTestDriver_expected.conf")
+    actual = IO.readlines("data/output/jsTestDriver.conf")
 
     actual.should == expected
   end
@@ -45,8 +43,8 @@ it "Standard Test With Browsers and Files In CI tool" do
     task.excecutedPop.should == "java -jar lib/jsTestDriver-1.2.1.jar --port 9876 "+
             "--browser iexplore.exe,firefox.exe --tests all --testOutput ."
 
-    expected = IO.readlines(@basepath+"/data/jstest/jsTestDriver_expected.conf")
-    actual = IO.readlines(@basepath+"/data/output/jsTestDriver.conf")
+    expected = IO.readlines("data/jstest/jsTestDriver_expected.conf")
+    actual = IO.readlines("data/output/jsTestDriver.conf")
 
     actual.should == expected
   end
@@ -66,8 +64,8 @@ it "Standard Test With Browsers and Files In CI tool" do
     task.excecutedPop.should == "java -jar newpath/jsTestDriver-1.2.1.jar --port 1234 "+
             "--browser iexplore.exe --tests all --testOutput testdir"
 
-    expected = IO.readlines(@basepath+"/data/jstest/jsTestDriver_expected_custom.conf")
-    actual = IO.readlines(@basepath+"/data/output/jsTestDriver.conf")
+    expected = IO.readlines("data/jstest/jsTestDriver_expected_custom.conf")
+    actual = IO.readlines("data/output/jsTestDriver.conf")
 
     actual.should == expected
   end

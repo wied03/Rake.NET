@@ -1,12 +1,9 @@
 require "base"
 require "bcp"
-require "basetaskmisc"
+require "basetaskmocking"
 
 describe "Task: BCP Data Loading" do
   before(:each) do
-    @props = {}
-    BW::Config.stub!(:Props).and_return(@props)
-    @basepath = File.expand_path(File.dirname(__FILE__))
     @props["db"] = {"name" => "regulardb"}
     @props["db"]["hostname"] = "myhostname"
     @props['db']["use"] = {"mode" => "sqlauth",
@@ -17,13 +14,13 @@ describe "Task: BCP Data Loading" do
 
   after(:each) do
     # Remove our generated test data
-    FileUtils::rm_rf File.expand_path(File.dirname(__FILE__))+"/data/output/bcp"
+    FileUtils::rm_rf "data/output/bcp"
   end
 
   it "Works OK with standard delimiters and SQL Auth" do
     task = BW::BCP.new do |bcp|
-      bcp.files = FileList[@basepath+"/data/bcp/01-firsttable.csv",
-                           @basepath+"/data/bcp/02-nexttable.csv"]      
+      bcp.files = FileList["data/bcp/01-firsttable.csv",
+                           "data/bcp/02-nexttable.csv"]
     end
 
     # Don't want to depend on specific registry setting
@@ -33,13 +30,13 @@ describe "Task: BCP Data Loading" do
     task.excecutedPop.should == "\"z:\\bcp.exe\" \"nexttable\" in 02-nexttable.csv -U theuser -P thepassword /Smyhostname -t \"|d3l1m1t3r|\" /c -m 1 -F 2"
     task.excecutedPop.should == "\"z:\\bcp.exe\" \"firsttable\" in 01-firsttable.csv -U theuser -P thepassword /Smyhostname -t \"|d3l1m1t3r|\" /c -m 1 -F 2"
 
-    expected = IO.readlines(@basepath+"/data/bcp/01-firsttable-expectedout.csv")
-    actual = IO.readlines(@basepath+"/data/output/bcp/01-firsttable.csv")
+    expected = IO.readlines("data/bcp/01-firsttable-expectedout.csv")
+    actual = IO.readlines("data/output/bcp/01-firsttable.csv")
 
     actual.should == expected
 
-    expected = IO.readlines(@basepath+"/data/bcp/02-nexttable-expectedout.csv")
-    actual = IO.readlines(@basepath+"/data/output/bcp/02-nexttable.csv")
+    expected = IO.readlines("data/bcp/02-nexttable-expectedout.csv")
+    actual = IO.readlines("data/output/bcp/02-nexttable.csv")
 
     actual.should == expected
 
@@ -48,8 +45,8 @@ describe "Task: BCP Data Loading" do
   it "Works OK with custom delimiters, Custom Version, and Windows Auth" do
     @props['db']["use"] = {"mode" => "winauth"}
     task = BW::BCP.new do |bcp|
-      bcp.files = FileList[@basepath+"/data/bcp/01-firsttable.csv",
-                           @basepath+"/data/bcp/02-nexttable.csv"]
+      bcp.files = FileList["data/bcp/01-firsttable.csv",
+                           "data/bcp/02-nexttable.csv"]
       bcp.delimiter = "foobar"
       bcp.version = "852"
     end
@@ -61,13 +58,13 @@ describe "Task: BCP Data Loading" do
     task.excecutedPop.should == "\"z:\\bcp.exe\" \"regulardb.dbo.nexttable\" in 02-nexttable.csv -T -S myhostname -t \"foobar\" /c -m 1 -F 2"
     task.excecutedPop.should == "\"z:\\bcp.exe\" \"regulardb.dbo.firsttable\" in 01-firsttable.csv -T -S myhostname -t \"foobar\" /c -m 1 -F 2"
 
-    expected = IO.readlines(@basepath+"/data/bcp/01-firsttable-expectedout2.csv")
-    actual = IO.readlines(@basepath+"/data/output/bcp/01-firsttable.csv")
+    expected = IO.readlines("data/bcp/01-firsttable-expectedout2.csv")
+    actual = IO.readlines("data/output/bcp/01-firsttable.csv")
 
     actual.should == expected
 
-    expected = IO.readlines(@basepath+"/data/bcp/02-nexttable-expectedout2.csv")
-    actual = IO.readlines(@basepath+"/data/output/bcp/02-nexttable.csv")
+    expected = IO.readlines("data/bcp/02-nexttable-expectedout2.csv")
+    actual = IO.readlines("data/output/bcp/02-nexttable.csv")
 
     actual.should == expected
   end
@@ -75,7 +72,7 @@ describe "Task: BCP Data Loading" do
   it "Handles delimiter interference Properly" do
     @props['db']["use"] = {"mode" => "winauth"}
     task = BW::BCP.new do |bcp|
-      bcp.files = FileList[@basepath+"/data/bcp/delimInData.csv"]
+      bcp.files = FileList["data/bcp/delimInData.csv"]
     end
 
     lambda {task.exectaskpublic}.should raise_exception()     

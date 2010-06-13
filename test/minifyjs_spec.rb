@@ -1,6 +1,6 @@
 require "base"
 require "minifyjs"
-require "basetaskmisc"
+require "basetaskmocking"
 
 describe "Task: Minify JS" do
 

@@ -3,8 +3,6 @@ require "db"
 
 describe "Database Utilities" do
   before(:each) do
-    @props = {}
-    BW::Config.stub!(:Props).and_return(@props)
     @db = BW::DB.new
     @props["db"] = {"name" => "regulardb"}
     @props["project"] = {"prefix" => "PRE"}

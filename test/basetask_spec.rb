@@ -1,6 +1,6 @@
 require "base"
 require "basetask"
-require "basetaskmisc"
+require "basetaskmocking"
 
 # Need to get access to our private dependencies property
 module BW

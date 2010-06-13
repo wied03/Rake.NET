@@ -3,7 +3,7 @@ require 'rubygems'
 require 'rake/gempackagetask'
 require 'spec/rake/spectask'
 
-Spec::Rake::SpecTask.new(:spec) do |t|
+Spec::Rake::SpecTask.new :spec do |t|
   t.spec_files = FileList['test/**/*_spec.rb']
   t.spec_opts << '--format specdoc'
   t.libs = FileList['test']

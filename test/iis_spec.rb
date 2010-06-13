@@ -1,6 +1,6 @@
 require "base"
 require "iis"
-require "basetaskmisc"
+require "basetaskmocking"
 
 describe "Task: IIS Start/Stop" do
 

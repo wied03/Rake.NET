@@ -44,7 +44,7 @@ end
 def rm_rf directory
   # Before we delete the files, copy them to a place where we can verify their correctness
   if File.exist? directory
-    FileUtils::cp_r directory, File.expand_path(File.dirname(__FILE__))+"/data/output"
+    FileUtils::cp_r directory, "data/output"
   end
   FileUtils::rm_rf directory
 end

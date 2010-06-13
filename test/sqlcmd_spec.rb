@@ -1,6 +1,6 @@
 require "base"
 require "sqlcmd"
-require "basetaskmisc"
+require "basetaskmocking"
 
 module BW
   class Sqlcmd < BaseTask
@@ -16,9 +16,7 @@ def testdata
 end
 
 describe "Task: SQLCMD" do
-  before(:each) do
-    @props = {}
-    BW::Config.stub!(:Props).and_return(@props)
+  before(:each) do    
     @db = BW::DB.new
     @props["db"] = {"name" => "regulardb",
                     "hostname" => "myhostname"}
@@ -26,13 +24,12 @@ describe "Task: SQLCMD" do
     @props['db']["use"] = {"mode" => "sqlauth",
                            "user" => "theuser",
                            "password" => "thepassword",
-                           "data-dir" => "F:\\"}
-    @basepath = File.expand_path(File.dirname(__FILE__))
+                           "data-dir" => "F:\\"}    
   end
 
   after(:each) do
     # Remove our generated test data
-    FileUtils::rm_rf @basepath + "/data/output/tempfile.sql"
+    FileUtils::rm_rf "data/output/tempfile.sql"
   end
 
   it "Should work with default version and default (non create) credentials in SQL auth mode" do
@@ -47,8 +44,8 @@ describe "Task: SQLCMD" do
             "sqlserverdatadirectory=\"F:\\\" dbname=regulardb dbpassword=thepassword dbuser=theuser "+
             "-i tempfile.sql"
 
-    expected = IO.readlines(@basepath+"/data/sqlcmd/expected.sql")
-    actual = IO.readlines(@basepath+"/data/output/tempfile.sql")
+    expected = IO.readlines("data/sqlcmd/expected.sql")
+    actual = IO.readlines("data/output/tempfile.sql")
 
     actual.should == expected    
   end
@@ -68,8 +65,8 @@ describe "Task: SQLCMD" do
             "sqlserverdatadirectory=\"F:\\\" dbname=regulardb dbpassword=thepassword dbuser=theuser "+
             "-i tempfile.sql"
 
-    expected = IO.readlines(@basepath+"/data/sqlcmd/expected.sql")
-    actual = IO.readlines(@basepath+"/data/output/tempfile.sql")
+    expected = IO.readlines("data/sqlcmd/expected.sql")
+    actual = IO.readlines("data/output/tempfile.sql")
 
     actual.should == expected
   end
@@ -91,8 +88,8 @@ describe "Task: SQLCMD" do
             "sqlserverdatadirectory=\"F:\\\" dbname=regulardb dbpassword=thepassword dbuser=theuser "+
             "-i tempfile.sql"
 
-    expected = IO.readlines(@basepath+"/data/sqlcmd/expected.sql")
-    actual = IO.readlines(@basepath+"/data/output/tempfile.sql")
+    expected = IO.readlines("data/sqlcmd/expected.sql")
+    actual = IO.readlines("data/output/tempfile.sql")
 
     actual.should == expected 
   end
@@ -112,8 +109,8 @@ describe "Task: SQLCMD" do
             "sqlserverdatadirectory=\"F:\\\" dbname=regulardb dbpassword=thepassword dbuser=theuser "+
             "-i tempfile.sql"
 
-    expected = IO.readlines(@basepath+"/data/sqlcmd/expected.sql")
-    actual = IO.readlines(@basepath+"/data/output/tempfile.sql")
+    expected = IO.readlines("data/sqlcmd/expected.sql")
+    actual = IO.readlines("data/output/tempfile.sql")
 
     actual.should == expected 
   end
@@ -131,8 +128,8 @@ describe "Task: SQLCMD" do
             "sqlserverdatadirectory=\"F:\\\" dbname=regulardb var1=val1 dbpassword=thepassword "+
             "dbuser=theuser -i tempfile.sql"
 
-    expected = IO.readlines(@basepath+"/data/sqlcmd/expected.sql")
-    actual = IO.readlines(@basepath+"/data/output/tempfile.sql")
+    expected = IO.readlines("data/sqlcmd/expected.sql")
+    actual = IO.readlines("data/output/tempfile.sql")
     actual.should == expected
     
   end
@@ -148,9 +145,9 @@ describe "Task: SQLCMD" do
     lambda {task.exectaskpublic}.should raise_exception("Command failed with status (BW Rake Task Problem):")
 
     # This means our temporary file was correctly cleaned up
-    File.exist?(@basepath+"/tempfile.sql").should_not == true
+    File.exist?("tempfile.sql").should_not == true
     # Our test code should have done this 
-    File.exist?(@basepath+"/data/output/tempfile.sql").should == true    
+    File.exist?("data/output/tempfile.sql").should == true    
   end
   
 end
