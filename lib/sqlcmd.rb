@@ -3,20 +3,48 @@ require 'windowspaths'
 require 'db'
 
 module BW
+
+  # Runs SQLcmd to run supplied SQL scripts.  This task will roll up all supplied SQL script files
+  # into 1 SQL file before running it in order to speed up the tasks.  The "-e" flag is used so that
+  # all statements are echo'ed to stdout.
   class Sqlcmd < BaseTask
     include WindowsPaths
 
-    attr_accessor :files, :version, :usecreatecredentials, :variables
-    HEADER = "-- *************************************************************"
+    # *Required* Which SQL scripts do you want to run?  Everything in this path will be run with this script.
+    # It's recommended that you arrange your structure like the one below.  If you do, the generated
+    # meta script will have nice comments that indicate what it's currently running
+    #  somedirectory
+    #    01-tables
+    #        01-table1.sql
+    #        02-table2.sql
+    #    02-indexes
+    attr_accessor :files
 
+    # *Optional* Version of SQL Server's sqlcmd to use.  Defaults to SQL Server 2008.  
+    attr_accessor :version
+
+    # *Optional* If you're creating a database, pass true in here to use the config file's creation
+    # credentials instead of the regular credentials.  Defaults to false.
+    attr_accessor :usecreatecredentials
+
+    # *Optional* By default, several variables are passed into SQLCMD based on the config file.
+    # Add yours in here as key value pairs if you want to send more.  Defaults:
+    # * dbname
+    # * sqlserverdatadirectory
+    # * dbuser
+    # * dbpassword
+    attr_accessor :variables
+
+    private
+
+    HEADER = "-- *************************************************************"
+    
     def initialize (parameters = :task)
       super parameters
       @dbprops = DB.new
       # We don't want the temp file/time changing on us during the run
       @tempfile = generatetempfilename
     end
-
-    private
 
     def exectask
       createtempfile
@@ -119,7 +147,7 @@ module BW
          'dbuser' => @dbprops.user,
          'dbpassword' => @dbprops.dbprops['use']['password']}
 
-      @variables ? default.merge(@variables) : default
+      default.merge @variables || {}
     end
   end
 end

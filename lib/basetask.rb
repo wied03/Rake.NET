@@ -2,17 +2,20 @@ require 'rake'
 require 'rake/tasklib'
 
 module BW
+
+    # Used to abstract some of the functionality of building custom tasks in Rake out
+    # and also provide a convenient point to mock them for testing purposes
 	class BaseTask < Rake::TaskLib
-		attr_accessor :name, :unless	
-		
-		def initialize(parameters = :task)
-			parseParams parameters
-			yield self if block_given?
-			task @name => @dependencies if @dependencies unless @unless	
-			define
-        end
+		attr_accessor :name, :unless
 
         protected
+
+        def initialize(parameters = :task)
+			parseParams parameters
+			yield self if block_given?
+			task @name => @dependencies if @dependencies unless @unless
+			define
+        end
 
         # Setup here for mocking purposes and also to stop verbose messages from ending up
         # in stderr and causing CruiseControl.net to display errors        

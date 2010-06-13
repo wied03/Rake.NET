@@ -25,4 +25,15 @@ describe "Task: MSBuild" do
     task.exectaskpublic
     task.excecutedPop.should == "C:\\yespath2\\msbuild.exe /target:t1,t2 /property:TargetFrameworkVersion=v1.0;Configuration=Release;prop1=prop1val;prop2=prop2val solutionhere"
   end
+
+  it "should build OK with custom properties that are also defaults" do
+    task = BW::MSBuild.new do |t|
+      t.properties = {'Configuration' => 'myconfig',
+                      'prop2' => 'prop2val'}
+      t.release = true
+    end
+    task.should_receive(:dotnet).with("4.0").and_return("C:\\yespath2\\")
+    task.exectaskpublic
+    task.excecutedPop.should == "C:\\yespath2\\msbuild.exe /property:TargetFrameworkVersion=v4.0;Configuration=myconfig;prop2=prop2val"
+  end
 end

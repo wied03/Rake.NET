@@ -2,13 +2,41 @@ require 'basetask'
 require 'yaml'
 
 module BW
-  class JsTest < BaseTask   
-    attr_accessor :browsers, :version, :testoutput, :jarpath, :port, :files, :server
+  # Executes Javascript tests using Google's JS Test.  By default, the task outputs test results in
+  # plain text to stdout.
+  class JsTest < BaseTask
+
+    # *Required* Which Javascript files should be passed on to JS Test driver?
+    attr_accessor :files
+    
+    # *Required* List of browser paths to run the test on. (surrounded in quotes on Windows)
+    attr_accessor :browsers
+
+    # *Optional* Google JS Test Driver in use (defaults to 1.2.1)
+    attr_accessor :version
+
+    # *Optional* If XML output is enabled, what directory should it go to (default is current)
+    attr_accessor :outpath
+
+    # *Optional* Should XML output be enabled?  By default the task looks for the CCNetProject environment
+    # variable to decide this
+    attr_accessor :xmloutput
+
+    # Where is the Test driver JAR located (defaults to "lib/")
+    attr_accessor :jarpath
+
+    # *Optional* Which port should the Test Driver Server run on (defaults to 9876)
+    attr_accessor :port
+
+    # *Optional* Where should the server be running?  Default is localhost, which causes the server to launch
+    # when this task is run.  If you specify another server here, then this task will NOT
+    # launch a server and will instead only run the tests.
+    attr_accessor :server
     
     private
     def exectask
 		genConfigFile
-		shell "java -jar #{jarpath}jsTestDriver-#{version}.jar --port #{port} --browser #{browsers} --tests all#{testoutput}"
+		shell "java -jar #{jarpath}jsTestDriver-#{version}.jar#{portparam}#{browsers} --tests all#{testoutput}"
 		rm_rf configFile
     end
 	
@@ -24,9 +52,13 @@ module BW
     end
 
     def testoutput
-      if ENV['CI']
-        " --testOutput " + (@testoutput || ".")
+      if xmloutput
+        " --testOutput " + (@outpath || ".")
       end
+    end
+
+    def xmloutput
+      @xmloutput || ENV["CCNetProject"]
     end
 	
 	def configFile
@@ -34,7 +66,7 @@ module BW
 	end
 	
 	def browsers
-		@browsers.join(",")
+		" --browser "+@browsers.join(",") unless @server
 	end
 	
 	def version
@@ -48,7 +80,12 @@ module BW
 	def jarpath
       @jarpath || "lib/"
 	end
-	
+
+
+    def portparam
+      " --port "+ port unless @server
+    end
+    
 	def port
       @port || "9876"
 	end

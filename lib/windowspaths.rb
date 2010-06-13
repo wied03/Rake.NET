@@ -2,14 +2,19 @@ require 'win32/registry'
 
 module BW
 	module WindowsPaths
+        private
+        
+        # Fetches the path for tools like bcp.exe and sqlcmd.exe from the registry
 		def sql_tool version
 			regvalue "SOFTWARE\\Microsoft\\Microsoft SQL Server\\#{version}\\Tools\\ClientSetup", 'Path'
 		end
-		
-		def visual_studio
+
+        # Fetches the path for Visual Studio tools like MSTest.exe from the registry
+		def visual_studio version
 			regvalue "SOFTWARE\\Microsoft\\VisualStudio\\#{version}", 'InstallDir'
         end
 
+        # Fetches the .NET Framework path from the registry
         def dotnet version
             regvalue "SOFTWARE\\Microsoft\\NET Framework Setup\\NDP\\v#{version}", "InstallPath"
         end

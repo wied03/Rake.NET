@@ -2,10 +2,30 @@ require 'basetask'
 require 'windowspaths'
 
 module BW
+
+    # Launches a build using MSBuild
 	class MSBuild < BaseTask
         include WindowsPaths
-        
-		attr_accessor :targets, :dotnet_bin_version, :solution, :compile_version, :properties, :release
+
+        # *Optional* Targets to build
+		attr_accessor :targets
+
+        # *Optional* Version of the MSBuild binary to use. Defaults to "4.0"
+        attr_accessor :dotnet_bin_version
+
+        # *Optional* Solution file to build
+        attr_accessor :solution
+
+        # *Optional* .NET compilation version (what should MSBuild compile code to, NOT what version
+        # of MSBuild to use).  Defaults to "4.0"
+        attr_accessor :compile_version
+
+        # *Optional* Properties to pass along to MSBuild.  By default 'Configuration' and
+        # 'TargetFrameworkVersion' will be set based on the other attributes of this class.
+        attr_accessor :properties
+
+        # *Optional* Do a release build?  By default, this is false.
+        attr_accessor :release
 
         private
         
@@ -32,13 +52,17 @@ module BW
 		def debugOrRelease
 			@release ? "Release" : "Debug"
 		end
-		
+
+        def propsmerged
+          default = {}
+		  default['Configuration'] = debugOrRelease
+		  default['TargetFrameworkVersion'] = compile
+          default.merge @properties || {}
+        end
+
 		def propstr
-			@properties = {} unless @properties
-			@properties['Configuration'] = debugOrRelease
-			@properties['TargetFrameworkVersion'] = compile
 			keyvalue = []			
-			@properties.each do |prop, set|
+			propsmerged.each do |prop, set|
 				keyvalue << "#{prop}=#{set}"
 			end
 			" /property:"+keyvalue.join(";")

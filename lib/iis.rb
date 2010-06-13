@@ -1,8 +1,16 @@
 require 'basetask'
 
 module BW
+
+    # A task for starting/stopping IIS.  The task will not fail if the service cannot be stopped
+    # successfully to avoid failing the build if IIS is already running.
 	class IIS < BaseTask
-		attr_accessor :command, :service		
+
+        # *Required* Command to execute, should be either :start or :stop
+		attr_accessor :command
+
+        # *Optional* Service to bounce, by default W3SVC will be bounced.
+        attr_accessor :service		
 
         private
     

@@ -4,8 +4,34 @@ require 'windowspaths'
 require 'db'
 
 module BW
+=begin rdoc
+Supports using Microsoft BCP to load CSV data.  Unlike BCP out of the box, this task attempts
+to "support" comma escaping by converting your CSV files to files with an odd delimiter before
+loading them in with BCP.
+=end
 	class BCP < BaseTask
-		attr_accessor :delimiter, :files, :version
+
+        # *Optional* If the delimiter exists in your code (the task will fail if it does),
+        # you need to change this attribute.
+		attr_accessor :delimiter
+
+#       *Required* Supply the files you wish to load into your tables here.  They should be named
+#       using the following pattern SEQUENCE-TABLENAME.csv
+#       Example:
+#          01-users.csv
+#          02-accounts.csv
+#
+#          OR
+#          001-users.csv
+#          002-accounts.csv
+
+        attr_accessor :files
+      
+#      *Optional* By default, this looks for your installed version of BCP with SQL Server 2008.
+#      If you're using SQL Server 2005, set this to "90"
+        attr_accessor :version
+
+      
 		include WindowsPaths
 
         def initialize (parameters = :task)
@@ -79,7 +105,6 @@ module BW
               ""
           end
       end
-
 
       def connect_string
         if @dbprops.dbprops['use']['mode'] == "winauth"

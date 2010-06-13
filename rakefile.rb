@@ -2,11 +2,16 @@ require 'rake'
 require 'rubygems'
 require 'rake/gempackagetask'
 require 'spec/rake/spectask'
+require 'rake/rdoctask'
 
 Spec::Rake::SpecTask.new :spec do |t|
   t.spec_files = FileList['test/**/*_spec.rb']
   t.spec_opts << '--format specdoc'
   t.libs = FileList['test']
+end
+
+task :install do
+  
 end
 
 spec = Gem::Specification.new do |s|
@@ -26,4 +31,11 @@ spec = Gem::Specification.new do |s|
 end
 
 Rake::GemPackageTask.new(spec) do |pkg|
-end 
+end
+
+Rake::RDocTask.new do |rd|
+  rd.rdoc_dir = 'doc/rdocs'
+  rd.rdoc_files.include "lib/**/*"
+  rd.options << '--inline-source'
+  rd.options << '--line-numbers'
+end

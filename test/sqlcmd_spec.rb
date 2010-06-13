@@ -118,14 +118,15 @@ describe "Task: SQLCMD" do
   it "Works fine with additional variables" do
     task = BW::Sqlcmd.new do |sql|
       sql.files = testdata
-      sql.variables = { "var1" => "val1"}
+      sql.variables = { "var1" => "val1",
+                        "dbpassword" => "yesitsoktooverride"}
     end
 
     task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
 
     task.exectaskpublic
     task.excecutedPop.should == "\"z:\\sqlcmd.exe\" -U theuser -P thepassword -S myhostname -e -v "+
-            "sqlserverdatadirectory=\"F:\\\" dbname=regulardb var1=val1 dbpassword=thepassword "+
+            "sqlserverdatadirectory=\"F:\\\" dbname=regulardb var1=val1 dbpassword=yesitsoktooverride "+
             "dbuser=theuser -i tempfile.sql"
 
     expected = IO.readlines("data/sqlcmd/expected.sql")
