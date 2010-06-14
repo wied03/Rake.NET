@@ -3,6 +3,7 @@ require 'rubygems'
 require 'rake/gempackagetask'
 require 'spec/rake/spectask'
 require 'rake/rdoctask'
+require 'lib/version'
 
 Spec::Rake::SpecTask.new :spec do |t|
   t.spec_files = FileList['test/**/*_spec.rb']
@@ -10,13 +11,16 @@ Spec::Rake::SpecTask.new :spec do |t|
   t.libs = FileList['test']
 end
 
+task :clean_install => [:repackage, :install]
+
 task :install do
-  
+  sh "gem install " +FileList['pkg/*.gem'].first()
+  sh "gem cleanup raketasks"
 end
 
 spec = Gem::Specification.new do |s|
   s.name = 'raketasks'
-  s.version = '1.0.0'
+  s.version = BW::Version.incrementandretrieve
   s.summary = "Rake tasks for building .NET projects"
   s.description = s.summary
   s.files = FileList['lib/**/*.rb', 'test/**/*.rb']

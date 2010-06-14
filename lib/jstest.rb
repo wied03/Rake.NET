@@ -83,7 +83,7 @@ module BW
 
 
     def portparam
-      " --port "+ port unless @server
+      " --port #{port}" unless @server
     end
     
 	def port

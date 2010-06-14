@@ -71,7 +71,7 @@ describe "Task: JSTest" do
     task = BW::JsTest.new do |js|
       js.files = jspath
       js.jarpath = "newpath/"
-      js.port = "1234"
+      js.port = 1234
       js.server = "anotherbox"
       js.outpath = "testdir"
     end
