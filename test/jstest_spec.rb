@@ -86,4 +86,20 @@ describe "Task: JSTest" do
     actual.should == expected
   end
 
+  it "Should clean up generated file is JS-Test-Driver fails" do
+    task = BW::JsTest.new do |js|
+      js.browsers = ["iexplore.exe", "firefox.exe"]
+      js.files = jspath
+    end
+
+    task.stub!(:shell).and_yield(nil, DummyProcessStatus.new)
+
+    lambda {task.exectaskpublic}.should raise_exception("Command failed with status (BW Rake Task Problem):")
+
+    # This means our temporary file was correctly cleaned up
+    File.exist?("jsTestDriver.conf").should_not == true
+    # Our test code should have done this
+    File.exist?("data/output/jsTestDriver.conf").should == true    
+  end
+
 end

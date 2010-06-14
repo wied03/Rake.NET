@@ -43,15 +43,14 @@ module BW
       super parameters
       @dbprops = DB.new
       # We don't want the temp file/time changing on us during the run
-      @tempfile = generatetempfilename
+      @tempfile = Sqlcmd.generatetempfilename
     end
 
     def exectask
       createtempfile
       exe = "\"#{path}sqlcmd.exe\""
-      args = "#{connect} -e #{variables_flat} -i #{@tempfile}"
+      args = "#{connect} -e -b #{variables_flat} -i #{@tempfile}"
       cmd = "#{exe} #{args}"
-      puts cmd
       shell cmd do |ok,status|
         # We want to clean up our temp file in case we fail
         removetempfile

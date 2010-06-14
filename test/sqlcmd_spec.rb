@@ -2,20 +2,16 @@ require "base"
 require "sqlcmd"
 require "basetaskmocking"
 
-module BW
-  class Sqlcmd < BaseTask
-    # It uses the current date, which is harder to test
-    def generatetempfilename
-      "tempfile.sql"
-    end
-  end
-end
-
 def testdata
   FileList["data/sqlcmd/input/**/*"]
 end
 
 describe "Task: SQLCMD" do
+  before(:all) do
+    # It uses the current date, which is harder to test
+    BW::Sqlcmd.stub!(:generatetempfilename).and_return "tempfile.sql"
+  end
+  
   before(:each) do    
     @db = BW::DB.new
     @props["db"] = {"name" => "regulardb",
@@ -40,7 +36,7 @@ describe "Task: SQLCMD" do
     task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
     
     task.exectaskpublic
-    task.excecutedPop.should == "\"z:\\sqlcmd.exe\" -U theuser -P thepassword -S myhostname -e -v "+
+    task.excecutedPop.should == "\"z:\\sqlcmd.exe\" -U theuser -P thepassword -S myhostname -e -b -v "+
             "sqlserverdatadirectory=\"F:\\\" dbname=regulardb dbpassword=thepassword dbuser=theuser "+
             "-i tempfile.sql"
 
@@ -61,7 +57,7 @@ describe "Task: SQLCMD" do
     task.should_receive(:sql_tool).any_number_of_times.with("902").and_return("z:\\")
 
     task.exectaskpublic
-    task.excecutedPop.should == "\"z:\\sqlcmd.exe\" -E -S myhostname -e -v "+
+    task.excecutedPop.should == "\"z:\\sqlcmd.exe\" -E -S myhostname -e -b -v "+
             "sqlserverdatadirectory=\"F:\\\" dbname=regulardb dbpassword=thepassword dbuser=theuser "+
             "-i tempfile.sql"
 
@@ -84,7 +80,7 @@ describe "Task: SQLCMD" do
     task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
 
     task.exectaskpublic
-    task.excecutedPop.should == "\"z:\\sqlcmd.exe\" -U createuser -P createpassword -S myhostname -e -v "+
+    task.excecutedPop.should == "\"z:\\sqlcmd.exe\" -U createuser -P createpassword -S myhostname -e -b -v "+
             "sqlserverdatadirectory=\"F:\\\" dbname=regulardb dbpassword=thepassword dbuser=theuser "+
             "-i tempfile.sql"
 
@@ -105,7 +101,7 @@ describe "Task: SQLCMD" do
     task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
 
     task.exectaskpublic
-    task.excecutedPop.should == "\"z:\\sqlcmd.exe\" -E -S myhostname -e -v "+
+    task.excecutedPop.should == "\"z:\\sqlcmd.exe\" -E -S myhostname -e -b -v "+
             "sqlserverdatadirectory=\"F:\\\" dbname=regulardb dbpassword=thepassword dbuser=theuser "+
             "-i tempfile.sql"
 
@@ -125,7 +121,7 @@ describe "Task: SQLCMD" do
     task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
 
     task.exectaskpublic
-    task.excecutedPop.should == "\"z:\\sqlcmd.exe\" -U theuser -P thepassword -S myhostname -e -v "+
+    task.excecutedPop.should == "\"z:\\sqlcmd.exe\" -U theuser -P thepassword -S myhostname -e -b -v "+
             "sqlserverdatadirectory=\"F:\\\" dbname=regulardb var1=val1 dbpassword=yesitsoktooverride "+
             "dbuser=theuser -i tempfile.sql"
 

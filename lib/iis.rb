@@ -18,8 +18,7 @@ module BW
 		def exectask
             raise "You forgot to supply a service command (:start, :stop)" unless @command 
 			puts "Starting/Stopping IIS Service"
-			cmd = "net.exe #{@command} #{service}"
-			puts cmd
+			cmd = "net.exe #{@command} #{service}"			
 			shell cmd do |ok,status|
 				ok or
 				if @command == :stop

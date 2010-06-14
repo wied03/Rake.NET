@@ -36,8 +36,13 @@ module BW
     private
     def exectask
 		genConfigFile
-		shell "java -jar #{jarpath}jsTestDriver-#{version}.jar#{portparam}#{browsers} --tests all#{testoutput}"
-		rm_rf configFile
+		cmd = "java -jar #{jarpath}jsTestDriver-#{version}.jar#{portparam}#{browsers} --tests all#{testoutput}"
+        shell cmd do |ok,status|
+           # We want to clean up our temp file in case we fail
+          rm_rf configFile
+          ok or
+          fail "Command failed with status (#{status.exitstatus}):"
+        end		
     end
 	
 	def genConfigFile
