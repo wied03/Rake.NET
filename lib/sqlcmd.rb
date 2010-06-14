@@ -35,6 +35,14 @@ module BW
     # * dbpassword
     attr_accessor :variables
 
+    # *Optional* Setting this to true will NOT execute sqlcmd at all, but instead will go through
+    # the source files supplied and replace any hard coded host names, database names, or any other
+    # variables with sqlcmd style $(variable)s to make scripts more dynamic.  It's useful when
+    # taking scripts creating on a single developer machine and prepping them for checkin.
+    # Default is false.
+    
+    attr_accessor :makedynamic
+
     private
 
     HEADER = "-- *************************************************************"
@@ -47,6 +55,11 @@ module BW
     end
 
     def exectask
+      if @makedynamic
+        processdynamic
+        return
+      end
+      
       createtempfile
       exe = "\"#{path}sqlcmd.exe\""
       args = "#{connect} -e -b #{variables_flat} -i #{@tempfile}"
@@ -59,6 +72,21 @@ module BW
 	  end
     end
 
+    def processdynamic
+       vars = variables
+       @files.each do |fileName|
+         next if File.directory? fileName
+         text = File.read(fileName)
+         vars.each do |setting,value|
+           text.gsub!(value,
+                      "$(#{setting})")
+         end
+         File.open fileName, "w" do |newFile|
+            newFile.puts text
+         end
+       end
+    end
+
     def Sqlcmd.getdir directory
       parentDir = File.dirname directory
       directory[parentDir.length+1..-1]
@@ -69,19 +97,28 @@ module BW
         file.puts HEADER
         file.puts "-- BEGIN BATCH SQL RUN"
         file.puts HEADER
+        file.puts
 
         @files.each do |input|
           if File.directory? input
             containingdir = Sqlcmd.getdir input
 
+            file.puts
+            file.puts
             file.puts HEADER
             file.puts "-- Running #{containingdir}..."
             file.puts HEADER
+            file.puts
+            file.puts
+
           else
             file.puts ":r #{input}"
           end
         end
 
+        file.puts
+        file.puts
+        file.puts
         file.puts HEADER
         file.puts "-- COMPLETED BATCH SQL RUN"
         file.puts HEADER

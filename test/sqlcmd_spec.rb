@@ -26,6 +26,7 @@ describe "Task: SQLCMD" do
   after(:each) do
     # Remove our generated test data
     FileUtils::rm_rf "data/output/tempfile.sql"
+    FileUtils::rm_rf "data/output/makedynamic"
   end
 
   it "Should work with default version and default (non create) credentials in SQL auth mode" do
@@ -145,6 +146,23 @@ describe "Task: SQLCMD" do
     File.exist?("tempfile.sql").should_not == true
     # Our test code should have done this 
     File.exist?("data/output/tempfile.sql").should == true    
+  end
+
+  it "Properly changes strings to dynamic ones in SQL files" do
+    FileUtils::cp_r "data/sqlcmd/makedynamic", "data/output"
+
+    task = BW::Sqlcmd.new do |sql|
+      sql.files = FileList['data/output/makedynamic/**/*']
+      sql.makedynamic = true
+    end
+
+    task.exectaskpublic
+
+    task.excecutedPop.should == nil
+
+    expected = IO.readlines("data/sqlcmd/dynamic_expected.sql")
+    actual = IO.readlines("data/output/makedynamic/01-tables/dynamic_input.sql")
+    actual.should == expected
   end
   
 end

@@ -30,6 +30,7 @@ module BW
         end
 
         def excecutedPop
+          return nil unless @sh
           @sh.pop()
         end
     end
