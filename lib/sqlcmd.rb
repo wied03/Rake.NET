@@ -106,12 +106,13 @@ module BW
             file.puts
             file.puts
             file.puts HEADER
-            file.puts "-- Running #{containingdir}..."
+            file.puts "-- Directory: #{containingdir}..."
             file.puts HEADER
             file.puts
             file.puts
 
           else
+            file.puts "-- Script: #{input}"
             file.puts ":r #{input}"
           end
         end

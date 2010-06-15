@@ -78,4 +78,22 @@ describe "Task: BCP Data Loading" do
     lambda {task.exectaskpublic}.should raise_exception()     
   end
 
+  it "Handles failure gracefully" do
+    task = BW::BCP.new do |bcp|
+      bcp.files = FileList["data/bcp/01-firsttable.csv",
+                           "data/bcp/02-nexttable.csv"]
+    end
+
+    # Don't want to depend on specific registry setting
+    task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
+
+    task.stub!(:shell).and_yield(nil, DummyProcessStatus.new)
+
+    lambda {task.exectaskpublic}.should raise_exception("Command failed with status (BW Rake Task Problem):")
+
+    # This means our temporary file was correctly cleaned up
+    File.exist?("#{ENV['tmp']}/bcp").should_not == true
+    # Our test code should have done this
+    File.exist?("data/output/bcp").should == true
+  end
 end

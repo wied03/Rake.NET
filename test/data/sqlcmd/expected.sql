@@ -5,19 +5,22 @@
 
 
 -- *************************************************************
--- Running 01-tables...
+-- Directory: 01-tables...
 -- *************************************************************
 
 
+-- Script: data/sqlcmd/input/01-tables/01-thistable.sql
 :r data/sqlcmd/input/01-tables/01-thistable.sql
+-- Script: data/sqlcmd/input/01-tables/02-thattable.sql
 :r data/sqlcmd/input/01-tables/02-thattable.sql
 
 
 -- *************************************************************
--- Running 02-indexes...
+-- Directory: 02-indexes...
 -- *************************************************************
 
 
+-- Script: data/sqlcmd/input/02-indexes/01-thisindex.sql
 :r data/sqlcmd/input/02-indexes/01-thisindex.sql
 
 
