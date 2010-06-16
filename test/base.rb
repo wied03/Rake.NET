@@ -6,6 +6,7 @@ require 'config'
 
 Spec::Runner.configure do |config|
 
+  # File dependent tests, so we always baseline ourselves in the test directory
   config.before(:all) do
     @current = pwd
     cd File.expand_path(File.dirname(__FILE__))

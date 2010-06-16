@@ -7,7 +7,7 @@ def testdata
 end
 
 describe "Task: SQLCMD" do
-  before(:all) do
+  before(:each) do
     # It uses the current date, which is harder to test
     BW::Sqlcmd.stub!(:generatetempfilename).and_return "tempfile.sql"
   end
