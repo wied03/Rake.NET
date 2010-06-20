@@ -46,7 +46,9 @@ module BW
     private
 
     HEADER = "-- *************************************************************"
-    
+    CONNECT_STRING_WINAUTH = "-E -S %s"
+    CONNECT_STRING_SQLAUTH = "-U %s -P %s -S %s"
+
     def initialize (parameters = :task)
       super parameters
       @dbprops = DB.new
@@ -146,26 +148,26 @@ module BW
     def connect
       creating ? connect_create : connect_use
     end
-
+   
     # Use this while creating tables/indexes/etc. (NOT creating a database)
     def connect_use
         if @dbprops.dbprops['use']['mode'] == "winauth"
-            "-E -S %s" % [@dbprops.host]
+            CONNECT_STRING_WINAUTH % [@dbprops.host]
         else
-            "-U %s -P %s -S %s" % [@dbprops.user,
-                                   @dbprops.dbprops['use']['password'],
-                                   @dbprops.host]
+            CONNECT_STRING_SQLAUTH % [@dbprops.user,
+                                      @dbprops.dbprops['use']['password'],
+                                      @dbprops.host]
         end
     end
 
     # Use this while creating a database
     def connect_create
         if @dbprops.dbprops['create']['mode'] == "winauth"
-            "-E -S %s" % [@dbprops.host]
+            CONNECT_STRING_WINAUTH % [@dbprops.host]
         else
-            "-U %s -P %s -S %s" % [@dbprops.dbprops['create']['user'],
-                                   @dbprops.dbprops['create']['password'],
-                                   @dbprops.host]
+            CONNECT_STRING_SQLAUTH % [@dbprops.dbprops['create']['user'],
+                                      @dbprops.dbprops['create']['password'],
+                                      @dbprops.host]
         end
     end
 

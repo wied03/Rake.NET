@@ -1,3 +1,4 @@
+require 'basetask'
 require 'windowspaths'
 
 module BW
@@ -14,22 +15,21 @@ module BW
         private
         
 		def exectask
-			@path = visual_studio_path
-			sh2 "\"#{@path}MSTest.exe\"#{testcontainers}"
+			shell "\"#{path}MSTest.exe\"#{testcontainers}"
 		end
 		
 		def testcontainers
 			specifier = " /testcontainer:"
 			mainstr = files.join(specifier)
 			specifier+mainstr
-		end
+        end
+
+        def path
+           visual_studio version
+        end
 		
 		def version
-			if @version
-				@version
-			else
-				"10.0"
-			end
+			@version || "10.0"
 		end
 	end
 end
