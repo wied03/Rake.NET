@@ -5,12 +5,16 @@ module BW
 
     # Launches a build using MSBuild
 	class MSBuild < BaseTask
+        DOTNET4_REG_PATH = "v4\\Client"
+        DOTNET35_REGPATH = "v3.5"
+        DOTNET2_HARDCODEDPATH = "C:\\Windows\\Microsoft.NET\\Framework\\v2.0.50727\\"
         include WindowsPaths
 
         # *Optional* Targets to build
 		attr_accessor :targets
 
-        # *Optional* Version of the MSBuild binary to use. Defaults to "4.0"
+        # *Optional* Version of the MSBuild binary to use. Defaults to :v4
+        # Other options are :v2 or :v3_5
         attr_accessor :dotnet_bin_version
 
         # *Optional* Solution file to build
@@ -66,11 +70,18 @@ module BW
 				keyvalue << "#{prop}=#{set}"
 			end
 			" /property:"+keyvalue.join(";")
-		end		
-		
-		def path
-          ver = @dotnet_bin_version || "4.0"
-		  dotnet ver
 		end
+
+        def path
+          symbol = @dotnet_bin_version || :v4
+          case symbol
+            when :v4
+              dotnet DOTNET4_REG_PATH
+            when :v3_5
+              dotnet DOTNET35_REGPATH
+            when :v2
+              DOTNET2_HARDCODEDPATH
+          end
+        end
 	end
 end
