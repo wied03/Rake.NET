@@ -4,6 +4,7 @@ require 'rake/gempackagetask'
 require 'spec/rake/spectask'
 require 'rake/rdoctask'
 require 'lib/version'
+require 'ci/reporter/rake/rspec'
 
 Spec::Rake::SpecTask.new :spec do |t|
   t.spec_files = FileList['test/**/*_spec.rb']
