@@ -1,4 +1,12 @@
-require 'msbuild'
+require "bcp"
+require "sqlcmd"
+require "tools"
+require "msbuild"
+require "mstest"
+require "minifyjs"
+require "iis"
+require "jstest"
+require "config"
 
 with('Distribution') do |dist|
 	BW::MinifyJs.new :minify_js do |js|
