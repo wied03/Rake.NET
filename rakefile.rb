@@ -20,13 +20,14 @@ task :install do
 end
 
 spec = Gem::Specification.new do |s|
-  s.name = 'raketasks'
+  s.name = 'rakedotnet'
   s.version = BW::Version.incrementandretrieve
   s.summary = "Rake tasks for building .NET projects"
   s.description = s.summary
   s.files = FileList['lib/**/*.rb', 'test/**/*.rb']
   s.test_files = FileList['test/**/*.rb']
-  s.has_rdoc = false
+  s.has_rdoc = true
+  s.rdoc_options << '--inline-source' <<  '--line-numbers'
   s.author = "Brady Wied"
   s.email = "brady@wied.us"
   s.add_dependency('fastercsv', '>= 1.5.0')
@@ -36,11 +37,4 @@ spec = Gem::Specification.new do |s|
 end
 
 Rake::GemPackageTask.new(spec) do |pkg|
-end
-
-Rake::RDocTask.new do |rd|
-  rd.rdoc_dir = 'doc/rdocs'
-  rd.rdoc_files.include "lib/**/*"
-  rd.options << '--inline-source'
-  rd.options << '--line-numbers'
 end
