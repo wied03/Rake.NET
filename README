@@ -1,6 +1,7 @@
 This is a set of Rake tasks for .NET
 
-The BWYAMLConfig dependent GEM can be obtained here on Github
+The BWYAMLConfig dependent GEM can be obtained here:
+http://github.com/wied03/YAMLConfig/downloads
 
 See the examples/ directory for how you can structure your RakeFile and config files:
 
