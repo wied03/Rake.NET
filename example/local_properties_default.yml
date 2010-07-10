@@ -2,12 +2,12 @@ project:
  prefix: BSW
 
 db:
- hostname: localhost
+ hostname: localhost\sqlexpress
  name: &dbName @prefix@-@thismachinehostname@ 
 
  create:
   # winauth or sqlauth
-  mode: sqlauth
+  mode: winauth
   user: user
   password: password
  
@@ -16,7 +16,7 @@ db:
   mode: sqlauth
   password: password
   user: *dbName
-  data-dir: D:\Data
+  data-dir: D:\sqlserverdata
 
  connect-strings:
   winauth: Data Source=@host@;Initial Catalog=@initialcatalog@;Persist Security Info=True;Min Pool Size=20;Max Pool Size=500;Connection Timeout=15;Trusted_Connection=Yes	  

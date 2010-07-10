@@ -1,0 +1,6 @@
+Here is an example project with a Rakefile intact
+
+This was a simple ASP.Net MVC solution created with VS2010 Beta 2.  I need to reinstall VS2010 final
+and make sure it works properly there.
+
+The db tasks require SQL Server client tools to be installed on your machine
