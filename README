@@ -1,0 +1,11 @@
+This is a set of Rake tasks for .NET
+
+The BWYAMLConfig dependent GEM can be obtained here on Github
+
+See the examples/ directory for how you can structure your RakeFile and config files:
+
+General rule of thumb is as follows:
+
+- Rakefile (versioned) - specific to your code base
+- local_properties_default.yml - Machine/build specific defaults (versioned) based on your machines or particulars of a build you might create (e.g. test,prod)
+- local_properties.yml (not versioned) - allows users/environments to supercede machine/build specific defaults
