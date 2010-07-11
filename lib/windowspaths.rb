@@ -23,7 +23,6 @@ module BW
               puts "Retrieving registry key #{key}\\#{value}"
               # workaround to make sure we have 64 bit registry access
               ourKeyRead = Win32::Registry::Constants::KEY_READ |
-						   Windows::Registry::KEY_WOW64_32KEY |
 						   Windows::Registry::KEY_WOW64_64KEY
               Win32::Registry::HKEY_LOCAL_MACHINE.open(key, ourKeyRead) do |reg|
                   return reg[value]
