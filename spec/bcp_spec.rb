@@ -96,4 +96,19 @@ describe "Task: BCP Data Loading" do
     # Our test code should have done this
     File.exist?("data/output/bcp").should == true
   end
+
+  it "Properly disables identity inserts when set" do
+    task = BW::BCP.new do |bcp|
+      bcp.identity_inserts = true
+      bcp.files = FileList["data/bcp/01-firsttable.csv",
+                           "data/bcp/02-nexttable.csv"]
+    end
+    # Don't want to depend on specific registry setting
+    task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
+
+    task.exectaskpublic
+    task.excecutedPop.should == "\"z:\\bcp.exe\" \"nexttable\" in 02-nexttable.csv -U theuser -P thepassword /Smyhostname -t \"|d3l1m1t3r|\" /c -E -m 1 -F 2"
+    task.excecutedPop.should == "\"z:\\bcp.exe\" \"firsttable\" in 01-firsttable.csv -U theuser -P thepassword /Smyhostname -t \"|d3l1m1t3r|\" /c -E -m 1 -F 2"
+
+  end
 end

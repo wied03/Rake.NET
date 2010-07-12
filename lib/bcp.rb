@@ -30,6 +30,10 @@ loading them in with BCP.
 #      *Optional* By default, this looks for your installed version of BCP with SQL Server 2008.
 #      If you're using SQL Server 2005, set this to "90"
         attr_accessor :version
+
+        # *Optional* If this is set to true, then BCP's "-E" command line argument will be used.  If you
+        # have primary keys in your files you wish to preserve, set this to true.  Default is false.
+        attr_accessor :identity_inserts
       
 		include WindowsPaths
 
@@ -59,7 +63,7 @@ loading them in with BCP.
                     # need to trim off both the extension and the leading 2 numbers/hyphen
                     sequenceAndTable = File.basename(csv, ".csv")
                     tableName = sequenceAndTable.match(/\d+-(.*)/)[1]
-                    args = "\"#{prefix}#{tableName}\" in #{fileName} #{connect_string} -t \"#{delimiter}\" /c -m 1 -F 2"
+                    args = "\"#{prefix}#{tableName}\" in #{fileName} #{connect_string} -t \"#{delimiter}\" /c #{identity_inserts}-m 1 -F 2"
 
                     shell "\"#{path}bcp.exe\" #{args}" do |ok,status|
                       if !ok
@@ -111,6 +115,10 @@ loading them in with BCP.
               else
                   ""
               end
+          end
+
+          def identity_inserts
+            @identity_inserts ? "-E " : ""
           end
 
           def connect_string
