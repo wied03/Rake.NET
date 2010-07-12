@@ -87,7 +87,7 @@ describe "Task: BCP Data Loading" do
     # Don't want to depend on specific registry setting
     task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
 
-    task.stub!(:shell).and_yield(nil, DummyProcessStatus.new)
+    task.stub!(:shell).and_yield(nil, SimulateProcessFailure.new)
 
     lambda {task.exectaskpublic}.should raise_exception("Command failed with status (BW Rake Task Problem):")
 

@@ -92,7 +92,7 @@ describe "Task: JSTest" do
       js.files = jspath
     end
 
-    task.stub!(:shell).and_yield(nil, DummyProcessStatus.new)
+    task.stub!(:shell).and_yield(nil, SimulateProcessFailure.new)
 
     lambda {task.exectaskpublic}.should raise_exception("Command failed with status (BW Rake Task Problem):")
 

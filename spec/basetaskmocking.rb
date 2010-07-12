@@ -36,7 +36,7 @@ module BW
     end
 end
 
-class DummyProcessStatus
+class SimulateProcessFailure
   def exitstatus
     return "BW Rake Task Problem"
   end

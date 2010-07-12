@@ -24,7 +24,7 @@ describe "Task: IIS Start/Stop" do
       task.service = "SVC"
     end
 
-    task.stub!(:shell).and_yield(nil, DummyProcessStatus.new)
+    task.stub!(:shell).and_yield(nil, SimulateProcessFailure.new)
     task.exectaskpublic
   end
 
@@ -33,7 +33,7 @@ describe "Task: IIS Start/Stop" do
       task.command = :start
     end
 
-    task.stub!(:shell).and_yield(nil, DummyProcessStatus.new)
+    task.stub!(:shell).and_yield(nil, SimulateProcessFailure.new)
     lambda {task.exectaskpublic}.should raise_exception(RuntimeError,
                                                          "Command failed with status (BW Rake Task Problem):")
   end

@@ -54,6 +54,7 @@ end
 with('Database') do |d|
 	BW::BCP.new :db_data do |bcp|
 		bcp.files = FileList["#{d}/data/*.csv"]
+        bcp.identity_inserts = true
     end
 
 	task :db => [:db_schema, :db_objects]
