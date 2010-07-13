@@ -123,7 +123,7 @@ describe "Task: SQLCMD" do
 
     task.exectaskpublic
     task.excecutedPop.should == "\"z:\\sqlcmd.exe\" -U theuser -P thepassword -S myhostname -e -b -v "+
-            "sqlserverdatadirectory=\"F:\\\" dbname=regulardb var1=val1 dbpassword=yesitsoktooverride "+
+            "sqlserverdatadirectory=\"F:\\\" var1=val1 dbname=regulardb dbpassword=yesitsoktooverride "+
             "dbuser=theuser -i tempfile.sql"
 
     expected = IO.readlines("data/sqlcmd/expected.sql")

@@ -5,7 +5,6 @@ require 'spec/rake/spectask'
 require 'rake/rdoctask'
 require 'lib/version'
 require 'lib/tools'
-require 'ci/reporter/rake/rspec'
 
 task :ci => :spec
 
