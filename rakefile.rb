@@ -7,6 +7,8 @@ require 'lib/version'
 require 'lib/tools'
 require 'ci/reporter/rake/rspec'
 
+task :ci => :spec
+
 with("spec") do |testdir|
   Spec::Rake::SpecTask.new(:spec) do |t|
     t.spec_files = FileList["#{testdir}/**/*_spec.rb"]
