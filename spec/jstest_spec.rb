@@ -6,6 +6,16 @@ def jspath
   FileList["data/jstest/path/**/*.js"]
 end
 
+Spec::Matchers.define :same_js_config do |expected|
+    match do |actual|
+      expected['server'] == actual['server']
+      expLoad = expected['load']
+      actLoad = actual['load']
+      expLoad.each { |file| actLoad.should include file }
+      actLoad.each { |file| expLoad.should include file }
+    end
+end
+
 describe "Task: JSTest" do
   before(:each) do
     ENV["CCNetProject"] = nil
@@ -27,9 +37,9 @@ describe "Task: JSTest" do
             "--browser iexplore.exe,firefox.exe --tests all"
 
     expected = YAML::load(File.read("data/jstest/jsTestDriver_expected.conf"))
-    actual = YAML::load(File.read("data/output/jsTestDriver.conf"))    
+    actual = YAML::load(File.read("data/output/jsTestDriver.conf"))
 
-    actual.should == expected
+    actual.should same_js_config(expected)    
   end
 
   it "Standard Test With Browsers and Files In CI tool" do
@@ -46,7 +56,7 @@ describe "Task: JSTest" do
     expected = YAML::load(File.read("data/jstest/jsTestDriver_expected.conf"))
     actual = YAML::load(File.read("data/output/jsTestDriver.conf"))    
 
-    actual.should == expected
+    actual.should same_js_config(expected)
   end
 
   it "Standard Test With Browsers and Files with manual XML config" do
@@ -63,7 +73,7 @@ describe "Task: JSTest" do
     expected = YAML::load(File.read("data/jstest/jsTestDriver_expected.conf"))
     actual = YAML::load(File.read("data/output/jsTestDriver.conf"))
 
-    actual.should == expected
+    actual.should same_js_config(expected)
   end
 
   it "Custom version, Test Output, JAR path, port, and server" do
@@ -83,7 +93,7 @@ describe "Task: JSTest" do
     expected = YAML::load(File.read("data/jstest/jsTestDriver_expected_custom.conf"))
     actual = YAML::load(File.read("data/output/jsTestDriver.conf"))
 
-    actual.should == expected
+    actual.should same_js_config(expected)
   end
 
   it "Should clean up generated file if JS-Test-Driver fails" do
