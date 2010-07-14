@@ -26,8 +26,8 @@ describe "Task: JSTest" do
     task.excecutedPop.should == "java -jar lib/jsTestDriver-1.2.1.jar --port 9876 "+
             "--browser iexplore.exe,firefox.exe --tests all"
 
-    expected = IO.readlines("data/jstest/jsTestDriver_expected.conf")
-    actual = IO.readlines("data/output/jsTestDriver.conf")
+    expected = YAML::load(File.read("data/jstest/jsTestDriver_expected.conf"))
+    actual = YAML::load(File.read("data/output/jsTestDriver.conf"))    
 
     actual.should == expected
   end
@@ -43,8 +43,8 @@ describe "Task: JSTest" do
     task.excecutedPop.should == "java -jar lib/jsTestDriver-1.2.1.jar --port 9876 "+
             "--browser iexplore.exe,firefox.exe --tests all --testOutput ."
 
-    expected = IO.readlines("data/jstest/jsTestDriver_expected.conf")
-    actual = IO.readlines("data/output/jsTestDriver.conf")
+    expected = YAML::load(File.read("data/jstest/jsTestDriver_expected.conf"))
+    actual = YAML::load(File.read("data/output/jsTestDriver.conf"))    
 
     actual.should == expected
   end
@@ -60,8 +60,8 @@ describe "Task: JSTest" do
     task.excecutedPop.should == "java -jar lib/jsTestDriver-1.2.1.jar --port 9876 "+
             "--browser iexplore.exe,firefox.exe --tests all --testOutput ."
 
-    expected = IO.readlines("data/jstest/jsTestDriver_expected.conf")
-    actual = IO.readlines("data/output/jsTestDriver.conf")
+    expected = YAML::load(File.read("data/jstest/jsTestDriver_expected.conf"))
+    actual = YAML::load(File.read("data/output/jsTestDriver.conf"))
 
     actual.should == expected
   end
@@ -80,13 +80,13 @@ describe "Task: JSTest" do
     task.excecutedPop.should == "java -jar newpath/jsTestDriver-1.2.1.jar "+
             "--tests all --testOutput testdir"
 
-    expected = IO.readlines("data/jstest/jsTestDriver_expected_custom.conf")
-    actual = IO.readlines("data/output/jsTestDriver.conf")
+    expected = YAML::load(File.read("data/jstest/jsTestDriver_expected_custom.conf"))
+    actual = YAML::load(File.read("data/output/jsTestDriver.conf"))
 
     actual.should == expected
   end
 
-  it "Should clean up generated file is JS-Test-Driver fails" do
+  it "Should clean up generated file if JS-Test-Driver fails" do
     task = BW::JsTest.new do |js|
       js.browsers = ["iexplore.exe", "firefox.exe"]
       js.files = jspath
