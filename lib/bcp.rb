@@ -43,7 +43,7 @@ loading them in with BCP.
           def initialize (parameters = :task)
             super parameters
             @dbprops = DB.new
-            @tmp = "#{ENV['tmp']}/bcp"
+            @tmp = "#{ENV['TMP']}/bcp"
           end
 
           def create_temp
