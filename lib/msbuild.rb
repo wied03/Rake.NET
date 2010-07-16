@@ -82,7 +82,7 @@ module BW
 
         def convertToNumber symbol
           trimmedV = symbol.to_s()[1..-1]
-          trimmedV.gsub (/_/, '.')
+          trimmedV.gsub(/_/, '.')
         end
 
         def path
