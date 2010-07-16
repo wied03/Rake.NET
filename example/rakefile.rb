@@ -37,7 +37,7 @@ end
 
 task :test => [:codetest, :jstest]
 
-with ('test') do |t|
+with ('Tests') do |t|
 	BW::MSTest.new :codetest => :build do |test|
 		test.files = FileList["#{t}/**/bin/Debug/*.Tests.dll"]
 	end
