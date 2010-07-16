@@ -42,12 +42,12 @@ module BW
 
       # Using the template in the YAML files, produces a .NET connect string
       def connect_code
-          prop = dbprops['connect-strings']
+          connects = dbprops['connect-strings']
           if dbprops['use']['mode'] == "winauth"
-              prop['winauth'].gsub(/@host@/,host).
+              connects['winauth'].gsub(/@host@/,host).
                               gsub(/@initialcatalog@/, name)
           else
-              prop['sqlauth'].gsub(/@host@/,host).
+              connects['sqlauth'].gsub(/@host@/,host).
                               gsub(/@initialcatalog@/, name).
                               gsub(/@user@/, user).
                               gsub(/@password@/, dbprops['use']['password'])
