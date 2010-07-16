@@ -1,5 +1,4 @@
-require 'win32/registry'
-require 'windows/registry'
+require 'registry_accessor'
 
 module BW
 	module WindowsPaths
@@ -22,33 +21,8 @@ module BW
           def regvalue(key, value)
               keyAndVal = "#{key}\\#{value}"
               log "Retrieving registry key #{keyAndVal}"
-              begin
-                regvalue64(key, value)
-              rescue
-                begin
-                  regvalue32(key, value)
-                rescue
-                  raise "Unable to find registry value in either 32 or 64 bit mode: #{keyAndVal}"
-                end
-              end
-          end
-
-          def regvalue64(key, value)
-             # workaround to make sure we have 64 bit registry access
-              ourKeyRead = Win32::Registry::Constants::KEY_READ |
-						   Windows::Registry::KEY_WOW64_64KEY
-              Win32::Registry.open(Win32::Registry::HKEY_LOCAL_MACHINE,
-                                   key,
-                                   ourKeyRead) do |reg|
-                  return reg[value]
-              end
-          end
-
-          def regvalue32(key, value)
-            Win32::Registry.open(Win32::Registry::HKEY_LOCAL_MACHINE,
-                                 key) do |reg|
-                return reg[value]
-            end
+              regacc = BW::RegistryAccessor.new
+              regacc.regvalue(key,value)
           end
 	end
 end
