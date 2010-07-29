@@ -1,7 +1,7 @@
 require "base"
 require "registry_accessor"
 
-describe "Registry Accessor" do
+describe BW::RegistryAccessor do
   before(:each) do
     @p = BW::RegistryAccessor.new
   end

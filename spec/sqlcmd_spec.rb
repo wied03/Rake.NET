@@ -6,7 +6,7 @@ def testdata
   FileList["data/sqlcmd/input/**/*"]
 end
 
-describe "Task: SQLCMD" do
+describe BW::Sqlcmd do
   before(:each) do
     # It uses the current date, which is harder to test
     BW::Sqlcmd.stub!(:generatetempfilename).and_return "tempfile.sql"

@@ -1,7 +1,7 @@
 require "base"
 require "db"
 
-describe "Database Utilities" do
+describe BW::DB do
   before(:each) do
     @db = BW::DB.new
     @props["db"] = {"name" => "regulardb"}

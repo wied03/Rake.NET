@@ -16,7 +16,7 @@ Spec::Matchers.define :same_js_config do |expected|
     end
 end
 
-describe "Task: JSTest" do
+describe BW::JsTest do
   before(:each) do
     ENV["CCNetProject"] = nil
   end

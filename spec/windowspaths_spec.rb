@@ -8,7 +8,7 @@ class PathTester
   end
 end
 
-describe "Windows Paths" do
+describe BW::WindowsPaths do
   before(:each) do
     @p = PathTester.new
     @regmock = BW::RegistryAccessor.new

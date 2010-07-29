@@ -2,7 +2,7 @@ require "base"
 require "bcp"
 require "basetaskmocking"
 
-describe "Task: BCP Data Loading" do
+describe BW::BCP do
   before(:each) do
     @props["db"] = {"name" => "regulardb"}
     @props["db"]["hostname"] = "myhostname"

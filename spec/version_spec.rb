@@ -1,7 +1,7 @@
 require "base"
 require "version"
 
-describe "Version Incrementer" do
+describe BW::Version do
   after(:each) do
     FileUtils::rm_rf "VERSION.yml"    
   end

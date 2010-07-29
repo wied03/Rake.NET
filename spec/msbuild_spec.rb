@@ -2,7 +2,7 @@ require "base"
 require "msbuild"
 require "basetaskmocking"
 
-describe "Task: MSBuild" do
+describe BW::MSBuild do
 
   it "should build OK vanilla (.NET 4.0)" do
     task = BW::MSBuild.new

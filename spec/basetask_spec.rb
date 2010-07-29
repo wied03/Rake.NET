@@ -2,18 +2,7 @@ require "base"
 require "basetask"
 require "basetaskmocking"
 
-# Need to get access to our private dependencies property
-module BW
-	class BaseTask < Rake::TaskLib
-		attr_accessor :testdiditrun
-        
-        def exectask
-          @testdiditrun = true
-        end        
-    end
-end
-
-describe "Base Task" do
+describe BW::BaseTask do
   before(:each) do
     Rake::Task.clear
   end
@@ -23,8 +12,8 @@ describe "Base Task" do
     task.name.should == :task
     task.dependencies.should == nil
     task.unless.should == nil
+    task.should_receive(:exectask)
     Rake::Task[:task].invoke
-    task.testdiditrun.should == true
     task.testoutput.should == "Running task: task"
   end
 
@@ -33,8 +22,8 @@ describe "Base Task" do
     task.name.should == "mytask"
     task.dependencies.should == nil
     task.unless.should == nil
+    task.should_receive(:exectask)
     Rake::Task[:mytask].invoke
-    task.testdiditrun.should == true
     task.testoutput.should == "Running task: mytask"
   end
 
@@ -43,12 +32,12 @@ describe "Base Task" do
     task.name.should == "mytask"
     task.dependencies.should == :dependenttask
     task.unless.should == nil
-    
+
     dtask = BW::BaseTask.new "dependenttask"
+    task.should_receive(:exectask)
+    dtask.should_receive(:exectask)
     Rake::Task[:mytask].invoke
-    
-    task.testdiditrun.should == true
-    dtask.testdiditrun.should == true
+
     dtask.testoutput.should == "Running task: dependenttask"
     task.testoutput.should == "Running task: mytask"
   end
@@ -62,10 +51,10 @@ describe "Base Task" do
     task.unless.should == "yes"
 
     dtask = BW::BaseTask.new "dependenttask"
+    task.should_not_receive(:exectask)
+    dtask.should_not_receive(:exectask)
     Rake::Task[:mytask].invoke
 
-    task.testdiditrun.should == nil
-    dtask.testdiditrun.should == nil    
     task.testoutput.should == "Skipping task: mytask due to unless condition specified in rakefile"
   end
 end

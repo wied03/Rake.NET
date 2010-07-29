@@ -2,7 +2,7 @@ require "base"
 require "iis"
 require "basetaskmocking"
 
-describe "Task: IIS Start/Stop" do
+describe BW::IIS do
 
   it "Standard Command" do
     task = BW::IIS.new do |task|

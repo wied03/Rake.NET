@@ -2,7 +2,7 @@ require "base"
 require "mstest"
 require "basetaskmocking"
 
-describe "Task: MS Test" do
+describe BW::MSTest do
 
   it "Should work with default settings" do
     task = BW::MSTest.new do |test|
