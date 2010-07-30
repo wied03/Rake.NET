@@ -2,6 +2,12 @@ require "base"
 require "basetask"
 require "basetaskmocking"
 
+module BW
+  class BaseTask < Rake::TaskLib
+    attr_accessor :dependencies
+  end
+end
+
 describe BW::BaseTask do
   before(:each) do
     Rake::Task.clear
@@ -9,22 +15,22 @@ describe BW::BaseTask do
 
   it "Task with no dependencies/default name" do
     task = BW::BaseTask.new
+    task.should_receive(:log).with("Running task: task")
     task.name.should == :task
     task.dependencies.should == nil
     task.unless.should == nil
     task.should_receive(:exectask)
     Rake::Task[:task].invoke
-    task.testoutput.should == "Running task: task"
   end
 
   it "Task with no dependencies/custom name" do
     task = BW::BaseTask.new "mytask"
+    task.should_receive(:log).with("Running task: mytask")
     task.name.should == "mytask"
     task.dependencies.should == nil
     task.unless.should == nil
     task.should_receive(:exectask)
     Rake::Task[:mytask].invoke
-    task.testoutput.should == "Running task: mytask"
   end
 
   it "Task with dependencies/custom name" do
@@ -36,10 +42,10 @@ describe BW::BaseTask do
     dtask = BW::BaseTask.new "dependenttask"
     task.should_receive(:exectask)
     dtask.should_receive(:exectask)
-    Rake::Task[:mytask].invoke
 
-    dtask.testoutput.should == "Running task: dependenttask"
-    task.testoutput.should == "Running task: mytask"
+    task.should_receive(:log).with("Running task: mytask")
+    dtask.should_receive(:log).with("Running task: dependenttask")
+    Rake::Task[:mytask].invoke
   end
 
   it "Task with dependencies/custom name + block" do
@@ -53,8 +59,8 @@ describe BW::BaseTask do
     dtask = BW::BaseTask.new "dependenttask"
     task.should_not_receive(:exectask)
     dtask.should_not_receive(:exectask)
-    Rake::Task[:mytask].invoke
 
-    task.testoutput.should == "Skipping task: mytask due to unless condition specified in rakefile"
+    task.should_receive(:log).with("Skipping task: mytask due to unless condition specified in rakefile")
+    Rake::Task[:mytask].invoke
   end
 end

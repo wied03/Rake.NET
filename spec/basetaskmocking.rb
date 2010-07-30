@@ -4,16 +4,9 @@ require 'rake/tasklib'
 
 module BW
 	class BaseTask < Rake::TaskLib
-		attr_accessor :dependencies, :testdiditrun, :testoutput
-
         def exectaskpublic
           exectask
-        end
-
-        def log text
-          @testoutput = text
-          puts text
-        end
+        end       
 
         def shell(*cmd, &block)
           command = cmd.first
