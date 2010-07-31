@@ -10,6 +10,16 @@ module BW
 
         protected
 
+        # Validates whether value is in the allowed list and raises an exception, using name
+        # as documentation, if it does not
+        def self.validate(value, name, allowed)
+          if !allowed.include? value
+            symbols = allowed.collect {|sym| ":#{sym}"}
+            formatted = symbols.join(", ")
+            raise "Invalid #{name} value!  Allowed values: #{formatted}"
+          end
+        end
+
         def initialize(parameters = :task)
 			parseParams parameters
 			yield self if block_given?

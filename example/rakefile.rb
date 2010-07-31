@@ -63,29 +63,30 @@ with('Database') do |d|
 						:db_schema_grant]
 	
     BW::Sqlcmd.new :db_schema_create do |db|
-      db.usecreatecredentials = true
+      db.credentials = :system
       db.files = FileList["#{d}/schema/create_database.sql"]
     end
 	
 	BW::Sqlcmd.new :db_schema_grant do |db|
-	  db.usecreatecredentials = true
+	  db.credentials = :system
 	  db.files = FileList["#{d}/schema/grant_sqlauth.sql"]
 	end
 	
 	task :db_drop => [:db_schema_revoke, :db_schema_drop]
 	
 	BW::Sqlcmd.new :db_schema_revoke do |db|
-	  db.usecreatecredentials = true
+	  db.credentials = :system
 	  db.files = FileList["#{d}/schema/revoke_sqlauth.sql"]
 	end
 	
     BW::Sqlcmd.new :db_schema_drop do |db|
-      db.usecreatecredentials = true
+      db.credentials = :system
       db.files = FileList["#{d}/schema/drop_database.sql"]
     end
 
     BW::Sqlcmd.new :db_objects do |db|
       db.files = FileList["#{d}/objects/**/*"]
+      db.credentials = :objectcreation
     end
 	
 	BW::Sqlcmd.new :db_replacevars do |db|

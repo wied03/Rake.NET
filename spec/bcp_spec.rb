@@ -6,9 +6,9 @@ describe BW::BCP do
   before(:each) do
     @props["db"] = {"name" => "regulardb"}
     @props["db"]["hostname"] = "myhostname"
-    @props['db']["use"] = {"mode" => "sqlauth",
-                           "user" => "theuser",
-                           "password" => "thepassword"}
+    @props['db'][:general.to_s] = {"mode" => "sqlauth",
+                                   "user" => "theuser",
+                                   "password" => "thepassword"}
     @props["project"] = {"prefix" => "PRE"}
   end
 
@@ -43,7 +43,7 @@ describe BW::BCP do
   end
 
   it "Works OK with custom delimiters, Custom Version, and Windows Auth" do
-    @props['db']["use"] = {"mode" => "winauth"}
+    @props['db'][:general.to_s] = {"mode" => "winauth"}
     task = BW::BCP.new do |bcp|
       bcp.files = FileList["data/bcp/01-firsttable.csv",
                            "data/bcp/02-nexttable.csv"]

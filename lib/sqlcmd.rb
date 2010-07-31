@@ -23,16 +23,13 @@ module BW
     # *Optional* Version of SQL Server's sqlcmd to use.  Defaults to SQL Server 2008.  
     attr_accessor :version
 
-    # *Optional* If you're creating a database, pass true in here to use the config file's creation
-    # credentials instead of the regular credentials.  Defaults to false.
-    attr_accessor :usecreatecredentials
-
     # *Optional* By default, several variables are passed into SQLCMD based on the config file.
-    # Add yours in here as key value pairs if you want to send more.  Defaults:
-    # * dbname
-    # * sqlserverdatadirectory
-    # * dbuser
-    # * dbpassword
+    # Add yours in here as key value pairs if you want to send more.
+    # The following will be set by default:
+    # * dbname - all credentials
+    # * sqlserverdatadirectory - only when using :system credentials
+    # * dbuser -> general user, all credentials
+    # * dbpassword - > general password, only when using :system credentials
     attr_accessor :variables
 
     # *Optional* Setting this to true will NOT execute sqlcmd at all, but instead will go through
@@ -40,10 +37,26 @@ module BW
     # variables with sqlcmd style $(variable)s to make scripts more dynamic.  It's useful when
     # taking scripts creating on a single developer machine and prepping them for checkin.
     # Default is false.
-    
-    attr_accessor :makedynamic
+    attr_accessor :makedynamic    
+
+    # *Optional* Which set of DB credentials should be used?
+    # :system - for creation/deletion of databases
+    # :objectcreation - for adding/creating objects within a database
+    # :general - DEFAULT - for adding/deleting rows within a database (use this for code)
+    def credentials=(value)
+      BaseTask.validate value, "credentials", DB::CREDENTIALS
+      @credentials = value
+    end
+
+    def credentials
+      @credentials || :general
+    end
 
     private
+
+    def credentialsString
+      credentials.to_s
+    end
 
     HEADER = "-- *************************************************************"
     CONNECT_STRING_WINAUTH = "-E -S %s"
@@ -57,14 +70,14 @@ module BW
     end
 
     def exectask
-      if @makedynamic
+      if makedynamic
         processdynamic
         return
       end
       
       createtempfile
       exe = "\"#{path}sqlcmd.exe\""
-      args = "#{connect} -e -b #{variables_flat} -i #{@tempfile}"
+      args = "#{connect} -e -b#{variables_flat} -i #{@tempfile}"
       cmd = "#{exe} #{args}"
       shell cmd do |ok,status|
         # We want to clean up our temp file in case we fail
@@ -141,50 +154,37 @@ module BW
       sql_tool p
     end
 
-    def creating
-       @usecreatecredentials || false
-    end
-
     def connect
-      creating ? connect_create : connect_use
-    end
-   
-    # Use this while creating tables/indexes/etc. (NOT creating a database)
-    def connect_use
-        if @dbprops.dbprops['use']['mode'] == "winauth"
+      props = @dbprops.dbprops[credentialsString]
+      if props['mode'] == "winauth"
             CONNECT_STRING_WINAUTH % [@dbprops.host]
         else
-            CONNECT_STRING_SQLAUTH % [@dbprops.user,
-                                      @dbprops.dbprops['use']['password'],
+            CONNECT_STRING_SQLAUTH % [props["user"],
+                                      props['password'],
                                       @dbprops.host]
-        end
-    end
-
-    # Use this while creating a database
-    def connect_create
-        if @dbprops.dbprops['create']['mode'] == "winauth"
-            CONNECT_STRING_WINAUTH % [@dbprops.host]
-        else
-            CONNECT_STRING_SQLAUTH % [@dbprops.dbprops['create']['user'],
-                                      @dbprops.dbprops['create']['password'],
-                                      @dbprops.host]
-        end
-    end
+      end
+    end   
 
     def variables_flat
       keyvalue = []
       variables.each do |variable, setting|
+        setting = setting.include?(' ') ? "\"#{setting}\"" : setting
         keyvalue << "#{variable}=#{setting}"  
       end
-      "-v " + keyvalue.join(" ")
+      " -v " + keyvalue.join(" ") unless variables.empty?
     end
 
     def variables
+      # when we have usernames in SQL scripts, we're probably granting to a general purpose user, so that's why
+      # we use gen and not something else
       default =
         {'dbname' => @dbprops.name,
-         'sqlserverdatadirectory' => "\"#{@dbprops.dbprops['use']['data-dir']}\"",
-         'dbuser' => @dbprops.user,
-         'dbpassword' => @dbprops.dbprops['use']['password']}
+         'dbuser' => @dbprops.user}
+
+      if (credentials == :system || makedynamic)
+        default['sqlserverdatadirectory'] = "\"#{@dbprops.dbprops[:system.to_s]['data-dir']}\""
+        default['dbpassword'] = @dbprops.password
+      end
 
       default.merge @variables || {}
     end

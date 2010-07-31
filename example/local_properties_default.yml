@@ -5,17 +5,23 @@ db:
  hostname: localhost\sqlexpress
  name: &dbName @prefix@-@thismachinehostname@ 
 
- create:
+ objectcreation:
   # winauth or sqlauth
   mode: winauth
   user: user
   password: password
  
- use:
+ general:
   # winauth or sqlauth
   mode: sqlauth
   password: password
   user: *dbName
+
+ system:
+  # winauth or sqlauth
+  mode: winauth
+  user: user
+  password: password
   data-dir: D:\sqlserverdata
 
  connect-strings:

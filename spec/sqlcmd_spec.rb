@@ -17,10 +17,16 @@ describe BW::Sqlcmd do
     @props["db"] = {"name" => "regulardb",
                     "hostname" => "myhostname"}
     @props["project"] = {"prefix" => "PRE"}
-    @props['db']["use"] = {"mode" => "sqlauth",
-                           "user" => "theuser",
-                           "password" => "thepassword",
-                           "data-dir" => "F:\\"}    
+    @props['db'][:general.to_s] = {"mode" => "sqlauth",
+                                   "user" => "theuser",
+                                   "password" => "thepassword"}
+    @props['db'][:system.to_s] = {"mode" => "sqlauth",
+                                  "user" => "systemuser",
+                                  "password" => "systempassword",
+                                  "data-dir" => "F:\\"}
+    @props['db'][:objectcreation.to_s] = {"mode" => "sqlauth",
+                                          "user" => "objectcreateuser",
+                                          "password" => "objectcreatepassword"}
   end
 
   after(:each) do
@@ -35,20 +41,19 @@ describe BW::Sqlcmd do
     end
 
     task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
-    
+
     task.exectaskpublic
     task.excecutedPop.should == "\"z:\\sqlcmd.exe\" -U theuser -P thepassword -S myhostname -e -b -v "+
-            "sqlserverdatadirectory=\"F:\\\" dbname=regulardb dbpassword=thepassword dbuser=theuser "+
-            "-i tempfile.sql"
+            "dbname=regulardb dbuser=theuser -i tempfile.sql"
 
     expected = IO.readlines("data/sqlcmd/expected.sql")
     actual = IO.readlines("data/output/tempfile.sql")
 
-    actual.should == expected    
+    actual.should == expected
   end
 
   it "Should work with a custom version and default (non create) credentials in Win auth mode" do
-    @props['db']["use"]["mode"] = "winauth"
+    @props['db'][:general.to_s]["mode"] = "winauth"
 
     task = BW::Sqlcmd.new do |sql|
       sql.files = testdata
@@ -58,9 +63,7 @@ describe BW::Sqlcmd do
     task.should_receive(:sql_tool).any_number_of_times.with("902").and_return("z:\\")
 
     task.exectaskpublic
-    task.excecutedPop.should == "\"z:\\sqlcmd.exe\" -E -S myhostname -e -b -v "+
-            "sqlserverdatadirectory=\"F:\\\" dbname=regulardb dbpassword=thepassword dbuser=theuser "+
-            "-i tempfile.sql"
+    task.excecutedPop.should == "\"z:\\sqlcmd.exe\" -E -S myhostname -e -b -v dbname=regulardb dbuser=theuser -i tempfile.sql"
 
     expected = IO.readlines("data/sqlcmd/expected.sql")
     actual = IO.readlines("data/output/tempfile.sql")
@@ -68,20 +71,16 @@ describe BW::Sqlcmd do
     actual.should == expected
   end
 
-  it "Works fine with create credentials in SQL auth mode" do
-    @props['db']["create"] = {"mode" => "sqlauth",
-                              "user" => "createuser",
-                              "password" => "createpassword"}
-
+  it "Works fine with system credentials in SQL auth mode" do
     task = BW::Sqlcmd.new do |sql|
       sql.files = testdata
-      sql.usecreatecredentials = true
+      sql.credentials = :system
     end
 
     task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
 
     task.exectaskpublic
-    task.excecutedPop.should == "\"z:\\sqlcmd.exe\" -U createuser -P createpassword -S myhostname -e -b -v "+
+    task.excecutedPop.should == "\"z:\\sqlcmd.exe\" -U systemuser -P systempassword -S myhostname -e -b -v "+
             "sqlserverdatadirectory=\"F:\\\" dbname=regulardb dbpassword=thepassword dbuser=theuser "+
             "-i tempfile.sql"
 
@@ -91,12 +90,37 @@ describe BW::Sqlcmd do
     actual.should == expected 
   end
 
-  it "Works fine with create credentials in Win auth mode" do
-    @props['db']["create"] = {"mode" => "winauth"}
+  it "Fails properly with invalid credential specifier" do
+    task = BW::Sqlcmd.new do |sql|
+      sql.files = testdata
+      lambda {sql.credentials = :foo}.should raise_exception("Invalid credentials value!  Allowed values: :system, :objectcreation, :general")
+    end    
+  end
+
+  it "Works fine with objectcreation credentials in SQL auth mode" do
+    task = BW::Sqlcmd.new do |sql|
+      sql.files = testdata
+      sql.credentials = :objectcreation
+    end
+
+    task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
+
+    task.exectaskpublic
+    task.excecutedPop.should == "\"z:\\sqlcmd.exe\" -U objectcreateuser -P objectcreatepassword -S myhostname -e -b "+
+            "-v dbname=regulardb dbuser=theuser -i tempfile.sql"
+
+    expected = IO.readlines("data/sqlcmd/expected.sql")
+    actual = IO.readlines("data/output/tempfile.sql")
+
+    actual.should == expected
+  end
+
+  it "Works fine with system credentials in Win auth mode" do
+    @props['db'][:system.to_s]["mode"] = "winauth"
 
     task = BW::Sqlcmd.new do |sql|
       sql.files = testdata
-      sql.usecreatecredentials = true
+      sql.credentials = :system
     end
 
     task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
@@ -115,21 +139,44 @@ describe BW::Sqlcmd do
   it "Works fine with additional variables" do
     task = BW::Sqlcmd.new do |sql|
       sql.files = testdata
+      sql.credentials = :system
       sql.variables = { "var1" => "val1",
-                        "dbpassword" => "yesitsoktooverride"}
+                        "dbpassword" => "yesitsoktooverride",
+                        "spacevar" => "deals with space right"}
+    end
+
+    task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
+
+    task.exectaskpublic
+    task.excecutedPop.should == "\"z:\\sqlcmd.exe\" -U systemuser -P systempassword -S myhostname -e -b -v "+
+            "sqlserverdatadirectory=\"F:\\\" var1=val1 spacevar=\"deals with space right\" dbname=regulardb "+
+            "dbpassword=yesitsoktooverride dbuser=theuser -i tempfile.sql"
+
+    expected = IO.readlines("data/sqlcmd/expected.sql")
+    actual = IO.readlines("data/output/tempfile.sql")
+    actual.should == expected
+
+  end
+
+  it "Works fine with custom variables" do
+    task = BW::Sqlcmd.new do |sql|
+      sql.files = testdata
+      sql.variables = { "var1" => "val1",
+                        "dbpassword" => "yesitsoktooverride",
+                        "spacevar" => "deals with space right"}
     end
 
     task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
 
     task.exectaskpublic
     task.excecutedPop.should == "\"z:\\sqlcmd.exe\" -U theuser -P thepassword -S myhostname -e -b -v "+
-            "sqlserverdatadirectory=\"F:\\\" var1=val1 dbname=regulardb dbpassword=yesitsoktooverride "+
-            "dbuser=theuser -i tempfile.sql"
+            "var1=val1 spacevar=\"deals with space right\" dbname=regulardb dbpassword=yesitsoktooverride dbuser=theuser"+
+            " -i tempfile.sql"
 
     expected = IO.readlines("data/sqlcmd/expected.sql")
     actual = IO.readlines("data/output/tempfile.sql")
     actual.should == expected
-    
+
   end
   
   it "Fails the build properly (and gracefully) if sqlcmd has an error" do

@@ -110,7 +110,7 @@ loading them in with BCP.
           # BCP doesn't allow initial catalogs for SQL auth, but does for winauth and we need them
           # since winauth users might use several schemas
           def prefix
-              if @dbprops.dbprops['use']['mode'] == "winauth"
+              if @dbprops.general['mode'] == "winauth"
                   "%s.dbo." % [@dbprops.name]
               else
                   ""
@@ -122,11 +122,12 @@ loading them in with BCP.
           end
 
           def connect_string
-            if @dbprops.dbprops['use']['mode'] == "winauth"
+            gen = @dbprops.general
+            if gen['mode'] == "winauth"
                 "-T -S %s" % [@dbprops.host]
             else
                 "-U %s -P %s /S%s" % [@dbprops.user,
-                                      @dbprops.dbprops['use']['password'],
+                                      @dbprops.password,
                                       @dbprops.host]
             end
           end

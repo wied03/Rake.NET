@@ -17,21 +17,31 @@ describe BW::DB do
     @db.name.should == "PRE-"+Socket.gethostname
   end
 
+  it "General props" do
+    @props["db"][:general.to_s] = "foo"
+    @db.general.should == "foo"
+  end
+
   it "User plain" do
-    @props["db"]["use"] = {"user" => "username"}
+    @props["db"][:general.to_s] = {"user" => "username"}
     @db.user.should == "username"
   end
 
+  it "Password" do
+    @props["db"][:general.to_s] = {"password" => "thepassword"}
+    @db.password.should == "thepassword"
+  end
+
   it "User hostname/prefix" do
-    @props["db"]["use"] = {"user" => "@prefix@-@thismachinehostname@"}
+    @props["db"][:general.to_s] = {"user" => "@prefix@-@thismachinehostname@"}
     @db.user.should == "PRE-"+Socket.gethostname
   end
 
   it "Connect String for .NET Code/SQL Auth" do
     @props["db"]["hostname"] = "myhostname"
-    @props['db']["use"] = {"mode" => "sqlauth",
-                           "user" => "theuser",
-                           "password" => "thepassword"}
+    @props['db'][:general.to_s] = {"mode" => "sqlauth",
+                                   "user" => "theuser",
+                                   "password" => "thepassword"}
     
     @props['db']["connect-strings"] =
              {"sqlauth" => "user @user@ pass @password@ host @host@ db @initialcatalog@"}
@@ -40,7 +50,7 @@ describe BW::DB do
 
   it "Connect String for .NET Code/Windows Auth" do
     @props["db"]["hostname"] = "myhostname"
-    @props['db']["use"] = {"mode" => "winauth"}
+    @props['db'][:general.to_s] = {"mode" => "winauth"}
 
     @props['db']["connect-strings"] =
              {"winauth" => "host @host@ db @initialcatalog@"}
