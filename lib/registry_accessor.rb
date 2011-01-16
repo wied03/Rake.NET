@@ -16,6 +16,8 @@ module BW
       end
     end
 
+	private
+	
     def regvalue64(key, value)
       # workaround to make sure we have 64 bit registry access
       ourKeyRead = Win32::Registry::Constants::KEY_READ |
