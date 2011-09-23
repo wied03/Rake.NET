@@ -1,3 +1,4 @@
+require 'psych'
 require 'rake'
 require 'rubygems'
 require 'rubygems/package_task'
@@ -28,7 +29,7 @@ with("spec") do |testdir|
         s.test_files = FileList["#{testdir}/**/*.rb"]
         s.version = BW::Version.incrementandretrieve
         s.summary = "Rake tasks for building .NET projects"
-        s.description = s.summary
+        s.description = s.summary      
         s.has_rdoc = true
         s.rdoc_options << '--inline-source' << '--line-numbers'
         s.author = "Brady Wied"
