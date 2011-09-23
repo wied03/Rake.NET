@@ -1,18 +1,15 @@
 require 'rake'
 require 'rubygems'
-require 'rake/gempackagetask'
-require 'spec/rake/spectask'
-require 'rake/rdoctask'
-require 'lib/version'
-require 'lib/tools'
+require 'rubygems/package_task'
+require 'rspec/core/rake_task'
+require './lib/version'
+require './lib/tools'
 
 task :ci => :spec
 
 with("spec") do |testdir|
-  Spec::Rake::SpecTask.new(:spec) do |t|
-    t.spec_files = FileList["#{testdir}/**/*_spec.rb"]
-    t.spec_opts << '--format specdoc'
-    t.libs = FileList[testdir]
+  RSpec::Core::RakeTask.new(:spec) do |t|
+    t.pattern = FileList["#{testdir}/**/*_spec.rb"] 
   end
 
   task :clean_install => [:repackage, :install]
@@ -35,14 +32,13 @@ with("spec") do |testdir|
         s.has_rdoc = true
         s.rdoc_options << '--inline-source' << '--line-numbers'
         s.author = "Brady Wied"
-        s.email = "brady@wied.us"
-        s.add_dependency('fastercsv', '>= 1.5.0')
+        s.email = "brady@wied.us"        
         s.add_dependency('bwyamlconfig')
         s.add_dependency('windows-pr')
         s.platform = 'mswin32'
       end
 
-      Rake::GemPackageTask.new(spec) do |pkg|
+      Gem::PackageTask.new(spec) do |pkg|
       end
     end
   end

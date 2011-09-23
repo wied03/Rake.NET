@@ -7,6 +7,32 @@ def testdata
 end
 
 describe BW::Sqlcmd do
+  RSpec::Matchers.define :have_sql_property do |expected|
+    match do |actual|
+      actualProps = parseProps actual
+      actualProps.include? expected
+    end
+
+    def parseProps (actual)
+        actualProps = actual.match(/.*-v (.+) -/)[1].scan(/('.*?'|\S+=".*?"|\S+)/).map do |kv|
+        arr = kv[0].split('=')
+        {:k => arr[0], :v =>arr[1]}
+        end
+        actualProps
+    end
+  end
+
+  RSpec::Matchers.define :have_sql_property_count do |expected|
+    match do |actual|
+      actualProps = parseProps actual
+      actualProps.should have(expected).items
+    end
+
+    def parseProps (actual)
+        actual.match(/.*-v (.+) -/)[1].scan(/('.*?'|\S+=".*?"|\S+)/)
+    end
+  end
+
   before(:each) do
     # It uses the current date, which is harder to test
     BW::Sqlcmd.stub!(:generatetempfilename).and_return "tempfile.sql"
@@ -43,8 +69,12 @@ describe BW::Sqlcmd do
     task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
 
     task.exectaskpublic
-    task.excecutedPop.should == "\"z:\\sqlcmd.exe\" -U theuser -P thepassword -S myhostname -e -b -v "+
-            "dbname=regulardb dbuser=theuser -i tempfile.sql"
+    execed = task.excecutedPop
+    execed.should match(/"z:\\sqlcmd\.exe\" -U theuser -P thepassword -S myhostname -e -b -v .* -i tempfile.sql/)
+
+    execed.should have_sql_property ({:k => "dbname", :v => "regulardb"})
+    execed.should have_sql_property ({:k => "dbuser", :v => "theuser"})
+    execed.should have_sql_property_count 2
 
     expected = IO.readlines("data/sqlcmd/expected.sql")
     actual = IO.readlines("data/output/tempfile.sql")
@@ -63,7 +93,13 @@ describe BW::Sqlcmd do
     task.should_receive(:sql_tool).any_number_of_times.with("902").and_return("z:\\")
 
     task.exectaskpublic
-    task.excecutedPop.should == "\"z:\\sqlcmd.exe\" -E -S myhostname -e -b -v dbname=regulardb dbuser=theuser -i tempfile.sql"
+
+    execed = task.excecutedPop
+    execed.should match(/"z:\\sqlcmd\.exe\" -E -S myhostname -e -b -v .* -i tempfile.sql/)
+
+    execed.should have_sql_property ({:k => "dbname", :v => "regulardb"})
+    execed.should have_sql_property ({:k => "dbuser", :v => "theuser"})
+    execed.should have_sql_property_count 2
 
     expected = IO.readlines("data/sqlcmd/expected.sql")
     actual = IO.readlines("data/output/tempfile.sql")
@@ -80,9 +116,13 @@ describe BW::Sqlcmd do
     task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
 
     task.exectaskpublic
-    task.excecutedPop.should == "\"z:\\sqlcmd.exe\" -U systemuser -P systempassword -S myhostname -e -b -v "+
-            "sqlserverdatadirectory=\"F:\\\" dbname=regulardb dbpassword=thepassword dbuser=theuser "+
-            "-i tempfile.sql"
+    execed = task.excecutedPop
+    execed.should match(/"z:\\sqlcmd\.exe\" -U systemuser -P systempassword -S myhostname -e -b -v .* -i tempfile.sql/)
+
+    execed.should have_sql_property ({:k => "dbuser", :v => "theuser"})
+    execed.should have_sql_property ({:k => "dbpassword", :v => "thepassword"})
+    execed.should have_sql_property ({:k => "sqlserverdatadirectory", :v => "\"F:\\\""})
+    execed.should have_sql_property_count 4
 
     expected = IO.readlines("data/sqlcmd/expected.sql")
     actual = IO.readlines("data/output/tempfile.sql")
@@ -106,8 +146,13 @@ describe BW::Sqlcmd do
     task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
 
     task.exectaskpublic
-    task.excecutedPop.should == "\"z:\\sqlcmd.exe\" -U objectcreateuser -P objectcreatepassword -S myhostname -e -b "+
-            "-v dbname=regulardb dbuser=theuser -i tempfile.sql"
+
+    execed = task.excecutedPop
+    execed.should match(/"z:\\sqlcmd\.exe\" -U objectcreateuser -P objectcreatepassword -S myhostname -e -b -v .* -i tempfile.sql/)
+
+    execed.should have_sql_property ({:k => "dbname", :v => "regulardb"})
+    execed.should have_sql_property ({:k => "dbuser", :v => "theuser"})
+    execed.should have_sql_property_count 2
 
     expected = IO.readlines("data/sqlcmd/expected.sql")
     actual = IO.readlines("data/output/tempfile.sql")
@@ -126,9 +171,14 @@ describe BW::Sqlcmd do
     task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
 
     task.exectaskpublic
-    task.excecutedPop.should == "\"z:\\sqlcmd.exe\" -E -S myhostname -e -b -v "+
-            "sqlserverdatadirectory=\"F:\\\" dbname=regulardb dbpassword=thepassword dbuser=theuser "+
-            "-i tempfile.sql"
+     execed = task.excecutedPop
+    execed.should match(/"z:\\sqlcmd\.exe\" -E -S myhostname -e -b -v .* -i tempfile.sql/)
+
+    execed.should have_sql_property ({:k => "dbname", :v => "regulardb"})
+    execed.should have_sql_property ({:k => "dbuser", :v => "theuser"})
+    execed.should have_sql_property ({:k => "sqlserverdatadirectory", :v => "\"F:\\\""})
+    execed.should have_sql_property ({:k => "dbpassword", :v => "thepassword"})
+    execed.should have_sql_property_count 4
 
     expected = IO.readlines("data/sqlcmd/expected.sql")
     actual = IO.readlines("data/output/tempfile.sql")
@@ -148,9 +198,17 @@ describe BW::Sqlcmd do
     task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
 
     task.exectaskpublic
-    task.excecutedPop.should == "\"z:\\sqlcmd.exe\" -U systemuser -P systempassword -S myhostname -e -b -v "+
-            "sqlserverdatadirectory=\"F:\\\" var1=val1 spacevar=\"deals with space right\" dbname=regulardb "+
-            "dbpassword=yesitsoktooverride dbuser=theuser -i tempfile.sql"
+    execed = task.excecutedPop
+    execed.should match(/"z:\\sqlcmd\.exe\" -U systemuser -P systempassword -S myhostname -e -b -v .* -i tempfile.sql/)
+
+    execed.should have_sql_property ({:k => "dbname", :v => "regulardb"})
+    execed.should have_sql_property ({:k => "dbuser", :v => "theuser"})
+    execed.should have_sql_property ({:k => "dbpassword", :v => "yesitsoktooverride"})
+    execed.should have_sql_property ({:k => "var1", :v => "val1"})
+    execed.should have_sql_property ({:k => "spacevar", :v => "\"deals with space right\""})
+    execed.should have_sql_property ({:k => "sqlserverdatadirectory", :v => "\"F:\\\""})
+
+    execed.should have_sql_property_count 6
 
     expected = IO.readlines("data/sqlcmd/expected.sql")
     actual = IO.readlines("data/output/tempfile.sql")
@@ -169,9 +227,16 @@ describe BW::Sqlcmd do
     task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
 
     task.exectaskpublic
-    task.excecutedPop.should == "\"z:\\sqlcmd.exe\" -U theuser -P thepassword -S myhostname -e -b -v "+
-            "var1=val1 spacevar=\"deals with space right\" dbname=regulardb dbpassword=yesitsoktooverride dbuser=theuser"+
-            " -i tempfile.sql"
+    execed = task.excecutedPop
+    execed.should match(/"z:\\sqlcmd\.exe\" -U theuser -P thepassword -S myhostname -e -b -v .* -i tempfile.sql/)
+
+    execed.should have_sql_property ({:k => "dbname", :v => "regulardb"})
+    execed.should have_sql_property ({:k => "dbuser", :v => "theuser"})
+    execed.should have_sql_property ({:k => "dbpassword", :v => "yesitsoktooverride"})
+    execed.should have_sql_property ({:k => "var1", :v => "val1"})
+    execed.should have_sql_property ({:k => "spacevar", :v => "\"deals with space right\""})
+
+    execed.should have_sql_property_count 5
 
     expected = IO.readlines("data/sqlcmd/expected.sql")
     actual = IO.readlines("data/output/tempfile.sql")

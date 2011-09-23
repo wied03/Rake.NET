@@ -1,7 +1,7 @@
 require 'basetask'
-require 'fastercsv'
 require 'windowspaths'
 require 'db'
+require 'csv'
 
 module BW
 =begin rdoc
@@ -43,7 +43,8 @@ loading them in with BCP.
           def initialize (parameters = :task)
             super parameters
             @dbprops = DB.new
-            @tmp = "#{ENV['TMP']}/bcp"
+            tmpDir = ENV['TMP'] || '/tmp'
+            @tmp = "#{tmpDir}/bcp"
           end
 
           def create_temp
@@ -79,9 +80,9 @@ loading them in with BCP.
                 rm_rf @tmp
             end
 
-            def csvtoCustomDelim(oldfile, newfile)
+            def csvtoCustomDelim(oldfile, newfile)              
                 File.open(newfile, "a") do |file|
-                  FasterCSV.foreach(oldfile) do |row|
+                  CSV.foreach(oldfile) do |row|
                       d = delimiter
                       row.each { |f| if f.include? d
                                           puts "Your data contains the crazy delimiter that's currently configured, which is "

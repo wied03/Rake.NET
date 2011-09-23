@@ -3,12 +3,41 @@ require "msbuild"
 require "basetaskmocking"
 
 describe BW::MSBuild do
+  RSpec::Matchers.define :have_build_property do |expected|
+    match do |actual|
+      actualProps = parseProps actual
+      actualProps.include? expected
+    end
+
+    def parseProps (actual)
+        actualProps = actual.match(/\/property:(\S+)/)[1].split(';').map do |kv|
+        arr = kv.split('=')
+        {:k => arr[0], :v =>arr[1]}
+        end
+        actualProps
+    end
+  end
+
+  RSpec::Matchers.define :have_build_property_count do |expected|
+    match do |actual|
+      actualProps = parseProps actual
+      actualProps.should have(expected).items
+    end
+
+    def parseProps (actual)
+        actual.match(/\/property:(\S+)/)[1].split(';')
+    end
+  end
 
   it "should build OK vanilla (.NET 4.0)" do
     task = BW::MSBuild.new
     task.should_receive(:dotnet).with("v4\\Client").and_return("C:\\yespath\\")
     task.exectaskpublic
-    task.excecutedPop.should == "C:\\yespath\\msbuild.exe /property:TargetFrameworkVersion=v4.0;Configuration=Debug"
+    execed = task.excecutedPop
+    execed.should include "C:\\yespath\\msbuild.exe"
+    execed.should have_build_property ({:k => "Configuration", :v => "Debug"})
+    execed.should have_build_property ({:k => "TargetFrameworkVersion", :v => "v4.0"})
+    execed.should have_build_property_count 2
   end
 
   it "should fail with an unsupported dotnet_bin_version" do
@@ -25,7 +54,11 @@ describe BW::MSBuild do
     
     task.should_receive(:dotnet).with("v4\\Client").and_return("C:\\yespath\\")
     task.exectaskpublic
-    task.excecutedPop.should == "C:\\yespath\\msbuild.exe /target:t1 /property:TargetFrameworkVersion=v4.0;Configuration=Debug"
+    execed = task.excecutedPop
+    execed.should include "C:\\yespath\\msbuild.exe /target:t1"
+    execed.should have_build_property ({:k => "Configuration", :v => "Debug"})
+    execed.should have_build_property ({:k => "TargetFrameworkVersion", :v => "v4.0"})
+    execed.should have_build_property_count 2
   end
 
   it "should build OK with everything customized (.NET 3.5)" do
@@ -40,7 +73,13 @@ describe BW::MSBuild do
     end
     task.should_receive(:dotnet).with("v3.5").and_return("C:\\yespath2\\")
     task.exectaskpublic
-    task.excecutedPop.should == "C:\\yespath2\\msbuild.exe /target:t1,t2 /property:TargetFrameworkVersion=v3.5;Configuration=Release;prop1=prop1val;prop2=prop2val solutionhere"
+    execed = task.excecutedPop
+    execed.should have_build_property ({:k => "Configuration", :v => "Release"})
+    execed.should have_build_property ({:k => "TargetFrameworkVersion", :v => "v3.5"})
+    execed.should have_build_property ({:k => "prop1", :v => "prop1val"})
+    execed.should have_build_property ({:k => "prop2", :v => "prop2val"})
+    execed.should have_build_property_count 4
+    execed.should match(/C:\\yespath2\\msbuild\.exe \/target:t1,t2 .* solutionhere/)
   end
 
   it "should build OK with custom properties that are also defaults (.NET 4.0)" do
@@ -51,7 +90,12 @@ describe BW::MSBuild do
     end
     task.should_receive(:dotnet).with("v4\\Client").and_return("C:\\yespath2\\")
     task.exectaskpublic
-    task.excecutedPop.should == "C:\\yespath2\\msbuild.exe /property:TargetFrameworkVersion=v4.0;Configuration=myconfig;prop2=prop2val"
+    execed = task.excecutedPop
+    execed.should include "C:\\yespath2\\msbuild.exe"
+    execed.should have_build_property ({:k => "Configuration", :v => "myconfig"})
+    execed.should have_build_property ({:k => "TargetFrameworkVersion", :v => "v4.0"})
+    execed.should have_build_property ({:k => "prop2", :v => "prop2val"})
+    execed.should have_build_property_count 3
   end
 
   it "should build OK with .NET 2.0" do
@@ -60,6 +104,10 @@ describe BW::MSBuild do
        t.compile_version = :v2_0
     end
     task.exectaskpublic
-    task.excecutedPop.should == "C:\\Windows\\Microsoft.NET\\Framework\\v2.0.50727\\msbuild.exe /property:TargetFrameworkVersion=v2.0;Configuration=Debug"
+    execed = task.excecutedPop
+    execed.should include "C:\\Windows\\Microsoft.NET\\Framework\\v2.0.50727\\msbuild.exe"
+    execed.should have_build_property ({:k => "Configuration", :v => "Debug"})
+    execed.should have_build_property ({:k => "TargetFrameworkVersion", :v => "v2.0"})
+    execed.should have_build_property_count 2
   end
 end

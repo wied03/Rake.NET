@@ -6,15 +6,15 @@ def jspath
   FileList["data/jstest/path/**/*.js"]
 end
 
-Spec::Matchers.define :have_same_config_as do |e|
+RSpec::Matchers.define :have_same_config_as do |e|
     expected = YAML::load(File.read(e))
     match do |a|
       actual = YAML::load(File.read(a))
       actual['server'].should == expected['server']
       expLoad = expected['load']
       actLoad = actual['load']
-      expLoad.each { |file| actLoad.should include file }
-      actLoad.each { |file| expLoad.should include file }
+      expLoad.each { |file| actLoad.include? file }
+      actLoad.each { |file| expLoad.include? file }
     end
 
     failure_message_for_should do |a|
