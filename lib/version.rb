@@ -4,7 +4,7 @@ module BW
   # Keeps track of package versions (1.0.x) using a YAML file
   class Version
 
-    FILENAME = "VERSION.yml"
+    FILENAME = "NEXTVERSION.yml"
 
     # Increments and retrieves the current version
     def Version.incrementandretrieve

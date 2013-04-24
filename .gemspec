@@ -1,4 +1,6 @@
+$LOAD_PATH << './lib'
 require 'rake'
+require 'version'
 
 src="lib"
 testdir="spec"
