@@ -1,5 +1,4 @@
 require 'win32/registry'
-require 'windows/registry'
 
 module BW
   class RegistryAccessor
