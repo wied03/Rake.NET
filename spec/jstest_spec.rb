@@ -27,7 +27,7 @@ RSpec::Matchers.define :have_same_config_as do |e|
     end
 end
 
-describe BW::JsTest do
+describe BradyW::JsTest do
   before(:each) do
     ENV["CCNetProject"] = nil
   end
@@ -38,7 +38,7 @@ describe BW::JsTest do
   end
 
   it "Standard Test With Browsers and Files" do
-    task = BW::JsTest.new do |js|
+    task = BradyW::JsTest.new do |js|
       js.browsers = ["iexplore.exe", "firefox.exe"]
       js.files = jspath
     end
@@ -52,7 +52,7 @@ describe BW::JsTest do
 
   it "Standard Test With Browsers and Files In CI tool" do
     ENV["CCNetProject"] = "yes"
-    task = BW::JsTest.new do |js|
+    task = BradyW::JsTest.new do |js|
       js.browsers = ["iexplore.exe", "firefox.exe"]
       js.files = jspath
     end
@@ -65,7 +65,7 @@ describe BW::JsTest do
   end
 
   it "Standard Test With Browsers and Files with manual XML config" do
-    task = BW::JsTest.new do |js|
+    task = BradyW::JsTest.new do |js|
       js.browsers = ["iexplore.exe", "firefox.exe"]
       js.files = jspath
       js.xmloutput = true
@@ -80,7 +80,7 @@ describe BW::JsTest do
 
   it "Custom version, Test Output, JAR path, port, and server" do
     ENV["CCNetProject"] = "yes"
-    task = BW::JsTest.new do |js|
+    task = BradyW::JsTest.new do |js|
       js.files = jspath
       js.jarpath = "newpath/"
       js.port = 1234
@@ -96,7 +96,7 @@ describe BW::JsTest do
   end
 
   it "Should clean up generated file if JS-Test-Driver fails" do
-    task = BW::JsTest.new do |js|
+    task = BradyW::JsTest.new do |js|
       js.browsers = ["iexplore.exe", "firefox.exe"]
       js.files = jspath
     end

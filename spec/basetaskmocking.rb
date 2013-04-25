@@ -2,7 +2,7 @@ require 'base'
 require 'rake'
 require 'rake/tasklib'
 
-module BW
+module BradyW
 	class BaseTask < Rake::TaskLib
         def exectaskpublic
           exectask

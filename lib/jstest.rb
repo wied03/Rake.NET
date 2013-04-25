@@ -1,7 +1,7 @@
 require 'basetask'
 require 'yaml'
 
-module BW
+module BradyW
   # Executes Javascript tests using Google's JS Test.  By default, the task outputs test results in
   # plain text to stdout.
   class JsTest < BaseTask

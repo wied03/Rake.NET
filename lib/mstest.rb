@@ -1,10 +1,10 @@
 require 'basetask'
 require 'windowspaths'
 
-module BW
+module BradyW
     # Runs MSTest tests using Visual Studio's MSTest runner
 	class MSTest < BaseTask
-		include BW::WindowsPaths
+		include BradyW::WindowsPaths
 
         # *Required* Files/test containers to test
 		attr_accessor :files

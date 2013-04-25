@@ -2,7 +2,7 @@ require "base"
 require "bcp"
 require "basetaskmocking"
 
-describe BW::BCP do
+describe BradyW::BCP do
   before(:each) do
     @props["db"] = {"name" => "regulardb"}
     @props["db"]["hostname"] = "myhostname"
@@ -18,7 +18,7 @@ describe BW::BCP do
   end
 
   it "Works OK with standard delimiters and SQL Auth" do
-    task = BW::BCP.new do |bcp|
+    task = BradyW::BCP.new do |bcp|
       bcp.files = FileList["data/bcp/01-firsttable.csv",
                            "data/bcp/02-nexttable.csv"]
     end
@@ -44,7 +44,7 @@ describe BW::BCP do
 
   it "Works OK with custom delimiters, Custom Version, and Windows Auth" do
     @props['db'][:general.to_s] = {"mode" => "winauth"}
-    task = BW::BCP.new do |bcp|
+    task = BradyW::BCP.new do |bcp|
       bcp.files = FileList["data/bcp/01-firsttable.csv",
                            "data/bcp/02-nexttable.csv"]
       bcp.delimiter = "foobar"
@@ -71,7 +71,7 @@ describe BW::BCP do
 
   it "Handles delimiter interference Properly" do
     @props['db']["use"] = {"mode" => "winauth"}
-    task = BW::BCP.new do |bcp|
+    task = BradyW::BCP.new do |bcp|
       bcp.files = FileList["data/bcp/delimInData.csv"]
     end
 
@@ -79,7 +79,7 @@ describe BW::BCP do
   end
 
   it "Handles failure gracefully" do
-    task = BW::BCP.new do |bcp|
+    task = BradyW::BCP.new do |bcp|
       bcp.files = FileList["data/bcp/01-firsttable.csv",
                            "data/bcp/02-nexttable.csv"]
     end
@@ -98,7 +98,7 @@ describe BW::BCP do
   end
 
   it "Properly disables identity inserts when set" do
-    task = BW::BCP.new do |bcp|
+    task = BradyW::BCP.new do |bcp|
       bcp.identity_inserts = true
       bcp.files = FileList["data/bcp/01-firsttable.csv",
                            "data/bcp/02-nexttable.csv"]

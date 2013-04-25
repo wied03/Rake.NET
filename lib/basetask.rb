@@ -1,7 +1,7 @@
 require 'rake'
 require 'rake/tasklib'
 
-module BW
+module BradyW
 
     # Used to abstract some of the functionality of building custom tasks in Rake out
     # and also provide a convenient point to mock them for testing purposes

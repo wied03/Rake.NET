@@ -1,6 +1,6 @@
 require "yaml_config"
 
-module BW
+module BradyW
   # Using the bwyamlconfig GEM, does a singleton fetch of properties from the YAML config files
   class Config
     private_class_method :new
@@ -9,7 +9,7 @@ module BW
 
     # Retrieve (using lazy instantation) our properties
     def Config.Props
-      @@props = BW::YAMLConfig.new.props unless @@props
+      @@props = BradyW::YAMLConfig.new.props unless @@props
       @@props
     end
   end

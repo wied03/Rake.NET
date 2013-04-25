@@ -2,10 +2,10 @@ require "base"
 require "mstest"
 require "basetaskmocking"
 
-describe BW::MSTest do
+describe BradyW::MSTest do
 
   it "Should work with default settings" do
-    task = BW::MSTest.new do |test|
+    task = BradyW::MSTest.new do |test|
       test.files = ["file1.dll", "file2.dll"]
     end
     task.should_receive(:visual_studio).with("10.0").and_return("C:\\yespath\\")
@@ -14,7 +14,7 @@ describe BW::MSTest do
   end
 
   it "Should work with custom settings" do
-    task = BW::MSTest.new do |test|
+    task = BradyW::MSTest.new do |test|
       test.files = ["file1.dll"]
       test.version = "8.0"
     end

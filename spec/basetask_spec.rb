@@ -2,19 +2,19 @@ require "base"
 require "basetask"
 require "basetaskmocking"
 
-module BW
+module BradyW
   class BaseTask < Rake::TaskLib
     attr_accessor :dependencies
   end
 end
 
-describe BW::BaseTask do
+describe BradyW::BaseTask do
   before(:each) do
     Rake::Task.clear
   end
 
   it "Task with no dependencies/default name" do
-    task = BW::BaseTask.new
+    task = BradyW::BaseTask.new
     task.should_receive(:log).with("Running task: task")
     task.name.should == :task
     task.dependencies.should == nil
@@ -24,7 +24,7 @@ describe BW::BaseTask do
   end
 
   it "Task with no dependencies/custom name" do
-    task = BW::BaseTask.new "mytask"
+    task = BradyW::BaseTask.new "mytask"
     task.should_receive(:log).with("Running task: mytask")
     task.name.should == "mytask"
     task.dependencies.should == nil
@@ -34,12 +34,12 @@ describe BW::BaseTask do
   end
 
   it "Task with dependencies/custom name" do
-    task = BW::BaseTask.new "mytask" => :dependenttask
+    task = BradyW::BaseTask.new "mytask" => :dependenttask
     task.name.should == "mytask"
     task.dependencies.should == :dependenttask
     task.unless.should == nil
 
-    dtask = BW::BaseTask.new "dependenttask"
+    dtask = BradyW::BaseTask.new "dependenttask"
     task.should_receive(:exectask)
     dtask.should_receive(:exectask)
 
@@ -49,14 +49,14 @@ describe BW::BaseTask do
   end
 
   it "Task with dependencies/custom name + block" do
-    task = BW::BaseTask.new "mytask" => [:dependenttask, :test] do |t|
+    task = BradyW::BaseTask.new "mytask" => [:dependenttask, :test] do |t|
       t.unless = "yes"
     end
     task.name.should == "mytask"
     task.dependencies.should == [:dependenttask, :test]
     task.unless.should == "yes"
 
-    dtask = BW::BaseTask.new "dependenttask"
+    dtask = BradyW::BaseTask.new "dependenttask"
     task.should_not_receive(:exectask)
     dtask.should_not_receive(:exectask)
 

@@ -1,6 +1,6 @@
 require 'registry_accessor'
 
-module BW
+module BradyW
 	module WindowsPaths
         private
           # Fetches the path for tools like bcp.exe and sqlcmd.exe from the registry
@@ -21,7 +21,7 @@ module BW
           def regvalue(key, value)
               keyAndVal = "#{key}\\#{value}"
               log "Retrieving registry key #{keyAndVal}"
-              regacc = BW::RegistryAccessor.new
+              regacc = BradyW::RegistryAccessor.new
               regacc.regvalue(key,value)
           end
 	end

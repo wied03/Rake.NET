@@ -1,13 +1,13 @@
 require 'socket'
 require 'config'
 
-module BW
+module BradyW
 
   # Retrieves database related settings from our YAML configuration files
   class DB
 
     def initialize
-      @props = BW::Config.Props
+      @props = BradyW::Config.Props
     end
 
     private

@@ -2,17 +2,17 @@ require "base"
 require "windowspaths"
 
 class PathTester
-  include BW::WindowsPaths
+  include BradyW::WindowsPaths
   def log text
     puts text
   end
 end
 
-describe BW::WindowsPaths do
+describe BradyW::WindowsPaths do
   before(:each) do
     @p = PathTester.new
-    @regmock = BW::RegistryAccessor.new
-    BW::RegistryAccessor.stub!(:new).and_return(@regmock)
+    @regmock = BradyW::RegistryAccessor.new
+    BradyW::RegistryAccessor.stub!(:new).and_return(@regmock)
   end
 
   it "should retrieve SQL Server tools properly" do

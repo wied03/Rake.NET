@@ -2,10 +2,10 @@ require "base"
 require "iis"
 require "basetaskmocking"
 
-describe BW::IIS do
+describe BradyW::IIS do
 
   it "Standard Command" do
-    task = BW::IIS.new do |task|
+    task = BradyW::IIS.new do |task|
       task.command = :start
     end
 
@@ -14,12 +14,12 @@ describe BW::IIS do
   end
 
   it "Forgot Command" do
-    task = BW::IIS.new
+    task = BradyW::IIS.new
     lambda {task.exectaskpublic}.should raise_exception("You forgot to supply a service command (:start, :stop)")
   end
 
   it "Custom Service With Failure on STOP" do
-    task = BW::IIS.new do |task|
+    task = BradyW::IIS.new do |task|
       task.command = :stop
       task.service = "SVC"
     end
@@ -29,7 +29,7 @@ describe BW::IIS do
   end
 
   it "Standard Service With Failure on some other command" do
-    task = BW::IIS.new do |task|
+    task = BradyW::IIS.new do |task|
       task.command = :start
     end
 
@@ -39,7 +39,7 @@ describe BW::IIS do
   end
 
   it "Standard Service With Success on STOP" do
-    task = BW::IIS.new do |task|
+    task = BradyW::IIS.new do |task|
       task.command = :stop
     end
 

@@ -1,7 +1,7 @@
 require 'basetask'
 require 'windowspaths'
 
-module BW
+module BradyW
 
     # Launches a build using MSBuild
 	class MSBuild < BaseTask

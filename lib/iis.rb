@@ -1,6 +1,6 @@
 require 'basetask'
 
-module BW
+module BradyW
 
     # A task for starting/stopping IIS.  The task will not fail if the service cannot be stopped
     # successfully to avoid failing the build if IIS is already running.

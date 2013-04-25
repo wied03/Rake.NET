@@ -3,7 +3,7 @@ require 'windowspaths'
 require 'db'
 require 'csv'
 
-module BW
+module BradyW
 =begin rdoc
 Supports using Microsoft BCP to load CSV data.  Unlike BCP out of the box, this task attempts
 to "support" comma escaping by converting your CSV files to files with an odd delimiter before

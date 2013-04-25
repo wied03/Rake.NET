@@ -2,7 +2,7 @@ require "base"
 require "msbuild"
 require "basetaskmocking"
 
-describe BW::MSBuild do
+describe BradyW::MSBuild do
   RSpec::Matchers.define :have_build_property do |expected|
     match do |actual|
       actualProps = parseProps actual
@@ -30,7 +30,7 @@ describe BW::MSBuild do
   end
 
   it "should build OK vanilla (.NET 4.0)" do
-    task = BW::MSBuild.new
+    task = BradyW::MSBuild.new
     task.should_receive(:dotnet).with("v4\\Client").and_return("C:\\yespath\\")
     task.exectaskpublic
     execed = task.excecutedPop
@@ -41,14 +41,14 @@ describe BW::MSBuild do
   end
 
   it "should fail with an unsupported dotnet_bin_version" do
-    task = BW::MSBuild.new do |t|
+    task = BradyW::MSBuild.new do |t|
       t.dotnet_bin_version = :v2_25
     end
     lambda {task.exectaskpublic}.should raise_exception("You supplied a .NET MSBuild binary version that's not supported.  Please use :v4_0, :v3_5, or :v2_0")
   end
 
   it "should build OK with a single target" do
-    task = BW::MSBuild.new do |t|
+    task = BradyW::MSBuild.new do |t|
       t.targets = 't1'
     end
     
@@ -62,7 +62,7 @@ describe BW::MSBuild do
   end
 
   it "should build OK with everything customized (.NET 3.5)" do
-    task = BW::MSBuild.new do |t|
+    task = BradyW::MSBuild.new do |t|
       t.targets = ['t1', 't2']
       t.dotnet_bin_version = :v3_5
       t.solution = "solutionhere"
@@ -83,7 +83,7 @@ describe BW::MSBuild do
   end
 
   it "should build OK with custom properties that are also defaults (.NET 4.0)" do
-    task = BW::MSBuild.new do |t|
+    task = BradyW::MSBuild.new do |t|
       t.properties = {'Configuration' => 'myconfig',
                       'prop2' => 'prop2val'}
       t.release = true
@@ -99,7 +99,7 @@ describe BW::MSBuild do
   end
 
   it "should build OK with .NET 2.0" do
-    task = BW::MSBuild.new do |t|
+    task = BradyW::MSBuild.new do |t|
        t.dotnet_bin_version = :v2_0
        t.compile_version = :v2_0
     end

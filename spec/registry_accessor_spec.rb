@@ -1,9 +1,9 @@
 require "base"
 require "registry_accessor"
 
-describe BW::RegistryAccessor do
+describe BradyW::RegistryAccessor do
   before(:each) do
-    @p = BW::RegistryAccessor.new
+    @p = BradyW::RegistryAccessor.new
   end
 
   it "should work OK with a 64 bit registry call" do

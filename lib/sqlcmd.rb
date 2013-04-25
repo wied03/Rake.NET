@@ -2,7 +2,7 @@ require 'basetask'
 require 'windowspaths'
 require 'db'
 
-module BW
+module BradyW
 
   # Runs SQLcmd to run supplied SQL scripts.  This task will roll up all supplied SQL script files
   # into 1 SQL file before running it in order to speed up the tasks.  The "-e" flag is used so that

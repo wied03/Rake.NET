@@ -1,6 +1,6 @@
 require 'basetask'
 
-module BW
+module BradyW
 
   # Minifies Javascript files using the Yahoo YUI tool
   class MinifyJs < BaseTask

@@ -6,7 +6,7 @@ def testdata
   FileList["data/sqlcmd/input/**/*"]
 end
 
-describe BW::Sqlcmd do
+describe BradyW::Sqlcmd do
   RSpec::Matchers.define :have_sql_property do |expected|
     match do |actual|
       actualProps = parseProps actual
@@ -35,11 +35,11 @@ describe BW::Sqlcmd do
 
   before(:each) do
     # It uses the current date, which is harder to test
-    BW::Sqlcmd.stub!(:generatetempfilename).and_return "tempfile.sql"
+    BradyW::Sqlcmd.stub!(:generatetempfilename).and_return "tempfile.sql"
   end
   
   before(:each) do    
-    @db = BW::DB.new
+    @db = BradyW::DB.new
     @props["db"] = {"name" => "regulardb",
                     "hostname" => "myhostname"}
     @props["project"] = {"prefix" => "PRE"}
@@ -62,7 +62,7 @@ describe BW::Sqlcmd do
   end
 
   it "Should work with default version and default (non create) credentials in SQL auth mode" do
-    task = BW::Sqlcmd.new do |sql|
+    task = BradyW::Sqlcmd.new do |sql|
       sql.files = testdata
     end
 
@@ -85,7 +85,7 @@ describe BW::Sqlcmd do
   it "Should work with a custom version and default (non create) credentials in Win auth mode" do
     @props['db'][:general.to_s]["mode"] = "winauth"
 
-    task = BW::Sqlcmd.new do |sql|
+    task = BradyW::Sqlcmd.new do |sql|
       sql.files = testdata
       sql.version = "902"
     end
@@ -108,7 +108,7 @@ describe BW::Sqlcmd do
   end
 
   it "Works fine with system credentials in SQL auth mode" do
-    task = BW::Sqlcmd.new do |sql|
+    task = BradyW::Sqlcmd.new do |sql|
       sql.files = testdata
       sql.credentials = :system
     end
@@ -131,14 +131,14 @@ describe BW::Sqlcmd do
   end
 
   it "Fails properly with invalid credential specifier" do
-    task = BW::Sqlcmd.new do |sql|
+    task = BradyW::Sqlcmd.new do |sql|
       sql.files = testdata
       lambda {sql.credentials = :foo}.should raise_exception("Invalid credentials value!  Allowed values: :system, :objectcreation, :general")
     end    
   end
 
   it "Works fine with objectcreation credentials in SQL auth mode" do
-    task = BW::Sqlcmd.new do |sql|
+    task = BradyW::Sqlcmd.new do |sql|
       sql.files = testdata
       sql.credentials = :objectcreation
     end
@@ -163,7 +163,7 @@ describe BW::Sqlcmd do
   it "Works fine with system credentials in Win auth mode" do
     @props['db'][:system.to_s]["mode"] = "winauth"
 
-    task = BW::Sqlcmd.new do |sql|
+    task = BradyW::Sqlcmd.new do |sql|
       sql.files = testdata
       sql.credentials = :system
     end
@@ -187,7 +187,7 @@ describe BW::Sqlcmd do
   end
 
   it "Works fine with additional variables" do
-    task = BW::Sqlcmd.new do |sql|
+    task = BradyW::Sqlcmd.new do |sql|
       sql.files = testdata
       sql.credentials = :system
       sql.variables = { "var1" => "val1",
@@ -217,7 +217,7 @@ describe BW::Sqlcmd do
   end
 
   it "Works fine with custom variables" do
-    task = BW::Sqlcmd.new do |sql|
+    task = BradyW::Sqlcmd.new do |sql|
       sql.files = testdata
       sql.variables = { "var1" => "val1",
                         "dbpassword" => "yesitsoktooverride",
@@ -245,7 +245,7 @@ describe BW::Sqlcmd do
   end
   
   it "Fails the build properly (and gracefully) if sqlcmd has an error" do
-    task = BW::Sqlcmd.new do |sql|
+    task = BradyW::Sqlcmd.new do |sql|
       sql.files = testdata
     end
 
@@ -263,7 +263,7 @@ describe BW::Sqlcmd do
   it "Properly changes strings to dynamic ones in SQL files" do
     FileUtils::cp_r "data/sqlcmd/makedynamic", "data/output"
 
-    task = BW::Sqlcmd.new do |sql|
+    task = BradyW::Sqlcmd.new do |sql|
       sql.files = FileList['data/output/makedynamic/**/*']
       sql.makedynamic = true
     end

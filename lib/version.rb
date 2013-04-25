@@ -1,6 +1,6 @@
 require 'yaml'
 
-module BW
+module BradyW
   # Keeps track of package versions (1.0.x) using a YAML file
   class Version
 

@@ -1,6 +1,6 @@
 require 'win32/registry'
 
-module BW
+module BradyW
   class RegistryAccessor
     def regvalue(key, value)
       keyAndVal = "#{key}\\#{value}"      

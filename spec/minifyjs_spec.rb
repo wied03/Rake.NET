@@ -2,10 +2,10 @@ require "base"
 require "minifyjs"
 require "basetaskmocking"
 
-describe BW::MinifyJs do
+describe BradyW::MinifyJs do
 
   it "Should work with default settings" do
-    task = BW::MinifyJs.new do |task|
+    task = BradyW::MinifyJs.new do |task|
       task.files = ["file1.js", "file2.js"]
     end
     task.exectaskpublic
@@ -14,7 +14,7 @@ describe BW::MinifyJs do
   end
 
   it "Should work with custom settings" do
-    task = BW::MinifyJs.new do |task|
+    task = BradyW::MinifyJs.new do |task|
       task.files = ["file1.js", "file2.js"]
       task.version = "3.0"
       task.charset = "ascii"
