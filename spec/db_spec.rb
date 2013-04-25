@@ -1,9 +1,9 @@
 require "base"
-require "db"
+require "database"
 
-describe BradyW::DB do
+describe BradyW::Database do
   before(:each) do
-    @db = BradyW::DB.new
+    @db = BradyW::Database.new
     @props["db"] = {"name" => "regulardb"}
     @props["project"] = {"prefix" => "PRE"}
   end

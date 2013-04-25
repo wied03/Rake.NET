@@ -19,6 +19,6 @@ RSpec.configure do |config|
 
   config.before(:each) do
     @props = {}
-    BradyW::Config.stub!(:Props).and_return(@props)
+    BradyW::Config.stub!(:props).and_return(@props)
   end
 end

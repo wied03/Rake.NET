@@ -1,6 +1,6 @@
 require 'basetask'
 require 'windowspaths'
-require 'db'
+require 'database'
 
 module BradyW
 
@@ -44,7 +44,7 @@ module BradyW
     # :objectcreation - for adding/creating objects within a database
     # :general - DEFAULT - for adding/deleting rows within a database (use this for code)
     def credentials=(value)
-      BaseTask.validate value, "credentials", DB::CREDENTIALS
+      BaseTask.validate value, "credentials", Database::CREDENTIALS
       @credentials = value
     end
 
@@ -64,7 +64,7 @@ module BradyW
 
     def initialize (parameters = :task)
       super parameters
-      @dbprops = DB.new
+      @dbprops = Database.new
       # We don't want the temp file/time changing on us during the run
       @tempfile = Sqlcmd.generatetempfilename
     end

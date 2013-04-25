@@ -1,6 +1,6 @@
 require 'basetask'
 require 'windowspaths'
-require 'db'
+require 'database'
 require 'csv'
 
 module BradyW
@@ -42,7 +42,7 @@ loading them in with BCP.
 
           def initialize (parameters = :task)
             super parameters
-            @dbprops = DB.new
+            @dbprops = Database.new
             tmpDir = ENV['TMP'] || '/tmp'
             @tmp = "#{tmpDir}/bcp"
           end

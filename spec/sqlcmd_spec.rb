@@ -39,7 +39,7 @@ describe BradyW::Sqlcmd do
   end
   
   before(:each) do    
-    @db = BradyW::DB.new
+    @db = BradyW::Database.new
     @props["db"] = {"name" => "regulardb",
                     "hostname" => "myhostname"}
     @props["project"] = {"prefix" => "PRE"}
@@ -70,7 +70,7 @@ describe BradyW::Sqlcmd do
 
     task.exectaskpublic
     execed = task.excecutedPop
-    execed.should match(/"z:\\sqlcmd\.exe\" -U theuser -P thepassword -S myhostname -e -b -v .* -i tempfile.sql/)
+    execed.should match(/"z:\\sqlcmd\.exe" -U theuser -P thepassword -S myhostname -e -b -v .* -i tempfile.sql/)
 
     execed.should have_sql_property ({:k => "dbname", :v => "regulardb"})
     execed.should have_sql_property ({:k => "dbuser", :v => "theuser"})
@@ -95,7 +95,7 @@ describe BradyW::Sqlcmd do
     task.exectaskpublic
 
     execed = task.excecutedPop
-    execed.should match(/"z:\\sqlcmd\.exe\" -E -S myhostname -e -b -v .* -i tempfile.sql/)
+    execed.should match(/"z:\\sqlcmd\.exe" -E -S myhostname -e -b -v .* -i tempfile.sql/)
 
     execed.should have_sql_property ({:k => "dbname", :v => "regulardb"})
     execed.should have_sql_property ({:k => "dbuser", :v => "theuser"})
@@ -117,7 +117,7 @@ describe BradyW::Sqlcmd do
 
     task.exectaskpublic
     execed = task.excecutedPop
-    execed.should match(/"z:\\sqlcmd\.exe\" -U systemuser -P systempassword -S myhostname -e -b -v .* -i tempfile.sql/)
+    execed.should match(/"z:\\sqlcmd\.exe" -U systemuser -P systempassword -S myhostname -e -b -v .* -i tempfile.sql/)
 
     execed.should have_sql_property ({:k => "dbuser", :v => "theuser"})
     execed.should have_sql_property ({:k => "dbpassword", :v => "thepassword"})
@@ -148,7 +148,7 @@ describe BradyW::Sqlcmd do
     task.exectaskpublic
 
     execed = task.excecutedPop
-    execed.should match(/"z:\\sqlcmd\.exe\" -U objectcreateuser -P objectcreatepassword -S myhostname -e -b -v .* -i tempfile.sql/)
+    execed.should match(/"z:\\sqlcmd\.exe" -U objectcreateuser -P objectcreatepassword -S myhostname -e -b -v .* -i tempfile.sql/)
 
     execed.should have_sql_property ({:k => "dbname", :v => "regulardb"})
     execed.should have_sql_property ({:k => "dbuser", :v => "theuser"})
@@ -172,7 +172,7 @@ describe BradyW::Sqlcmd do
 
     task.exectaskpublic
      execed = task.excecutedPop
-    execed.should match(/"z:\\sqlcmd\.exe\" -E -S myhostname -e -b -v .* -i tempfile.sql/)
+    execed.should match(/"z:\\sqlcmd\.exe" -E -S myhostname -e -b -v .* -i tempfile.sql/)
 
     execed.should have_sql_property ({:k => "dbname", :v => "regulardb"})
     execed.should have_sql_property ({:k => "dbuser", :v => "theuser"})
@@ -199,7 +199,7 @@ describe BradyW::Sqlcmd do
 
     task.exectaskpublic
     execed = task.excecutedPop
-    execed.should match(/"z:\\sqlcmd\.exe\" -U systemuser -P systempassword -S myhostname -e -b -v .* -i tempfile.sql/)
+    execed.should match(/"z:\\sqlcmd\.exe" -U systemuser -P systempassword -S myhostname -e -b -v .* -i tempfile.sql/)
 
     execed.should have_sql_property ({:k => "dbname", :v => "regulardb"})
     execed.should have_sql_property ({:k => "dbuser", :v => "theuser"})
@@ -228,7 +228,7 @@ describe BradyW::Sqlcmd do
 
     task.exectaskpublic
     execed = task.excecutedPop
-    execed.should match(/"z:\\sqlcmd\.exe\" -U theuser -P thepassword -S myhostname -e -b -v .* -i tempfile.sql/)
+    execed.should match(/"z:\\sqlcmd\.exe" -U theuser -P thepassword -S myhostname -e -b -v .* -i tempfile.sql/)
 
     execed.should have_sql_property ({:k => "dbname", :v => "regulardb"})
     execed.should have_sql_property ({:k => "dbuser", :v => "theuser"})

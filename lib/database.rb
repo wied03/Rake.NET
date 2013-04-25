@@ -4,10 +4,10 @@ require 'config'
 module BradyW
 
   # Retrieves database related settings from our YAML configuration files
-  class DB
+  class Database
 
     def initialize
-      @props = BradyW::Config.Props
+      @props = BradyW::Config.props
     end
 
     private

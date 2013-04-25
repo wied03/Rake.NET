@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="RUBY_MODULE" version="4">
+  <component name="FacetManager">
+    <facet type="gem" name="Gem">
+      <configuration>
+        <option name="GEM_APP_ROOT_PATH" value="$MODULE_DIR$" />
+        <option name="GEM_APP_TEST_PATH" value="" />
+        <option name="GEM_APP_LIB_PATH" value="$MODULE_DIR$/lib" />
+      </configuration>
+    </facet>
+  </component>
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/example" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" scope="PROVIDED" name="builder (v3.2.0, RVM: ruby-1.9.3-p392 [rakenet]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="bundler (v1.3.5, RVM: ruby-1.9.3-p392 [rakenet]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="bwyamlconfig (v1.0.1@dc7c57, RVM: ruby-1.9.3-p392 [rakenet]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="ci_reporter (v1.8.4, RVM: ruby-1.9.3-p392 [rakenet]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="diff-lcs (v1.2.4, RVM: ruby-1.9.3-p392 [rakenet]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="rake (v10.0.4, RVM: ruby-1.9.3-p392 [rakenet]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="rspec (v2.13.0, RVM: ruby-1.9.3-p392 [rakenet]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="rspec-core (v2.13.1, RVM: ruby-1.9.3-p392 [rakenet]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="rspec-expectations (v2.13.0, RVM: ruby-1.9.3-p392 [rakenet]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="rspec-mocks (v2.13.1, RVM: ruby-1.9.3-p392 [rakenet]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="win32stub (v1.0.1@9aa7f0, RVM: ruby-1.9.3-p392 [rakenet]) [gem]" level="application" />
+  </component>
+</module>
+

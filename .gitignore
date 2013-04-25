@@ -1,3 +1,2 @@
-pkg
-.idea
 *.gem
+.idea/workspace.xml
