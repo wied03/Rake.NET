@@ -35,7 +35,7 @@ class SimulateProcessFailure
   end
 end
 
-def rm_rf directory
+def rm_safe directory
   # Before we delete the files, copy them to a place where we can verify their correctness
   if File.exist? directory
     FileUtils::cp_r directory, "data/output"

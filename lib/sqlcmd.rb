@@ -142,7 +142,7 @@ module BW
     end
 
     def removetempfile
-      rm_rf @tempfile
+      rm_safe @tempfile
     end
 
     def Sqlcmd.generatetempfilename

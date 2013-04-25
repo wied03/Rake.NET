@@ -39,7 +39,7 @@ module BW
 		cmd = "java -jar #{jarpath}jsTestDriver-#{version}.jar#{portparam}#{browsers} --tests all#{testoutput}"
         shell cmd do |ok,status|
            # We want to clean up our temp file in case we fail
-          rm_rf configFile
+          rm_safe configFile
           ok or
           fail "Command failed with status (#{status.exitstatus}):"
         end		

@@ -48,7 +48,7 @@ loading them in with BCP.
           end
 
           def create_temp
-            rm_rf @tmp
+            rm_safe @tmp
             mkdir @tmp
           end
 
@@ -70,14 +70,14 @@ loading them in with BCP.
                       if !ok
                         cd currentdir
                         # We want to clean up our temp files if we fail
-                        rm_rf @tmp
+                        rm_safe @tmp
                         fail "Command failed with status (#{status.exitstatus}):"
                       end
                     end
 
                     cd currentdir
                 end
-                rm_rf @tmp
+                rm_safe @tmp
             end
 
             def csvtoCustomDelim(oldfile, newfile)              
