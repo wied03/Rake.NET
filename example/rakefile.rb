@@ -8,7 +8,7 @@ require "msbuild"
 require "mstest"
 require "iis"
 
-@props = BradyW::Config.Props
+@props = BradyW::Config.props
 with("Javascript") do |js|
 	BradyW::JsTest.new :jstest do |j|
 		j.files = FileList["#{js}/src/**/*.js",

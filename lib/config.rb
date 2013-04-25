@@ -9,7 +9,7 @@ module BradyW
 
     # Retrieve (using lazy instantation) our properties
     def Config.props
-      @@props = BradyW::YAMLConfig.new.props unless @@props
+      @@props = BW::YAMLConfig.new.props unless @@props
       @@props
     end
   end
