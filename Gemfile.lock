@@ -1,4 +1,10 @@
 GIT
+  remote: git://github.com/wied03/Win32TestStub.git
+  revision: 9aa7f0c5e6d36ef376b082df7dd0028d02523826
+  specs:
+    win32stub (1.0.1)
+
+GIT
   remote: git://github.com/wied03/YAMLConfig.git
   revision: dc7c57abb2312f337cd9b57107fd7d6e987cb7f9
   specs:
@@ -30,3 +36,4 @@ DEPENDENCIES
   ci_reporter
   rake
   rspec
+  win32stub (= 1.0.1)!

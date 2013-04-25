@@ -1,8 +1,9 @@
 $: << File.expand_path(File.dirname(__FILE__) +"/../lib")
 require "rspec"
-require 'rake'
 # Needed to mock out our config/props
 require 'config'
+
+include FileUtils
 
 RSpec.configure do |config|
 
