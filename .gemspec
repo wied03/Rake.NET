@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
   s.files = FileList["#{src}/**/*.rb",
                      "#{testdir}/**/*.rb"]
   s.test_files = FileList["#{testdir}/**/*.rb"]
-  s.version = Bradyw::Version.incrementandretrieve
+  s.version = BradyW::Version.incrementandretrieve
   s.summary = "Rake tasks for building .NET projects"
   s.description = s.summary      
   s.has_rdoc = true
