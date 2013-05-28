@@ -4,12 +4,6 @@ GIT
   specs:
     win32stub (1.0.1)
 
-GIT
-  remote: git://github.com/wied03/YAMLConfig.git
-  revision: dc7c57abb2312f337cd9b57107fd7d6e987cb7f9
-  specs:
-    bwyamlconfig (1.0.1)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -32,7 +26,6 @@ PLATFORMS
   x86-mingw32
 
 DEPENDENCIES
-  bwyamlconfig (= 1.0.1)!
   ci_reporter
   rake
   rspec
