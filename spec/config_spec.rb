@@ -12,12 +12,12 @@ describe "Configuration Works Properly" do
 
   def fetchprops(defaultfile,userfile)
     # get around the private method
-    BradyW::Config.send(:new,defaultfile,userfile)
+    BradyW::Config.send(:new,defaultfile,userfile).currentConfiguration
   end
 
   it "Should work fine with only default properties" do
     props = fetchprops("onlydefault.rb",
-                               "newuserfile.rb").props
+                               "newuserfile.rb")
 
     props.setting.should == "yep"
     props.setting2.should == "nope"
@@ -26,7 +26,7 @@ describe "Configuration Works Properly" do
 
   it "Should work OK with default + partially filled out user properties" do
     props = fetchprops("defaultpartialuser_default.rb",
-                                    "defaultpartialuser_user.rb").props
+                                    "defaultpartialuser_user.rb")
 
     props.setting.should == "overrodethis"
     props.setting2.should == "nope"
@@ -34,7 +34,7 @@ describe "Configuration Works Properly" do
   end
 
   it "Should work OK with default + completely filled out user properties" do
-    props = BradyW::Config.send(:new).props
+    props = BradyW::Config.send(:new).currentConfiguration
 
     props.setting.should == "yep2"
     props.setting2.should == "nope2"

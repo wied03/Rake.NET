@@ -4,8 +4,12 @@ require "database"
 describe BradyW::Database do
   before(:each) do
     @db = BradyW::Database.new
-    @props["db"] = {"name" => "regulardb"}
-    @props["project"] = {"prefix" => "PRE"}
+    def @config.db_name
+          "regulardb"
+    end
+    def @config.project_prefix
+      "PRE"
+    end
   end
 
   it "DB Name Plain" do
@@ -13,27 +17,32 @@ describe BradyW::Database do
   end
 
   it "DB Name with hostname/prefix" do
-    @props["db"]["name"] = "@prefix@-@thismachinehostname@"
+    def @config.db_name
+      "@prefix@-@thismachinehostname@"
+    end
     @db.name.should == "PRE-"+Socket.gethostname
   end
 
-  it "General props" do
-    @props["db"][:general.to_s] = "foo"
-    @db.general.should == "foo"
-  end
-
   it "User plain" do
-    @props["db"][:general.to_s] = {"user" => "username"}
-    @db.user.should == "username"
+    def @config.db_general_user
+      "username2"
+    end
+
+    @db.user.should == "username2"
   end
 
   it "Password" do
-    @props["db"][:general.to_s] = {"password" => "thepassword"}
+    def @config.db_general_password
+        "thepassword"
+    end
+
     @db.password.should == "thepassword"
   end
 
   it "User hostname/prefix" do
-    @props["db"][:general.to_s] = {"user" => "@prefix@-@thismachinehostname@"}
+    def @config.db_general_user
+          "@prefix@-@thismachinehostname@"
+    end
     @db.user.should == "PRE-"+Socket.gethostname
   end
 

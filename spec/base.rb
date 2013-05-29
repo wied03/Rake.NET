@@ -18,5 +18,7 @@ RSpec.configure do |config|
   end
 
   config.before(:each) do
+    @config = BradyW::BaseConfig.new
+    BradyW::Config.stub!(:activeConfiguration).and_return(@config)
   end
 end
