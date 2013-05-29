@@ -33,3 +33,4 @@ NuGet.exe
 nuget.config
 .DS_Store
 nuget_pkg_lnk
+packages
