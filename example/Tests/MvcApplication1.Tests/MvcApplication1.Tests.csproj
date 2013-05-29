@@ -62,12 +62,6 @@
     <Content Include="AuthoringTests.txt" />
     <Content Include="App.config" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\Project\MvcApplication1\MvcApplication1.csproj">
-      <Project>{1880FE2C-E01D-471D-90BC-C4663AAD964D}</Project>
-      <Name>MvcApplication1</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

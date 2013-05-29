@@ -1,0 +1,29 @@
+GIT
+  remote: git://github.com/wied03/buildconfig.git
+  revision: 7ad31ad240f0a9acf8aa4eb151d89af4611af94c
+  specs:
+    bwbuildconfig (1.0.0)
+
+PATH
+  remote: ..
+  specs:
+    rakedotnet (1.0.114)
+      bwbuildconfig
+      windows-pr
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    win32-api (1.4.8-x86-mingw32)
+    windows-api (0.4.2)
+      win32-api (>= 1.4.5)
+    windows-pr (1.2.2)
+      win32-api (>= 1.4.5)
+      windows-api (>= 0.3.0)
+
+PLATFORMS
+  x86-mingw32
+
+DEPENDENCIES
+  bwbuildconfig (= 1.0.0)!
+  rakedotnet!
