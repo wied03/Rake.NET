@@ -8,6 +8,7 @@ require "config"
 require "minifyjs"
 require "msbuild"
 require "mstest"
+require "nunit"
 require "iis"
 
 @config = BradyW::Config.instance.values
@@ -40,8 +41,8 @@ end
 task :test => [:codetest, :jstest]
 
 with ('Tests') do |t|
-	BradyW::MSTest.new :codetest => :build do |test|
-		test.files = FileList["#{t}/**/bin/Debug/*.Tests.dll"]
+	BradyW::Nunit.new :codetest => :build do |test|
+		test.files = FileList["#{t}/**/bin/Debug/*.Test.dll"]
 	end
 end
 
