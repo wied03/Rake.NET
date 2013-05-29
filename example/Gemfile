@@ -1,3 +1,4 @@
 source 'https://rubygems.org'
+gem 'rake'
 gem 'rakedotnet', :path => '..'
 gem 'bwbuildconfig', '1.0.0', :git => 'git://github.com/wied03/buildconfig.git'

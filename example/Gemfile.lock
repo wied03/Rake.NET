@@ -7,13 +7,14 @@ GIT
 PATH
   remote: ..
   specs:
-    rakedotnet (1.0.114)
+    rakedotnet (1.0.118)
       bwbuildconfig
       windows-pr
 
 GEM
   remote: https://rubygems.org/
   specs:
+    rake (10.0.4)
     win32-api (1.4.8-x86-mingw32)
     windows-api (0.4.2)
       win32-api (>= 1.4.5)
@@ -26,4 +27,5 @@ PLATFORMS
 
 DEPENDENCIES
   bwbuildconfig (= 1.0.0)!
+  rake
   rakedotnet!
