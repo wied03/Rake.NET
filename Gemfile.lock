@@ -4,12 +4,6 @@ GIT
   specs:
     win32stub (1.0.1)
 
-GIT
-  remote: git://github.com/wied03/buildconfig.git
-  revision: f24da7644b297d215b82818f355ebccfeb6e0aba
-  specs:
-    bwbuildconfig (1.0.0)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -32,7 +26,6 @@ PLATFORMS
   x86-mingw32
 
 DEPENDENCIES
-  bwbuildconfig (= 1.0.0)!
   ci_reporter
   rake
   rspec

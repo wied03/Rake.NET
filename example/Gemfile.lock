@@ -7,7 +7,7 @@ GIT
 PATH
   remote: ..
   specs:
-    rakedotnet (1.0.118)
+    rakedotnet (1.0.132)
       bwbuildconfig
       windows-pr
 

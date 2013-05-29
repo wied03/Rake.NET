@@ -17,7 +17,6 @@
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" scope="PROVIDED" name="builder (v3.2.0, RVM: ruby-1.9.3-p392 [rakenet]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="bundler (v1.3.5, RVM: ruby-1.9.3-p392 [rakenet]) [gem]" level="application" />
-    <orderEntry type="library" scope="PROVIDED" name="bwbuildconfig (v1.0.0@f24da7, RVM: ruby-1.9.3-p392 [rakenet]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="ci_reporter (v1.8.4, RVM: ruby-1.9.3-p392 [rakenet]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="diff-lcs (v1.2.4, RVM: ruby-1.9.3-p392 [rakenet]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="rake (v10.0.4, RVM: ruby-1.9.3-p392 [rakenet]) [gem]" level="application" />

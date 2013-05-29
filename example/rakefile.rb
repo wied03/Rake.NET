@@ -1,3 +1,5 @@
+$: << File.expand_path(File.dirname(__FILE__))
+
 require "bcp"
 require "sqlcmd"
 require "tools"
@@ -13,8 +15,8 @@ with("Javascript") do |js|
 	BradyW::JsTest.new :jstest do |j|
 		j.files = FileList["#{js}/src/**/*.js",
 						   "#{js}/test/**/*.js"]
-		j.browsers = @props['test']['javascript']['browsers']
-		j.port = @props['test']['javascript']['port']
+		j.browsers = @props.test_javascript_browsers
+		j.port = @props.test_javascript_port
 	end
 end
 
