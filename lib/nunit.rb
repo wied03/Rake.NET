@@ -33,7 +33,7 @@ module BradyW
     end
 
     def path
-      @path || "C:\\Program Files\\NUnit-#{version}\\bin"
+      @path || "C:\\Program Files (x86)\\NUnit-#{version}\\bin"
     end
 
 
