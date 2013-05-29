@@ -18,6 +18,5 @@ Gem::Specification.new do |s|
   s.author = "Brady Wied"
   s.email = "brady@wied.us"        
   s.add_dependency('bwbuildconfig')
-  s.add_dependency('windows-pr')
-  s.platform = 'mswin32'
+  s.add_dependency('windows-pr')  
 end
