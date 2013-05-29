@@ -9,7 +9,7 @@ describe BradyW::Nunit do
       test.files = ["file1.dll", "file2.dll"]
     end
     task.exectaskpublic
-    task.excecutedPop.should == "\"C:\\Program Files (x86)\\NUnit-2.6.2\\bin\\nunit-console.exe\" /framework=4.5 file1.dll file2.dll"
+    task.excecutedPop.should == "\"C:\\Program Files (x86)\\NUnit 2.6.2\\bin\\nunit-console.exe\" /framework=4.5 file1.dll file2.dll"
   end
 
   it 'uses NUnit 2.6.1' do
@@ -18,7 +18,7 @@ describe BradyW::Nunit do
         test.version = "2.6.1"
       end
       task.exectaskpublic
-      task.excecutedPop.should == "\"C:\\Program Files (x86)\\NUnit-2.6.1\\bin\\nunit-console.exe\" /framework=4.5 file1.dll file2.dll"
+      task.excecutedPop.should == "\"C:\\Program Files (x86)\\NUnit 2.6.1\\bin\\nunit-console.exe\" /framework=4.5 file1.dll file2.dll"
     end
 
   it 'uses a configured custom path' do
@@ -36,6 +36,6 @@ describe BradyW::Nunit do
         test.framework_version = :v3_5
       end
       task.exectaskpublic
-      task.excecutedPop.should == "\"C:\\Program Files (x86)\\NUnit-2.6.2\\bin\\nunit-console.exe\" /framework=3.5 file1.dll file2.dll"
+      task.excecutedPop.should == "\"C:\\Program Files (x86)\\NUnit 2.6.2\\bin\\nunit-console.exe\" /framework=3.5 file1.dll file2.dll"
     end
 end
