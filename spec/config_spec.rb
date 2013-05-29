@@ -12,7 +12,7 @@ describe "Configuration Works Properly" do
 
   def fetchprops(defaultfile,userfile)
     # get around the private method
-    BradyW::Config.send(:new,defaultfile,userfile).currentConfiguration
+    BradyW::Config.send(:new,defaultfile,userfile).values
   end
 
   it "Should work fine with only default properties" do
@@ -34,7 +34,7 @@ describe "Configuration Works Properly" do
   end
 
   it "Should work OK with default + completely filled out user properties" do
-    props = BradyW::Config.send(:new).currentConfiguration
+    props = BradyW::Config.send(:new).values
 
     props.setting.should == "yep2"
     props.setting2.should == "nope2"

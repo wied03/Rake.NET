@@ -65,7 +65,7 @@ module BradyW
     def initialize (parameters = :task)
       super parameters
       @dbprops = Database.new
-      @config =  Config.activeConfiguration
+      @config =  Config.instance.values
       # We don't want the temp file/time changing on us during the run
       @tempfile = Sqlcmd.generatetempfilename
     end

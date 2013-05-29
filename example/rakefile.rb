@@ -10,13 +10,13 @@ require "msbuild"
 require "mstest"
 require "iis"
 
-@props = BradyW::Config.props
+@config = BradyW::Config.instance.values
 with("Javascript") do |js|
 	BradyW::JsTest.new :jstest do |j|
 		j.files = FileList["#{js}/src/**/*.js",
 						   "#{js}/test/**/*.js"]
-		j.browsers = @props.test_javascript_browsers
-		j.port = @props.test_javascript_port
+		j.browsers = @config.test_javascript_browsers
+		j.port = @config.test_javascript_port
 	end
 end
 

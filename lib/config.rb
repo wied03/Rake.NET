@@ -1,17 +1,11 @@
 require "base_config"
+require "singleton"
 
 module BradyW
   # Using the bwbuildconfig GEM, does a singleton fetch of properties from the YAML config files
   class Config
-    attr_accessor :currentConfiguration
-
-    @@activeConfiguration = Config.new
-    private_class_method :new
-
-    # Retrieve (using lazy instantation) our properties
-    def self.activeConfiguration
-      @@activeConfiguration
-    end
+    include Singleton
+    attr_accessor :values
 
     def initialize(defaultfile = "local_properties_default.rb",
                    userfile = "local_properties.rb")
@@ -25,7 +19,7 @@ module BradyW
       end
       configclass = BaseConfig.subclasses[-1]
       puts "Using configuration class: #{configclass.name}"
-      @currentConfiguration = configclass.new
+      @values = configclass.new
     end
   end
 end

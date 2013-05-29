@@ -7,7 +7,7 @@ module BradyW
   class Database
 
     def initialize
-      @config = Config.activeConfiguration
+      @config = Config.instance.values
     end
 
     private

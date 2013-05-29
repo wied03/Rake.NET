@@ -1,14 +1,7 @@
-GIT
-  remote: git://github.com/wied03/buildconfig.git
-  revision: 7ad31ad240f0a9acf8aa4eb151d89af4611af94c
-  specs:
-    bwbuildconfig (1.0.0)
-
 PATH
   remote: ..
   specs:
-    rakedotnet (1.0.132)
-      bwbuildconfig
+    rakedotnet (1.0.175)
       windows-pr
 
 GEM
@@ -26,6 +19,5 @@ PLATFORMS
   x86-mingw32
 
 DEPENDENCIES
-  bwbuildconfig (= 1.0.0)!
   rake
   rakedotnet!

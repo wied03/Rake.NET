@@ -2,6 +2,7 @@ $: << File.expand_path(File.dirname(__FILE__) +"/../lib")
 require "rspec"
 # Needed to mock out our config/props
 require 'config'
+require "singleton"
 
 include FileUtils
 
@@ -19,6 +20,13 @@ RSpec.configure do |config|
 
   config.before(:each) do
     @config = BradyW::BaseConfig.new
-    BradyW::Config.stub!(:activeConfiguration).and_return(@config)
+    class MockConfig
+      include Singleton
+      attr_accessor :values
+    end
+
+    # Force only our base class to be returned
+    BradyW::Config.stub!(:instance).and_return(MockConfig.instance)
+    MockConfig.instance.values = @config
   end
 end

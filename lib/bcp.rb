@@ -43,7 +43,7 @@ loading them in with BCP.
           def initialize (parameters = :task)
             super parameters
             @dbprops = Database.new
-            @config = BradyW::Config.activeConfiguration
+            @config = BradyW::Config.instance.values
             tmpDir = ENV['TMP'] || '/tmp'
             @tmp = "#{tmpDir}/bcp"
           end
