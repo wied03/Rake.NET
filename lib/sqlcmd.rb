@@ -65,6 +65,7 @@ module BradyW
     def initialize (parameters = :task)
       super parameters
       @dbprops = Database.new
+      @config =  Config.activeConfiguration
       # We don't want the temp file/time changing on us during the run
       @tempfile = Sqlcmd.generatetempfilename
     end
@@ -155,12 +156,14 @@ module BradyW
     end
 
     def connect
-      props = @dbprops.dbprops[credentialsString]
-      if props['mode'] == "winauth"
+      # TODO: Use better class structure in the config file
+      prefix = "db_#{credentialsString}_"
+      authMode = @config.send("#{prefix}authmode")
+      if authMode == :winauth
             CONNECT_STRING_WINAUTH % [@dbprops.host]
         else
-            CONNECT_STRING_SQLAUTH % [props["user"],
-                                      props['password'],
+            CONNECT_STRING_SQLAUTH % [@config.send("#{prefix}user"),
+                                      @config.send("#{prefix}password"),
                                       @dbprops.host]
       end
     end   
@@ -182,7 +185,7 @@ module BradyW
          'dbuser' => @dbprops.user}
 
       if (credentials == :system || makedynamic)
-        default['sqlserverdatadirectory'] = "\"#{@dbprops.dbprops[:system.to_s]['data-dir']}\""
+        default['sqlserverdatadirectory'] = "\"#{@config.db_system_datadir}\""
         default['dbpassword'] = @dbprops.password
       end
 
