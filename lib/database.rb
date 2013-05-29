@@ -44,16 +44,14 @@ module BradyW
 
     # Using the template in the YAML files, produces a .NET connect string
     def connect_code
-      connects = dbprops['connect-strings']
-      props = dbprops[:general.to_s]
-      if @config.db_general_authmode == "winauth"
+      if @config.db_general_authmode == :winauth
         @config.db_connect_string_winauth.gsub(/@host@/, host).
             gsub(/@initialcatalog@/, name)
       else
         @config.db_connect_string_sqlauth.gsub(/@host@/, host).
             gsub(/@initialcatalog@/, name).
             gsub(/@user@/, user).
-            gsub(/@password@/, props['password'])
+            gsub(/@password@/, @config.db_general_password)
       end
     end
   end

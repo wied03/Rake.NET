@@ -47,22 +47,42 @@ describe BradyW::Database do
   end
 
   it "Connect String for .NET Code/SQL Auth" do
-    @props["db"]["hostname"] = "myhostname"
-    @props['db'][:general.to_s] = {"mode" => "sqlauth",
-                                   "user" => "theuser",
-                                   "password" => "thepassword"}
-    
-    @props['db']["connect-strings"] =
-             {"sqlauth" => "user @user@ pass @password@ host @host@ db @initialcatalog@"}
+    def @config.db_hostname
+      "myhostname"
+    end
+
+    def @config.db_general_authmode
+      :sqlauth
+    end
+
+    def @config.db_general_user
+      "theuser"
+    end
+
+    def @config.db_general_password
+      "thepassword"
+    end
+
+    def @config.db_connect_string_sqlauth
+      "user @user@ pass @password@ host @host@ db @initialcatalog@"
+    end
+
     @db.connect_code.should == "user theuser pass thepassword host myhostname db regulardb"
   end
 
   it "Connect String for .NET Code/Windows Auth" do
-    @props["db"]["hostname"] = "myhostname"
-    @props['db'][:general.to_s] = {"mode" => "winauth"}
+    def @config.db_hostname
+          "myhostname"
+    end
 
-    @props['db']["connect-strings"] =
-             {"winauth" => "host @host@ db @initialcatalog@"}
+    def @config.db_general_authmode
+          :winauth
+    end
+
+    def @config.db_connect_string_winauth
+      "host @host@ db @initialcatalog@"
+    end
+
     @db.connect_code.should == "host myhostname db regulardb"
   end
 end
