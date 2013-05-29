@@ -14,11 +14,11 @@ describe BradyW::Sqlcmd do
     end
 
     def parseProps (actual)
-        actualProps = actual.match(/.*-v (.+) -/)[1].scan(/('.*?'|\S+=".*?"|\S+)/).map do |kv|
+      actualProps = actual.match(/.*-v (.+) -/)[1].scan(/('.*?'|\S+=".*?"|\S+)/).map do |kv|
         arr = kv[0].split('=')
-        {:k => arr[0], :v =>arr[1]}
-        end
-        actualProps
+        {:k => arr[0], :v => arr[1]}
+      end
+      actualProps
     end
   end
 
@@ -29,7 +29,7 @@ describe BradyW::Sqlcmd do
     end
 
     def parseProps (actual)
-        actual.match(/.*-v (.+) -/)[1].scan(/('.*?'|\S+=".*?"|\S+)/)
+      actual.match(/.*-v (.+) -/)[1].scan(/('.*?'|\S+=".*?"|\S+)/)
     end
   end
 
@@ -37,22 +37,61 @@ describe BradyW::Sqlcmd do
     # It uses the current date, which is harder to test
     BradyW::Sqlcmd.stub!(:generatetempfilename).and_return "tempfile.sql"
   end
-  
-  before(:each) do    
+
+  before(:each) do
     @db = BradyW::Database.new
-    @props["db"] = {"name" => "regulardb",
-                    "hostname" => "myhostname"}
-    @props["project"] = {"prefix" => "PRE"}
-    @props['db'][:general.to_s] = {"mode" => "sqlauth",
-                                   "user" => "theuser",
-                                   "password" => "thepassword"}
-    @props['db'][:system.to_s] = {"mode" => "sqlauth",
-                                  "user" => "systemuser",
-                                  "password" => "systempassword",
-                                  "data-dir" => "F:\\"}
-    @props['db'][:objectcreation.to_s] = {"mode" => "sqlauth",
-                                          "user" => "objectcreateuser",
-                                          "password" => "objectcreatepassword"}
+
+    def @config.db_name
+      "regulardb"
+    end
+
+    def @config.db_hostname
+      "myhostname"
+    end
+
+    def @config.db_general_authmode
+      :sqlauth
+    end
+
+    def @config.db_general_user
+      "theuser"
+    end
+
+    def @config.db_general_password
+      "thepassword"
+    end
+
+    def @config.project_prefix
+      "PRE"
+    end
+
+    def @config.db_system_authmode
+      :sqlauth
+    end
+
+    def @config.db_system_user
+      "systemuser"
+    end
+
+    def @config.db_system_password
+      "systempassword"
+    end
+
+    def @config.db_system_datadir
+      "F:\\"
+    end
+
+    def @config.db_objectcreation_authmode
+      :sqlauth
+    end
+
+    def @config.db_objectcreation_user
+      "objectcreateuser"
+    end
+
+    def @config.db_objectcreation_password
+      "objectcreatepassword"
+    end
   end
 
   after(:each) do
@@ -83,7 +122,9 @@ describe BradyW::Sqlcmd do
   end
 
   it "Should work with a custom version and default (non create) credentials in Win auth mode" do
-    @props['db'][:general.to_s]["mode"] = "winauth"
+    def @config.db_general_authmode
+      :winauth
+    end
 
     task = BradyW::Sqlcmd.new do |sql|
       sql.files = testdata
@@ -127,14 +168,14 @@ describe BradyW::Sqlcmd do
     expected = IO.readlines("data/sqlcmd/expected.sql")
     actual = IO.readlines("data/output/tempfile.sql")
 
-    actual.should == expected 
+    actual.should == expected
   end
 
   it "Fails properly with invalid credential specifier" do
     task = BradyW::Sqlcmd.new do |sql|
       sql.files = testdata
-      lambda {sql.credentials = :foo}.should raise_exception("Invalid credentials value!  Allowed values: :system, :objectcreation, :general")
-    end    
+      lambda { sql.credentials = :foo }.should raise_exception("Invalid credentials value!  Allowed values: :system, :objectcreation, :general")
+    end
   end
 
   it "Works fine with objectcreation credentials in SQL auth mode" do
@@ -161,7 +202,9 @@ describe BradyW::Sqlcmd do
   end
 
   it "Works fine with system credentials in Win auth mode" do
-    @props['db'][:system.to_s]["mode"] = "winauth"
+    def @config.db_system_authmode
+      :winauth
+    end
 
     task = BradyW::Sqlcmd.new do |sql|
       sql.files = testdata
@@ -171,7 +214,7 @@ describe BradyW::Sqlcmd do
     task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
 
     task.exectaskpublic
-     execed = task.excecutedPop
+    execed = task.excecutedPop
     execed.should match(/"z:\\sqlcmd\.exe" -E -S myhostname -e -b -v .* -i tempfile.sql/)
 
     execed.should have_sql_property ({:k => "dbname", :v => "regulardb"})
@@ -183,16 +226,16 @@ describe BradyW::Sqlcmd do
     expected = IO.readlines("data/sqlcmd/expected.sql")
     actual = IO.readlines("data/output/tempfile.sql")
 
-    actual.should == expected 
+    actual.should == expected
   end
 
   it "Works fine with additional variables" do
     task = BradyW::Sqlcmd.new do |sql|
       sql.files = testdata
       sql.credentials = :system
-      sql.variables = { "var1" => "val1",
-                        "dbpassword" => "yesitsoktooverride",
-                        "spacevar" => "deals with space right"}
+      sql.variables = {"var1" => "val1",
+                       "dbpassword" => "yesitsoktooverride",
+                       "spacevar" => "deals with space right"}
     end
 
     task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
@@ -219,9 +262,9 @@ describe BradyW::Sqlcmd do
   it "Works fine with custom variables" do
     task = BradyW::Sqlcmd.new do |sql|
       sql.files = testdata
-      sql.variables = { "var1" => "val1",
-                        "dbpassword" => "yesitsoktooverride",
-                        "spacevar" => "deals with space right"}
+      sql.variables = {"var1" => "val1",
+                       "dbpassword" => "yesitsoktooverride",
+                       "spacevar" => "deals with space right"}
     end
 
     task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
@@ -243,7 +286,7 @@ describe BradyW::Sqlcmd do
     actual.should == expected
 
   end
-  
+
   it "Fails the build properly (and gracefully) if sqlcmd has an error" do
     task = BradyW::Sqlcmd.new do |sql|
       sql.files = testdata
@@ -251,13 +294,13 @@ describe BradyW::Sqlcmd do
 
     task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
     task.stub!(:shell).and_yield(nil, SimulateProcessFailure.new)
-    
-    lambda {task.exectaskpublic}.should raise_exception("Command failed with status (BW Rake Task Problem):")
+
+    lambda { task.exectaskpublic }.should raise_exception("Command failed with status (BW Rake Task Problem):")
 
     # This means our temporary file was correctly cleaned up
     File.exist?("tempfile.sql").should_not == true
-    # Our test code should have done this 
-    File.exist?("data/output/tempfile.sql").should == true    
+    # Our test code should have done this
+    File.exist?("data/output/tempfile.sql").should == true
   end
 
   it "Properly changes strings to dynamic ones in SQL files" do
@@ -276,5 +319,5 @@ describe BradyW::Sqlcmd do
     actual = IO.readlines("data/output/makedynamic/01-tables/dynamic_input.sql")
     actual.should == expected
   end
-  
+
 end

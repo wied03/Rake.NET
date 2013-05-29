@@ -1,16 +1,25 @@
-require "yaml_config"
+require "base_config"
+require "singleton"
 
 module BradyW
-  # Using the bwyamlconfig GEM, does a singleton fetch of properties from the YAML config files
+  # Using the bwbuildconfig GEM, does a singleton fetch of properties from the YAML config files
   class Config
-    private_class_method :new
+    include Singleton
+    attr_accessor :values
 
-    @@props = nil
-
-    # Retrieve (using lazy instantation) our properties
-    def Config.props
-      @@props = BW::YAMLConfig.new.props unless @@props
-      @@props
+    def initialize(defaultfile = "local_properties_default.rb",
+                   userfile = "local_properties.rb")
+      puts "Using props file #{defaultfile} for default values"
+      require defaultfile
+      begin
+        puts "Attempting to use props file #{userfile} for user/environment values"
+        require userfile
+      rescue LoadError
+        puts "No user config file available"
+      end
+      configclass = BaseConfig.subclasses[-1]
+      puts "Using configuration class: #{configclass.name}"
+      @values = configclass.new
     end
   end
 end

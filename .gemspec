@@ -16,8 +16,6 @@ Gem::Specification.new do |s|
   s.has_rdoc = true
   s.rdoc_options << '--inline-source' << '--line-numbers'
   s.author = "Brady Wied"
-  s.email = "brady@wied.us"        
-  s.add_dependency('bwyamlconfig')
-  s.add_dependency('windows-pr')
-  s.platform = 'mswin32'
+  s.email = "brady@wied.us"          
+  s.add_dependency('windows-pr')  
 end

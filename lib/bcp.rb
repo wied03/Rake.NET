@@ -43,6 +43,7 @@ loading them in with BCP.
           def initialize (parameters = :task)
             super parameters
             @dbprops = Database.new
+            @config = BradyW::Config.instance.values
             tmpDir = ENV['TMP'] || '/tmp'
             @tmp = "#{tmpDir}/bcp"
           end
@@ -111,7 +112,7 @@ loading them in with BCP.
           # BCP doesn't allow initial catalogs for SQL auth, but does for winauth and we need them
           # since winauth users might use several schemas
           def prefix
-              if @dbprops.general['mode'] == "winauth"
+              if @config.db_general_authmode == :winauth
                   "%s.dbo." % [@dbprops.name]
               else
                   ""
@@ -123,8 +124,7 @@ loading them in with BCP.
           end
 
           def connect_string
-            gen = @dbprops.general
-            if gen['mode'] == "winauth"
+            if @config.db_general_authmode == :winauth
                 "-T -S %s" % [@dbprops.host]
             else
                 "-U %s -P %s /S%s" % [@dbprops.user,

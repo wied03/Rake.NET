@@ -4,12 +4,29 @@ require "basetaskmocking"
 
 describe BradyW::BCP do
   before(:each) do
-    @props["db"] = {"name" => "regulardb"}
-    @props["db"]["hostname"] = "myhostname"
-    @props['db'][:general.to_s] = {"mode" => "sqlauth",
-                                   "user" => "theuser",
-                                   "password" => "thepassword"}
-    @props["project"] = {"prefix" => "PRE"}
+    def @config.db_name
+      "regulardb"
+    end
+
+    def @config.db_hostname
+      "myhostname"
+    end
+
+    def @config.db_general_authmode
+      :sqlauth
+    end
+
+    def @config.db_general_user
+      "theuser"
+    end
+
+    def @config.db_general_password
+      "thepassword"
+    end
+
+    def @config.project_prefix
+      "PRE"
+    end
   end
 
   after(:each) do
@@ -43,7 +60,10 @@ describe BradyW::BCP do
   end
 
   it "Works OK with custom delimiters, Custom Version, and Windows Auth" do
-    @props['db'][:general.to_s] = {"mode" => "winauth"}
+    def @config.db_general_authmode
+      :winauth
+    end
+
     task = BradyW::BCP.new do |bcp|
       bcp.files = FileList["data/bcp/01-firsttable.csv",
                            "data/bcp/02-nexttable.csv"]
@@ -70,12 +90,15 @@ describe BradyW::BCP do
   end
 
   it "Handles delimiter interference Properly" do
-    @props['db']["use"] = {"mode" => "winauth"}
+    def @config.db_general_authmode
+          :winauth
+        end
+
     task = BradyW::BCP.new do |bcp|
       bcp.files = FileList["data/bcp/delimInData.csv"]
     end
 
-    lambda {task.exectaskpublic}.should raise_exception()     
+    lambda { task.exectaskpublic }.should raise_exception()
   end
 
   it "Handles failure gracefully" do
@@ -89,7 +112,7 @@ describe BradyW::BCP do
 
     task.stub!(:shell).and_yield(nil, SimulateProcessFailure.new)
 
-    lambda {task.exectaskpublic}.should raise_exception("Command failed with status (BW Rake Task Problem):")
+    lambda { task.exectaskpublic }.should raise_exception("Command failed with status (BW Rake Task Problem):")
 
     # This means our temporary file was correctly cleaned up
     File.exist?("#{ENV['tmp']}/bcp").should_not == true

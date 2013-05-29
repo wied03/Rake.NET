@@ -1,3 +1,5 @@
+$: << File.expand_path(File.dirname(__FILE__))
+
 require "bcp"
 require "sqlcmd"
 require "tools"
@@ -6,15 +8,16 @@ require "config"
 require "minifyjs"
 require "msbuild"
 require "mstest"
+require "nunit"
 require "iis"
 
-@props = BradyW::Config.props
+@config = BradyW::Config.instance.values
 with("Javascript") do |js|
 	BradyW::JsTest.new :jstest do |j|
 		j.files = FileList["#{js}/src/**/*.js",
 						   "#{js}/test/**/*.js"]
-		j.browsers = @props['test']['javascript']['browsers']
-		j.port = @props['test']['javascript']['port']
+		j.browsers = @config.test_javascript_browsers
+		j.port = @config.test_javascript_port
 	end
 end
 
@@ -38,8 +41,8 @@ end
 task :test => [:codetest, :jstest]
 
 with ('Tests') do |t|
-	BradyW::MSTest.new :codetest => :build do |test|
-		test.files = FileList["#{t}/**/bin/Debug/*.Tests.dll"]
+	BradyW::Nunit.new :codetest => :build do |test|
+		test.files = FileList["#{t}/**/bin/Debug/*.Test.dll"]
 	end
 end
 
