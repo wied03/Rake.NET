@@ -29,16 +29,30 @@ describe BradyW::MSBuild do
     end
   end
 
-  it "should build OK vanilla (.NET 4.0)" do
+  it "should build OK vanilla (.NET 4.5)" do
     task = BradyW::MSBuild.new
     task.should_receive(:dotnet).with("v4\\Client").and_return("C:\\yespath\\")
     task.exectaskpublic
     execed = task.excecutedPop
     execed.should include "C:\\yespath\\msbuild.exe"
     execed.should have_build_property ({:k => "Configuration", :v => "Debug"})
-    execed.should have_build_property ({:k => "TargetFrameworkVersion", :v => "v4.0"})
+    execed.should have_build_property ({:k => "TargetFrameworkVersion", :v => "v4.5"})
     execed.should have_build_property_count 2
   end
+
+  it "should build OK (.NET 4.0)" do
+      task = BradyW::MSBuild.new do |t|
+        t.dotnet_bin_version = :v4_0
+        t.compile_version = :v4_0
+      end
+      task.should_receive(:dotnet).with("v4\\Client").and_return("C:\\yespath\\")
+      task.exectaskpublic
+      execed = task.excecutedPop
+      execed.should include "C:\\yespath\\msbuild.exe"
+      execed.should have_build_property ({:k => "Configuration", :v => "Debug"})
+      execed.should have_build_property ({:k => "TargetFrameworkVersion", :v => "v4.0"})
+      execed.should have_build_property_count 2
+    end
 
   it "should fail with an unsupported dotnet_bin_version" do
     task = BradyW::MSBuild.new do |t|
@@ -57,7 +71,7 @@ describe BradyW::MSBuild do
     execed = task.excecutedPop
     execed.should include "C:\\yespath\\msbuild.exe /target:t1"
     execed.should have_build_property ({:k => "Configuration", :v => "Debug"})
-    execed.should have_build_property ({:k => "TargetFrameworkVersion", :v => "v4.0"})
+    execed.should have_build_property ({:k => "TargetFrameworkVersion", :v => "v4.5"})
     execed.should have_build_property_count 2
   end
 
@@ -93,7 +107,7 @@ describe BradyW::MSBuild do
     execed = task.excecutedPop
     execed.should include "C:\\yespath2\\msbuild.exe"
     execed.should have_build_property ({:k => "Configuration", :v => "myconfig"})
-    execed.should have_build_property ({:k => "TargetFrameworkVersion", :v => "v4.0"})
+    execed.should have_build_property ({:k => "TargetFrameworkVersion", :v => "v4.5"})
     execed.should have_build_property ({:k => "prop2", :v => "prop2val"})
     execed.should have_build_property_count 3
   end

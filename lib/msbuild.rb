@@ -10,15 +10,15 @@ module BradyW
         # *Optional* Targets to build.  Can be a single target or an array of targets
 		attr_accessor :targets
 
-        # *Optional* Version of the MSBuild binary to use. Defaults to :v4_0
-        # Other options are :v2_0 or :v3_5
+        # *Optional* Version of the MSBuild binary to use. Defaults to :v4_5
+        # Other options are :v2_0, :v3_5, :v4_0
         attr_accessor :dotnet_bin_version
 
         # *Optional* Solution file to build
         attr_accessor :solution
 
         # *Optional* .NET compilation version (what should MSBuild compile code to, NOT what version
-        # of MSBuild to use).  Defaults to :v4_0).  Other options are :v2_0 or :v3_5
+        # of MSBuild to use).  Defaults to :v4_5).  Other options are :v2_0, :v3_5, :v4_0
         attr_accessor :compile_version
 
         # *Optional* Properties to pass along to MSBuild.  By default 'Configuration' and
@@ -39,7 +39,7 @@ module BradyW
 		end
 		
 		def compile_version
-            symbol =  @compile_version || :v4_0
+            symbol =  @compile_version || :v4_5
             ver = convertToNumber symbol
 			"v#{ver}"
         end
@@ -86,9 +86,11 @@ module BradyW
         end
 
         def path
-          symbol = @dotnet_bin_version || :v4_0
+          symbol = @dotnet_bin_version || :v4_5
           case symbol
             when :v4_0
+              dotnet DOTNET4_REG_PATH
+            when :v4_5
               dotnet DOTNET4_REG_PATH
             when :v3_5
               dotnet DOTNET35_REGPATH
