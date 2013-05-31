@@ -17,11 +17,14 @@ module BradyW
     # *Optional* Location of nunit-console.exe, defaults to C:\Program Files (x86)\NUnit ${version}\bin
     attr_accessor :path
 
+    # *Optional* Timeout for each test case in milliseconds, by default the timeout is 35 seconds
+    attr_accessor :timeout
+
     private
 
     def exectask
       assemblies = files.join(" ")
-      shell "\"#{path}\\nunit-console.exe\" /framework=#{framework_version} #{assemblies}"
+      shell "\"#{path}\\nunit-console.exe\" /framework=#{framework_version} /timeout=#{timeout} #{assemblies}"
     end
 
     def version
@@ -36,6 +39,8 @@ module BradyW
       @path || "C:\\Program Files (x86)\\NUnit #{version}\\bin"
     end
 
-
+    def timeout
+      @timeout || 35000
+    end
   end
 end
