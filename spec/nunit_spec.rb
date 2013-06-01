@@ -9,7 +9,7 @@ describe BradyW::Nunit do
       test.files = ["file1.dll", "file2.dll"]
     end
     task.exectaskpublic
-    task.excecutedPop.should == "\"C:\\Program Files (x86)\\NUnit 2.6.2\\bin\\nunit-console.exe\" /framework=4.5 /timeout=35000 file1.dll file2.dll"
+    task.excecutedPop.should == "\"C:\\Program Files (x86)\\NUnit 2.6.2\\bin\\nunit-console.exe\" /noxml /framework=4.5 /timeout=35000 file1.dll file2.dll"
   end
 
   it 'uses NUnit 2.6.1' do
@@ -18,7 +18,7 @@ describe BradyW::Nunit do
       test.version = "2.6.1"
     end
     task.exectaskpublic
-    task.excecutedPop.should == "\"C:\\Program Files (x86)\\NUnit 2.6.1\\bin\\nunit-console.exe\" /framework=4.5 /timeout=35000 file1.dll file2.dll"
+    task.excecutedPop.should == "\"C:\\Program Files (x86)\\NUnit 2.6.1\\bin\\nunit-console.exe\" /noxml /framework=4.5 /timeout=35000 file1.dll file2.dll"
   end
 
   it 'uses a configured custom path' do
@@ -27,7 +27,7 @@ describe BradyW::Nunit do
       test.path = "C:\\SomeOtherplace"
     end
     task.exectaskpublic
-    task.excecutedPop.should == "\"C:\\SomeOtherplace\\nunit-console.exe\" /framework=4.5 /timeout=35000 file1.dll file2.dll"
+    task.excecutedPop.should == "\"C:\\SomeOtherplace\\nunit-console.exe\" /noxml /framework=4.5 /timeout=35000 file1.dll file2.dll"
   end
 
   it 'uses a custom timeout' do
@@ -36,7 +36,7 @@ describe BradyW::Nunit do
       test.timeout = 25
     end
     task.exectaskpublic
-    task.excecutedPop.should == "\"C:\\Program Files (x86)\\NUnit 2.6.2\\bin\\nunit-console.exe\" /framework=4.5 /timeout=25 file1.dll file2.dll"
+    task.excecutedPop.should == "\"C:\\Program Files (x86)\\NUnit 2.6.2\\bin\\nunit-console.exe\" /noxml /framework=4.5 /timeout=25 file1.dll file2.dll"
   end
 
   it 'uses .NET 3.5' do
@@ -45,7 +45,7 @@ describe BradyW::Nunit do
       test.framework_version = :v3_5
     end
     task.exectaskpublic
-    task.excecutedPop.should == "\"C:\\Program Files (x86)\\NUnit 2.6.2\\bin\\nunit-console.exe\" /framework=3.5 /timeout=35000 file1.dll file2.dll"
+    task.excecutedPop.should == "\"C:\\Program Files (x86)\\NUnit 2.6.2\\bin\\nunit-console.exe\" /noxml /framework=3.5 /timeout=35000 file1.dll file2.dll"
   end
 
   it 'can handle a single specific test to run' do
@@ -55,16 +55,26 @@ describe BradyW::Nunit do
     end
 
     task.exectaskpublic
-    task.excecutedPop.should == "\"C:\\Program Files (x86)\\NUnit 2.6.2\\bin\\nunit-console.exe\" /framework=4.5 /timeout=35000 /run=some.test file1.dll file2.dll"
+    task.excecutedPop.should == "\"C:\\Program Files (x86)\\NUnit 2.6.2\\bin\\nunit-console.exe\" /noxml /framework=4.5 /timeout=35000 /run=some.test file1.dll file2.dll"
   end
 
   it 'can handle a multiple specific tests to run' do
-      task = BradyW::Nunit.new do |test|
-        test.files = ["file1.dll", "file2.dll"]
-        test.tests = ["some.test","some.other.test"]
-      end
-
-      task.exectaskpublic
-      task.excecutedPop.should == "\"C:\\Program Files (x86)\\NUnit 2.6.2\\bin\\nunit-console.exe\" /framework=4.5 /timeout=35000 /run=some.test,some.other.test file1.dll file2.dll"
+    task = BradyW::Nunit.new do |test|
+      test.files = ["file1.dll", "file2.dll"]
+      test.tests = ["some.test", "some.other.test"]
     end
+
+    task.exectaskpublic
+    task.excecutedPop.should == "\"C:\\Program Files (x86)\\NUnit 2.6.2\\bin\\nunit-console.exe\" /noxml /framework=4.5 /timeout=35000 /run=some.test,some.other.test file1.dll file2.dll"
+  end
+
+  it 'should work OK if XML output is turned on' do
+    task = BradyW::Nunit.new do |test|
+      test.files = ["file1.dll", "file2.dll"]
+      test.xml_output = :enabled
+    end
+    task.exectaskpublic
+    task.excecutedPop.should == "\"C:\\Program Files (x86)\\NUnit 2.6.2\\bin\\nunit-console.exe\" /framework=4.5 /timeout=35000 file1.dll file2.dll"
+
+  end
 end

@@ -23,11 +23,22 @@ module BradyW
     # *Optional* Which tests should be run (specify namespace+class), can be multiple, defaults to all in class
     attr_accessor :tests
 
+    # *Optional* Should XML be outputted?  By default the answer is no, but set this to :enabled if you want XML output
+    attr_accessor :xml_output
+
     private
 
     def exectask
       assemblies = files.join(" ")
-      shell "\"#{path}\\nunit-console.exe\" /framework=#{framework_version} /timeout=#{timeout}#{testsparam}#{assemblies}"
+      shell "\"#{path}\\nunit-console.exe\"#{xml_output_flat}/framework=#{framework_version} /timeout=#{timeout}#{testsparam}#{assemblies}"
+    end
+
+    def xml_output_flat
+      xml_output == :disabled ? " /noxml " : " "
+    end
+
+    def xml_output
+      @xml_output || :disabled
     end
 
     def version
