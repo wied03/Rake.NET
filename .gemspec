@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
   s.files = FileList["#{src}/**/*.rb",
                      "#{testdir}/**/*.rb"]
   s.test_files = FileList["#{testdir}/**/*.rb"]
-  s.version = env['version_number']
+  s.version = ENV['version_number']
   s.summary = "Rake tasks for building .NET projects"
   s.description = s.summary      
   s.has_rdoc = true
