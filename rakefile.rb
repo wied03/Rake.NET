@@ -2,7 +2,6 @@ require 'psych'
 require 'rake/clean'
 require 'rubygems'
 require 'rspec/core/rake_task'
-require './lib/version'
 require './lib/tools'
 
 task :ci => [:clean,:spec,:gem,:pushtorepo]
