@@ -20,15 +20,24 @@ module BradyW
     # *Optional* Timeout for each test case in milliseconds, by default the timeout is 35 seconds
     attr_accessor :timeout
 
+    # *Optional* Which tests should be run (specify namespace+class), can be multiple, defaults to all in class
+    attr_accessor :tests
+
     private
 
     def exectask
       assemblies = files.join(" ")
-      shell "\"#{path}\\nunit-console.exe\" /framework=#{framework_version} /timeout=#{timeout} #{assemblies}"
+      shell "\"#{path}\\nunit-console.exe\" /framework=#{framework_version} /timeout=#{timeout}#{testsparam}#{assemblies}"
     end
 
     def version
       @version || "2.6.2"
+    end
+
+    def testsparam
+      return " " unless @tests
+      flat = @tests.is_a?(Array) ? @tests.join(",") : @tests
+      " /run=#{flat} "
     end
 
     def framework_version

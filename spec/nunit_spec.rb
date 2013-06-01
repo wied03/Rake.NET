@@ -47,4 +47,24 @@ describe BradyW::Nunit do
     task.exectaskpublic
     task.excecutedPop.should == "\"C:\\Program Files (x86)\\NUnit 2.6.2\\bin\\nunit-console.exe\" /framework=3.5 /timeout=35000 file1.dll file2.dll"
   end
+
+  it 'can handle a single specific test to run' do
+    task = BradyW::Nunit.new do |test|
+      test.files = ["file1.dll", "file2.dll"]
+      test.tests = "some.test"
+    end
+
+    task.exectaskpublic
+    task.excecutedPop.should == "\"C:\\Program Files (x86)\\NUnit 2.6.2\\bin\\nunit-console.exe\" /framework=4.5 /timeout=35000 /run=some.test file1.dll file2.dll"
+  end
+
+  it 'can handle a multiple specific tests to run' do
+      task = BradyW::Nunit.new do |test|
+        test.files = ["file1.dll", "file2.dll"]
+        test.tests = ["some.test","some.other.test"]
+      end
+
+      task.exectaskpublic
+      task.excecutedPop.should == "\"C:\\Program Files (x86)\\NUnit 2.6.2\\bin\\nunit-console.exe\" /framework=4.5 /timeout=35000 /run=some.test,some.other.test file1.dll file2.dll"
+    end
 end
