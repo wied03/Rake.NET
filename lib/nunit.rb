@@ -26,11 +26,14 @@ module BradyW
     # *Optional* Should XML be outputted?  By default the answer is no, but set this to :enabled if you want XML output
     attr_accessor :xml_output
 
+    # *Optional* Should labels be printed in the test output, default is :include_labels, can also say :exclude_labels
+    attr_accessor :labels
+
     private
 
     def exectask
       assemblies = files.join(" ")
-      shell "\"#{path}\\nunit-console.exe\"#{xml_output_flat}/framework=#{framework_version} /timeout=#{timeout}#{testsparam}#{assemblies}"
+      shell "\"#{path}\\nunit-console.exe\"#{labels_flat}#{xml_output_flat}/framework=#{framework_version} /timeout=#{timeout}#{testsparam}#{assemblies}"
     end
 
     def xml_output_flat
@@ -43,6 +46,14 @@ module BradyW
 
     def version
       @version || "2.6.2"
+    end
+
+    def labels
+      @labels || :include_labels
+    end
+
+    def labels_flat
+      labels == :include_labels ? " /labels" : ""
     end
 
     def testsparam
