@@ -29,11 +29,17 @@ module BradyW
     # *Optional* Should labels be printed in the test output, default is :include_labels, can also say :exclude_labels
     attr_accessor :labels
 
+    # *Optional* Where should test output be stored?  Default is console
+    attr_accessor :output
+
+    # *Optional* Where should test errors be stored?  Default is console
+    attr_accessor :errors
+
     private
 
     def exectask
       assemblies = files.join(" ")
-      shell "\"#{path}\\nunit-console.exe\"#{labels_flat}#{xml_output_flat}/framework=#{framework_version} /timeout=#{timeout}#{testsparam}#{assemblies}"
+      shell "\"#{path}\\nunit-console.exe\"#{output}#{errors}#{labels_flat}#{xml_output_flat}/framework=#{framework_version} /timeout=#{timeout}#{testsparam}#{assemblies}"
     end
 
     def xml_output_flat
@@ -42,6 +48,14 @@ module BradyW
 
     def xml_output
       @xml_output || :disabled
+    end
+
+    def output
+      @output ? " /output=#{@output}" : ""
+    end
+
+    def errors
+      @errors ? " /err=#{@errors}" : ""
     end
 
     def version
