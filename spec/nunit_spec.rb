@@ -97,4 +97,14 @@ describe BradyW::Nunit do
     task.exectaskpublic
     task.excecutedPop.should == "\"C:\\Program Files (x86)\\NUnit 2.6.2\\bin\\nunit-console.exe\" /output=somefile.txt /err=someerrorfile.txt /labels /noxml /framework=4.5 /timeout=35000 file1.dll file2.dll"
   end
+
+  it 'Should work OK with x86 arch' do
+    task = BradyW::Nunit.new do |test|
+      test.files = ["file1.dll", "file2.dll"]
+      test.arch = :x86
+    end
+    task.exectaskpublic
+    task.excecutedPop.should == "\"C:\\Program Files (x86)\\NUnit 2.6.2\\bin\\nunit-console-x86.exe\" /labels /noxml /framework=4.5 /timeout=35000 file1.dll file2.dll"
+
+  end
 end
