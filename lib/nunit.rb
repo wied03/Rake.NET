@@ -41,7 +41,7 @@ module BradyW
     private
 
     def exectask
-      assemblies = files.join(" ")
+      assemblies = files.uniq.join(" ")
       shell "\"#{path}\\#{executable}\"#{output}#{errors}#{labels_flat}#{xml_output_flat}/framework=#{framework_version} /timeout=#{timeout}#{testsparam}#{assemblies}"
     end
 
