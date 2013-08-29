@@ -35,11 +35,22 @@ module BradyW
     # *Optional* Where should test errors be stored?  Default is console
     attr_accessor :errors
 
+    # *Optional* Should :x86 or :anycpu archiecture be used?  Default is :anycpu
+    attr_accessor :arch
+
     private
 
     def exectask
-      assemblies = files.join(" ")
-      shell "\"#{path}\\nunit-console.exe\"#{output}#{errors}#{labels_flat}#{xml_output_flat}/framework=#{framework_version} /timeout=#{timeout}#{testsparam}#{assemblies}"
+      assemblies = files.uniq.join(" ")
+      shell "\"#{path}\\#{executable}\"#{output}#{errors}#{labels_flat}#{xml_output_flat}/framework=#{framework_version} /timeout=#{timeout}#{testsparam}#{assemblies}"
+    end
+
+    def executable
+      arch == :anycpu ? "nunit-console.exe" : "nunit-console-x86.exe"
+    end
+
+    def arch
+      @arch || :anycpu
     end
 
     def xml_output_flat
