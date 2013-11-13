@@ -4,6 +4,7 @@ require 'dotframeworksymbolhelp'
 module BradyW
   class Nunit < BaseTask
     include Dotframeworksymbolhelp
+    PROGRAM_FILES_DIR = "C:/Program Files (x86)"
 
     # *Required* Files/assemblies to test
     attr_accessor :files
@@ -14,7 +15,7 @@ module BradyW
     # *Optional* What version of the .NET framework to use for the tests?  :v2_0, :v3_5, :v4_0, :v4_5, defaults to :v4_5
     attr_accessor :framework_version
 
-    # *Optional* Location of nunit-console.exe, defaults to C:\Program Files (x86)\NUnit ${version}\bin
+    # *Optional* Full path of nunit-console.exe, defaults to C:\Program Files (x86)\NUnit ${version}\bin\nunit-console.exe
     attr_accessor :path
 
     # *Optional* Timeout for each test case in milliseconds, by default the timeout is 35 seconds
@@ -42,7 +43,7 @@ module BradyW
 
     def exectask
       assemblies = files.uniq.join(" ")
-      shell "\"#{path}\\#{executable}\"#{output}#{errors}#{labels_flat}#{xml_output_flat}/framework=#{framework_version} /timeout=#{timeout}#{testsparam}#{assemblies}"
+      shell "\"#{full_path}\"#{output}#{errors}#{labels_flat}#{xml_output_flat}/framework=#{framework_version} /timeout=#{timeout}#{testsparam}#{assemblies}"
     end
 
     def executable
@@ -91,8 +92,12 @@ module BradyW
       convertToNumber(@framework_version || :v4_5)
     end
 
-    def path
-      @path || "C:\\Program Files (x86)\\NUnit #{version}\\bin"
+    def full_path
+      possibleDirectories = ["NUnit #{version}","NUnit-#{version}"]
+      candidates = @path ? [@path] : possibleDirectories.map {|p| File.join(PROGRAM_FILES_DIR,p,"bin",executable) }
+      found = candidates.detect {|c| File.exists? c}
+      return found if found
+      raise "We checked the following locations and could not find nunit-console.exe #{candidates}"
     end
 
     def timeout
