@@ -70,7 +70,7 @@ module BradyW
     end
 
     def version
-      @version || "2.6.2"
+      @version || "2.6.3"
     end
 
     def labels
