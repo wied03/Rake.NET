@@ -18,11 +18,62 @@ module BradyW
     # *Required* Which directory should be scanned?
     attr_accessor :directory_to_scan
 
+    # *Optional* Should the root directory be ignored?
+    attr_accessor :no_root_directory
+
+    # *Optional* File extensions (don't include a dot or any wildcards) that should be ignored. Can be an array or single item
+    attr_accessor :ignore_extensions
+
+    # *Optional* Directories that should be ignored. Can be an array or single item
+    attr_accessor :ignore_directories
+
+    # *Optional* Regular expressions that should be ignored. Can be an array or single item
+    attr_accessor :exclude_regexp
+
     def exectask
-      shell "\"#{path}\"#{directory_to_scan}#{directory_reference}#{component_group} #{@output_file}#{the_alias} -verbose"
+      validate
+      params = [directory_to_scan,
+                directory_reference,
+                component_group,
+                @output_file,
+                the_alias,
+                ignore_extensions,
+                ignore_directories,
+                exclude_regexp,
+                '-verbose',
+                no_root_directory]
+      params.reject! &:empty?
+      flat_params = params.join ' '
+      shell "\"#{path}\" #{flat_params}"
     end
 
     private
+
+    def validate
+      required = {:component_group => @component_group,
+                  :alias => @alias,
+                  :output_file => @output_file,
+                  :directory_to_scan => @directory_to_scan}
+      missing = required.reject { |k, v| v }
+      .keys
+      raise "These required attributes must be set by your task: #{missing}" unless missing.empty?
+    end
+
+    def exclude_regexp
+      [*@exclude_regexp].map { |re| switch_and_param 'regExExclude', re, :quote => true }
+    end
+
+    def ignore_extensions
+      [*@ignore_extensions].map { |ext| switch_and_param 'ext', ext }
+    end
+
+    def ignore_directories
+      [*@ignore_directories].map { |dir| switch_and_param 'direXclude', dir, :quote => true }
+    end
+
+    def no_root_directory
+      @no_root_directory ? "-NoRootDirectory" : String.new
+    end
 
     def the_alias
       switch_and_param 'alias', @alias
@@ -40,18 +91,16 @@ module BradyW
       switch_and_param 'dr', @directory_reference
     end
 
-
-    def switch_and_param(switch,setting,options=nil)
-      return "" if ! setting
+    def switch_and_param(switch, setting, options=nil)
+      return String.new if !setting
       quoteSetting = options.is_a?(Hash) && options[:quote]
       quoted = quoteSetting ? quoted(setting) : setting
-      " -#{switch} #{quoted}"
+      "-#{switch} #{quoted}"
     end
 
     def quoted(setting)
-          "\"#{setting}\""
+      "\"#{setting}\""
     end
-
 
     def path
       BswTech::DnetInstallUtil::PARAFFIN_EXE

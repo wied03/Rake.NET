@@ -28,9 +28,10 @@ describe BradyW::ParaffinFragmentGenerator do
 
   it 'should require a component group, alias, output file, and directory to scan' do
     # arrange
+    task = BradyW::ParaffinFragmentGenerator.new
 
     # act + assert
-    lambda { BradyW::ParaffinFragmentGenerator.new }.should throw "component_group, alias, output_file, directory_to_scan all required"
+    lambda { task.exectaskpublic }.should raise_exception "These required attributes must be set by your task: [:component_group, :alias, :output_file, :directory_to_scan]"
   end
 
   it 'should use -NoRootDirectory' do
@@ -39,7 +40,7 @@ describe BradyW::ParaffinFragmentGenerator do
       t.component_group = 'ServiceBinariesGroup'
       t.alias = '$(var.Project.TargetDir)'
       t.output_file = 'something.wxs'
-      t.directory_to_scan = '..\bin\Release'
+      t.directory_to_scan = '..\Bin\Release'
       t.no_root_directory = true
     end
 
@@ -48,7 +49,7 @@ describe BradyW::ParaffinFragmentGenerator do
     command = task.executedPop
 
     # assert
-    command.should equal('"someParaffinPath\Paraffin.exe" -dir "..\Bin\Release" -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -verbose -NoRootDirectory')
+    command.should eq '"someParaffinPath\Paraffin.exe" -dir "..\Bin\Release" -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -verbose -NoRootDirectory'
   end
 
   it 'should generate a WXS with 1 extension ignored, 1 directory excluded, 1 regex excluded' do
@@ -57,7 +58,7 @@ describe BradyW::ParaffinFragmentGenerator do
       t.component_group = 'ServiceBinariesGroup'
       t.alias = '$(var.Project.TargetDir)'
       t.output_file = 'something.wxs'
-      t.directory_to_scan = '..\bin\Release'
+      t.directory_to_scan = '..\Bin\Release'
       t.no_root_directory = false
       t.ignore_extensions = 'pdb'
       t.ignore_directories = 'bin'
@@ -69,7 +70,7 @@ describe BradyW::ParaffinFragmentGenerator do
     command = task.executedPop
 
     # assert
-    command.should equal('"someParaffinPath\Paraffin.exe" -dir "..\Bin\Release" -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -ext pdb -direXclude "bin" -regExExclude ".*" -verbose')
+    command.should eq '"someParaffinPath\Paraffin.exe" -dir "..\Bin\Release" -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -ext pdb -direXclude "bin" -regExExclude ".*" -verbose'
   end
 
   it 'should generate a WXS with 2 extensions ignored, 2 directories excluded, 2 regexes excluded' do
@@ -78,7 +79,7 @@ describe BradyW::ParaffinFragmentGenerator do
       t.component_group = 'ServiceBinariesGroup'
       t.alias = '$(var.Project.TargetDir)'
       t.output_file = 'something.wxs'
-      t.directory_to_scan = '..\bin\Release'
+      t.directory_to_scan = '..\Bin\Release'
       t.no_root_directory = false
       t.ignore_extensions = ['pdb', 'txt']
       t.ignore_directories = ['bin', 'conf']
@@ -90,7 +91,6 @@ describe BradyW::ParaffinFragmentGenerator do
     command = task.executedPop
 
     # assert
-    command.should equal('"someParaffinPath\Paraffin.exe" -dir "..\Bin\Release" -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -ext pdb -ext txt -direXclude "bin" -direXclude "conf" -regExExclude "\d+" -regExExclude "\w+" -verbose')
-    fail 'Write this test'
+    command.should eq '"someParaffinPath\Paraffin.exe" -dir "..\Bin\Release" -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -ext pdb -ext txt -direXclude "bin" -direXclude "conf" -regExExclude "\d+" -regExExclude "\w+" -verbose'
   end
 end
