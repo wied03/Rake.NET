@@ -30,7 +30,7 @@ describe BradyW::ParaffinFragmentUpdater do
     command.should == '"someParaffinPath\Paraffin.exe" -update some_file.wxs -verbose'
   end
 
-  it 'should replace the output file with Paraffin''s generated file if Paraffin ran successfully' do
+  it 'should work properly with the ReportIfDifferent flag' do
     # arrange
 
     # act
@@ -39,7 +39,34 @@ describe BradyW::ParaffinFragmentUpdater do
     fail 'Write this test'
   end
 
-  it 'should handle an error in Paraffin OK' do
+  it 'should replace the output file with Paraffin''s generated file if told to do so' do
+    # arrange
+
+    # act
+
+    # assert
+    fail 'Write this test'
+  end
+
+  it 'should remove the generated file if we are told to replace it' do
+    # arrange
+
+    # act
+
+    # assert
+    fail 'Write this test'
+  end
+
+  it 'should handle an error in Paraffin OK when replacing the generated file' do
+    # arrange
+
+    # act
+
+    # assert
+    fail 'Write this test'
+  end
+
+  it 'should handle an error in Paraffin OK when NOT replacing the generated file' do
     # arrange
 
     # act

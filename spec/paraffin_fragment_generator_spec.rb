@@ -65,6 +65,7 @@ describe BradyW::ParaffinFragmentGenerator do
       t.exclude_regexp = '.*'
     end
 
+    fail "dirExclude is deprecated according to Paraffin docs, remove it and only rely on regex"
     # act
     task.exectaskpublic
     command = task.executedPop
