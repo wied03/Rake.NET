@@ -35,10 +35,14 @@ module BradyW
       generated_file_name = TempXmlFileNameGenerator.filename @xml_config
       File.open(generated_file_name,'w') do |out|
         File.open @xml_config, 'r' do |input|
-          input.each {|line|
-
-
-            out << line }
+          input.each do |line|
+            if @tokens then
+              @tokens.each do |k,v|
+                line.sub! token_replace(k), v
+              end
+            end
+            out << line
+          end
         end
       end
       params=[param('c', generated_file_name, :quote => true),
@@ -56,6 +60,10 @@ module BradyW
     end
 
     private
+
+    def token_replace(token)
+      "$(#{token})"
+    end
 
     def linker_path
       File.join bin_path, 'InstallerLinker.exe'
