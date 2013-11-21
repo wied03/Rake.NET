@@ -32,12 +32,29 @@ module BradyW
     attr_accessor :tokens
 
     def exectask
+      generated_file_name = generate_xml_file
+      params=[param('c', generated_file_name, :quote => true),
+              param('o', @output, :quote => true),
+              param('t', bootstrapper_path, :quote => true)]
+      clean_file = lambda { FileUtils.rm generated_file_name }
+      shell "\"#{linker_path}\" #{params.join(' ')}" do |ok, status|
+        if !ok then
+          clean_file.call
+          fail "Problem with dotNetInstaller.  Return code '#{status.exitstatus}'"
+        end
+      end
+      clean_file.call
+    end
+
+    private
+
+    def generate_xml_file
       generated_file_name = TempXmlFileNameGenerator.filename @xml_config
-      File.open(generated_file_name,'w') do |out|
+      File.open(generated_file_name, 'w') do |out|
         File.open @xml_config, 'r' do |input|
           input.each do |line|
             if @tokens then
-              @tokens.each do |k,v|
+              @tokens.each do |k, v|
                 line.sub! token_replace(k), v
               end
             end
@@ -45,12 +62,7 @@ module BradyW
           end
         end
       end
-      params=[param('c', generated_file_name, :quote => true),
-              param('o', @output, :quote => true),
-              param('t', bootstrapper_path, :quote => true)]
-      shell "\"#{linker_path}\" #{params.join(' ')}" do |ok, status|
-
-      end
+      generated_file_name
     end
 
     def param(switch, setting, options={})
@@ -58,8 +70,6 @@ module BradyW
       quoted = options[:quote] ? quoted(setting) : setting
       "/#{switch}:#{quoted}"
     end
-
-    private
 
     def token_replace(token)
       "$(#{token})"

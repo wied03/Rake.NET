@@ -35,7 +35,7 @@ module BradyW
               FileUtils.rm generated_file
             end
 
-            raise "Paraffin failed with status code: '#{status.exitstatus}'"
+            fail "Paraffin failed with status code: '#{status.exitstatus}'"
           end
         end
         if @replace_original

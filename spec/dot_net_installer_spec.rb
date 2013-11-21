@@ -11,7 +11,7 @@ describe BradyW::DotNetInstaller do
 
   after :each do
     FileUtils.rspec_reset
-    rm @should_delete if @should_delete
+    rm @should_delete if (@should_delete && File.exists?(@should_delete))
   end
 
   it 'should generate a valid filename' do
@@ -71,7 +71,21 @@ describe BradyW::DotNetInstaller do
     actual.should == expected
   end
 
-  it 'should remove the temporarily generated XML file if an error occurs in the executable' do
+  it 'should remove the temporarily generated XML file' do
+    # arrange
+    task = BradyW::DotNetInstaller.new do |t|
+      t.xml_config = 'data/dot_net_installer/input.xml'
+      t.output = 'somedir/Our.File.Exe'
+    end
+
+    # act
+    task.exectaskpublic
+
+    # assert
+    File.should_not be_exist(@should_delete)
+  end
+
+  it 'should remove the temporarily generated XML file even if an error occurs in the executable' do
     # arrange
     task = BradyW::DotNetInstaller.new do |t|
       t.xml_config = 'data/dot_net_installer/input.xml'
@@ -80,7 +94,7 @@ describe BradyW::DotNetInstaller do
     task.stub!(:shell).and_yield(nil, SimulateProcessFailure.new)
 
     # act + assert
-    lambda { task.exectaskpublic }.should raise_exception "Problem with dotNetInstaller.  Return code 'ddd'"
-    File.exists?('generated_name.xml').should be_false
+    lambda { task.exectaskpublic }.should raise_exception "Problem with dotNetInstaller.  Return code 'BW Rake Task Problem'"
+    File.should_not be_exist(@should_delete)
   end
 end
