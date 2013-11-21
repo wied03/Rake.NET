@@ -23,51 +23,74 @@ describe BradyW::ParaffinRunner do
     command = task.executedPop
 
     # assert
-    fail 'Write this test'
+    command.should equal('"someParaffinPath\Paraffin.exe" -dir "..\Bin\Release" -dr BinDir -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -verbose')
   end
 
   it 'should require a component group, alias, output file, and directory to scan' do
     # arrange
 
-    # act
-
-    # assert
-    fail 'Write this test'
+    # act + assert
+    lambda { BradyW::ParaffinRunner.new }.should throw "component_group, alias, output_file, directory_to_scan all required"
   end
 
   it 'should use -NoRootDirectory' do
     # arrange
+    task = BradyW::ParaffinRunner.new do |t|
+      t.component_group = 'ServiceBinariesGroup'
+      t.alias = '$(var.Project.TargetDir)'
+      t.output_file = 'something.wxs'
+      t.directory_to_scan = '..\bin\Release'
+      t.no_root_directory = true
+    end
 
     # act
+    task.exectaskpublic
+    command = task.executedPop
 
     # assert
-    fail 'Write this test'
+    command.should equal('"someParaffinPath\Paraffin.exe" -dir "..\Bin\Release" -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -verbose -NoRootDirectory')
   end
 
   it 'should generate a WXS with 1 extension ignored, 1 directory excluded, 1 regex excluded' do
     # arrange
+    task = BradyW::ParaffinRunner.new do |t|
+      t.component_group = 'ServiceBinariesGroup'
+      t.alias = '$(var.Project.TargetDir)'
+      t.output_file = 'something.wxs'
+      t.directory_to_scan = '..\bin\Release'
+      t.no_root_directory = false
+      t.ignore_extensions = 'pdb'
+      t.ignore_directories = 'bin'
+      t.exclude_regexp = '.*'
+    end
 
     # act
+    task.exectaskpublic
+    command = task.executedPop
 
     # assert
-    fail 'Write this test'
+    command.should equal('"someParaffinPath\Paraffin.exe" -dir "..\Bin\Release" -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -ext pdb -direXclude "bin" -regExExclude ".*" -verbose')
   end
 
   it 'should generate a WXS with 2 extensions ignored, 2 directories excluded, 2 regexes excluded' do
     # arrange
+    task = BradyW::ParaffinRunner.new do |t|
+      t.component_group = 'ServiceBinariesGroup'
+      t.alias = '$(var.Project.TargetDir)'
+      t.output_file = 'something.wxs'
+      t.directory_to_scan = '..\bin\Release'
+      t.no_root_directory = false
+      t.ignore_extensions = ['pdb', 'txt']
+      t.ignore_directories = ['bin', 'conf']
+      t.exclude_regexp = ['\d+', '\w+']
+    end
 
     # act
+    task.exectaskpublic
+    command = task.executedPop
 
     # assert
-    fail 'Write this test'
-  end
-
-  it 'should allow a custom path' do
-    # arrange
-
-    # act
-
-    # assert
+    command.should equal('"someParaffinPath\Paraffin.exe" -dir "..\Bin\Release" -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -ext pdb -ext txt -direXclude "bin" -direXclude "conf" -regExExclude "\d+" -regExExclude "\w+" -verbose')
     fail 'Write this test'
   end
 end
