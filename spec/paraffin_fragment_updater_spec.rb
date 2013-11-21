@@ -2,6 +2,12 @@ require 'base'
 require 'paraffin_fragment_updater'
 require 'basetaskmocking'
 
+class ParaffinReportDifferentError
+  def exitstatus
+    4
+  end
+end
+
 describe BradyW::ParaffinFragmentUpdater do
   before(:each) do
     @mockBasePath = 'someParaffinPath\Paraffin.exe'
@@ -16,10 +22,11 @@ describe BradyW::ParaffinFragmentUpdater do
     lambda { task.exectaskpublic }.should raise_exception ':fragment_file is required for this task'
   end
 
-  it 'should work OK when the WXS value is supplied' do
+  it 'should work OK when the WXS value is supplied and replace original is off' do
     # arrange
     task = BradyW::ParaffinFragmentUpdater.new do |t|
       t.fragment_file = 'some_file.wxs'
+      t.replace_original = false
     end
 
     # act
@@ -27,51 +34,56 @@ describe BradyW::ParaffinFragmentUpdater do
     command = task.executedPop
 
     # assert
-    command.should == '"someParaffinPath\Paraffin.exe" -update some_file.wxs -verbose'
+    command.should == '"someParaffinPath\Paraffin.exe" -update "some_file.wxs" -verbose -ReportIfDifferent'
   end
 
-  it 'should work properly with the ReportIfDifferent flag' do
+  it 'should work properly with the ReportIfDifferent error codes from Paraffin' do
     # arrange
+    task = BradyW::ParaffinFragmentUpdater.new do |t|
+      t.fragment_file = 'some_file.wxs'
+      t.replace_original = false
+    end
+    task.stub!(:shell).and_yield(nil, ParaffinReportDifferentError.new)
 
-    # act
-
-    # assert
-    fail 'Write this test'
+    # act + assert
+    lambda { task.exectaskpublic }.should raise_exception 'some_file.wxs has changed and you don' 't have :replace_original enabled.  Manually update some_file.wxs using some_file.wxs.PARAFFIN or enabled :replace_original'
   end
 
-  it 'should replace the output file with Paraffin''s generated file if told to do so' do
+  it 'should replace the output file with Paraffin' 's generated file if told to do so' do
     # arrange
+    task = BradyW::ParaffinFragmentUpdater.new do |t|
+      t.fragment_file = 'someDirectory/some_file.wxs'
+    end
+    original_file = nil
+    destination_file = nil
+    FileUtils.stub(:mv) do |orig, dest|
+      original_file = orig
+      destination_file = dest
+    end
 
     # act
+    task.exectaskpublic
+    command = task.executedPop
 
     # assert
-    fail 'Write this test'
-  end
-
-  it 'should remove the generated file if we are told to replace it' do
-    # arrange
-
-    # act
-
-    # assert
-    fail 'Write this test'
+    command.should == '"someParaffinPath\Paraffin.exe" -update "someDirectory/some_file.wxs" -verbose'
+    original_file.should == 'someDirectory/some_file.wxs.PARAFFIN'
+    destination_file.should == 'someDirectory/some_file.wxs'
   end
 
   it 'should handle an error in Paraffin OK when replacing the generated file' do
     # arrange
+    task = BradyW::ParaffinFragmentUpdater.new do |t|
+      t.fragment_file = 'someDirectory\some_file.wxs'
+    end
+    task.stub!(:shell).and_yield(nil, SimulateProcessFailure.new)
+    deleted_file = nil
+    FileUtils.stub(:rm) do |f|
+      deleted_file = f
+    end
 
-    # act
-
-    # assert
-    fail 'Write this test'
-  end
-
-  it 'should handle an error in Paraffin OK when NOT replacing the generated file' do
-    # arrange
-
-    # act
-
-    # assert
-    fail 'Write this test'
+    # act + assert
+    lambda { task.exectaskpublic }.should raise_exception 'Error code ''blah'' from Paraffin'
+    deleted_file.should == 'someDirectory/some_file.wxs.PARAFFIN'
   end
 end

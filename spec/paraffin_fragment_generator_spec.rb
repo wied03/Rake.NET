@@ -61,17 +61,15 @@ describe BradyW::ParaffinFragmentGenerator do
       t.directory_to_scan = '..\Bin\Release'
       t.no_root_directory = false
       t.ignore_extensions = 'pdb'
-      t.ignore_directories = 'bin'
       t.exclude_regexp = '.*'
     end
 
-    fail "dirExclude is deprecated according to Paraffin docs, remove it and only rely on regex"
     # act
     task.exectaskpublic
     command = task.executedPop
 
     # assert
-    command.should eq '"someParaffinPath\Paraffin.exe" -dir "..\Bin\Release" -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -ext pdb -direXclude "bin" -regExExclude ".*" -verbose'
+    command.should eq '"someParaffinPath\Paraffin.exe" -dir "..\Bin\Release" -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -ext pdb -regExExclude ".*" -verbose'
   end
 
   it 'should generate a WXS with 2 extensions ignored, 2 directories excluded, 2 regexes excluded' do
@@ -83,7 +81,6 @@ describe BradyW::ParaffinFragmentGenerator do
       t.directory_to_scan = '..\Bin\Release'
       t.no_root_directory = false
       t.ignore_extensions = ['pdb', 'txt']
-      t.ignore_directories = ['bin', 'conf']
       t.exclude_regexp = ['\d+', '\w+']
     end
 
@@ -92,6 +89,6 @@ describe BradyW::ParaffinFragmentGenerator do
     command = task.executedPop
 
     # assert
-    command.should eq '"someParaffinPath\Paraffin.exe" -dir "..\Bin\Release" -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -ext pdb -ext txt -direXclude "bin" -direXclude "conf" -regExExclude "\d+" -regExExclude "\w+" -verbose'
+    command.should eq '"someParaffinPath\Paraffin.exe" -dir "..\Bin\Release" -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -ext pdb -ext txt -regExExclude "\d+" -regExExclude "\w+" -verbose'
   end
 end

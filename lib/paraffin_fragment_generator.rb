@@ -1,8 +1,11 @@
 require 'basetask'
 require 'path_fetcher'
+require 'param_quotes'
 
 module BradyW
   class ParaffinFragmentGenerator < BaseTask
+    include ParamQuotes
+
     # *Optional* Which directory reference (defined somewhere in your wxs files) should be used
     attr_accessor :directory_reference
 
@@ -24,9 +27,6 @@ module BradyW
     # *Optional* File extensions (don't include a dot or any wildcards) that should be ignored. Can be an array or single item
     attr_accessor :ignore_extensions
 
-    # *Optional* Directories that should be ignored. Can be an array or single item
-    attr_accessor :ignore_directories
-
     # *Optional* Regular expressions that should be ignored. Can be an array or single item
     attr_accessor :exclude_regexp
 
@@ -38,7 +38,6 @@ module BradyW
                 @output_file,
                 the_alias,
                 ignore_extensions,
-                ignore_directories,
                 exclude_regexp,
                 '-verbose',
                 no_root_directory]
@@ -67,10 +66,6 @@ module BradyW
       [*@ignore_extensions].map { |ext| switch_and_param 'ext', ext }
     end
 
-    def ignore_directories
-      [*@ignore_directories].map { |dir| switch_and_param 'direXclude', dir, :quote => true }
-    end
-
     def no_root_directory
       @no_root_directory ? "-NoRootDirectory" : String.new
     end
@@ -89,17 +84,6 @@ module BradyW
 
     def directory_reference
       switch_and_param 'dr', @directory_reference
-    end
-
-    def switch_and_param(switch, setting, options=nil)
-      return String.new if !setting
-      quoteSetting = options.is_a?(Hash) && options[:quote]
-      quoted = quoteSetting ? quoted(setting) : setting
-      "-#{switch} #{quoted}"
-    end
-
-    def quoted(setting)
-      "\"#{setting}\""
     end
 
     def path
