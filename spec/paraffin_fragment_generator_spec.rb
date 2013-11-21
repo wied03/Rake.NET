@@ -15,7 +15,7 @@ describe BradyW::ParaffinFragmentGenerator do
       t.component_group = 'ServiceBinariesGroup'
       t.alias = '$(var.Project.TargetDir)'
       t.output_file = 'something.wxs'
-      t.directory_to_scan = '..\bin\Release'
+      t.directory_to_scan = '..\Bin\Release'
     end
 
     # act
@@ -23,7 +23,7 @@ describe BradyW::ParaffinFragmentGenerator do
     command = task.executedPop
 
     # assert
-    expect(command).to eq('"someParaffinPath\Paraffin.exe" -dir "..\Bin\Release" -dr BinDir -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -verbose')
+    command.should eq '"someParaffinPath\Paraffin.exe" -dir "..\Bin\Release" -dr BinDir -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -verbose'
   end
 
   it 'should require a component group, alias, output file, and directory to scan' do
