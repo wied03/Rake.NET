@@ -5,7 +5,7 @@ require 'param_quotes'
 module BradyW
   module Paraffin
     class FragmentUpdater < BaseTask
-      include ParamQuotes
+      include BradyW::ParamQuotes
 
       # *Required* The path to the WXS file to update
       attr_accessor :fragment_file
