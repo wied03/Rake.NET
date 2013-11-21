@@ -1,8 +1,8 @@
 require 'base'
 require 'basetaskmocking'
-require 'paraffin_runner'
+require 'paraffin_fragment_generator'
 
-describe BradyW::ParaffinRunner do
+describe BradyW::ParaffinFragmentGenerator do
   before(:each) do
     @mockBasePath = 'someParaffinPath\Paraffin.exe'
     stub_const 'BswTech::DnetInstallUtil::PARAFFIN_EXE', @mockBasePath
@@ -10,7 +10,7 @@ describe BradyW::ParaffinRunner do
 
   it 'should work properly when specifying dir ref' do
     # arrange
-    task = BradyW::ParaffinRunner.new do |t|
+    task = BradyW::ParaffinFragmentGenerator.new do |t|
       t.directory_reference = 'BinDir'
       t.component_group = 'ServiceBinariesGroup'
       t.alias = '$(var.Project.TargetDir)'
@@ -30,12 +30,12 @@ describe BradyW::ParaffinRunner do
     # arrange
 
     # act + assert
-    lambda { BradyW::ParaffinRunner.new }.should throw "component_group, alias, output_file, directory_to_scan all required"
+    lambda { BradyW::ParaffinFragmentGenerator.new }.should throw "component_group, alias, output_file, directory_to_scan all required"
   end
 
   it 'should use -NoRootDirectory' do
     # arrange
-    task = BradyW::ParaffinRunner.new do |t|
+    task = BradyW::ParaffinFragmentGenerator.new do |t|
       t.component_group = 'ServiceBinariesGroup'
       t.alias = '$(var.Project.TargetDir)'
       t.output_file = 'something.wxs'
@@ -53,7 +53,7 @@ describe BradyW::ParaffinRunner do
 
   it 'should generate a WXS with 1 extension ignored, 1 directory excluded, 1 regex excluded' do
     # arrange
-    task = BradyW::ParaffinRunner.new do |t|
+    task = BradyW::ParaffinFragmentGenerator.new do |t|
       t.component_group = 'ServiceBinariesGroup'
       t.alias = '$(var.Project.TargetDir)'
       t.output_file = 'something.wxs'
@@ -74,7 +74,7 @@ describe BradyW::ParaffinRunner do
 
   it 'should generate a WXS with 2 extensions ignored, 2 directories excluded, 2 regexes excluded' do
     # arrange
-    task = BradyW::ParaffinRunner.new do |t|
+    task = BradyW::ParaffinFragmentGenerator.new do |t|
       t.component_group = 'ServiceBinariesGroup'
       t.alias = '$(var.Project.TargetDir)'
       t.output_file = 'something.wxs'

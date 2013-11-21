@@ -2,7 +2,7 @@ require 'basetask'
 require 'path_fetcher'
 
 module BradyW
-  class ParaffinRunner
+  class ParaffinFragmentGenerator
 
   end
 end
