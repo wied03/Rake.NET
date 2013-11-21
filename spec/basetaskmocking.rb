@@ -22,7 +22,7 @@ module BradyW
           yield true, nil if block_given?
         end
 
-        def excecutedPop
+        def executedPop
           return nil unless @sh
           @sh.pop()
         end

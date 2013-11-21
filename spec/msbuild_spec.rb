@@ -33,7 +33,7 @@ describe BradyW::MSBuild do
     task = BradyW::MSBuild.new
     task.should_receive(:dotnet).with("v4\\Client").and_return("C:\\yespath\\")
     task.exectaskpublic
-    execed = task.excecutedPop
+    execed = task.executedPop
     execed.should include "C:\\yespath\\msbuild.exe"
     execed.should have_build_property ({:k => "Configuration", :v => "Debug"})
     execed.should have_build_property ({:k => "TargetFrameworkVersion", :v => "v4.5"})
@@ -47,7 +47,7 @@ describe BradyW::MSBuild do
       end
       task.should_receive(:dotnet).with("v4\\Client").and_return("C:\\yespath\\")
       task.exectaskpublic
-      execed = task.excecutedPop
+      execed = task.executedPop
       execed.should include "C:\\yespath\\msbuild.exe"
       execed.should have_build_property ({:k => "Configuration", :v => "Debug"})
       execed.should have_build_property ({:k => "TargetFrameworkVersion", :v => "v4.0"})
@@ -68,7 +68,7 @@ describe BradyW::MSBuild do
     
     task.should_receive(:dotnet).with("v4\\Client").and_return("C:\\yespath\\")
     task.exectaskpublic
-    execed = task.excecutedPop
+    execed = task.executedPop
     execed.should include "C:\\yespath\\msbuild.exe /target:t1"
     execed.should have_build_property ({:k => "Configuration", :v => "Debug"})
     execed.should have_build_property ({:k => "TargetFrameworkVersion", :v => "v4.5"})
@@ -87,7 +87,7 @@ describe BradyW::MSBuild do
     end
     task.should_receive(:dotnet).with("v3.5").and_return("C:\\yespath2\\")
     task.exectaskpublic
-    execed = task.excecutedPop
+    execed = task.executedPop
     execed.should have_build_property ({:k => "Configuration", :v => "Release"})
     execed.should have_build_property ({:k => "TargetFrameworkVersion", :v => "v3.5"})
     execed.should have_build_property ({:k => "prop1", :v => "prop1val"})
@@ -104,7 +104,7 @@ describe BradyW::MSBuild do
     end
     task.should_receive(:dotnet).with("v4\\Client").and_return("C:\\yespath2\\")
     task.exectaskpublic
-    execed = task.excecutedPop
+    execed = task.executedPop
     execed.should include "C:\\yespath2\\msbuild.exe"
     execed.should have_build_property ({:k => "Configuration", :v => "myconfig"})
     execed.should have_build_property ({:k => "TargetFrameworkVersion", :v => "v4.5"})
@@ -118,7 +118,7 @@ describe BradyW::MSBuild do
        t.compile_version = :v2_0
     end
     task.exectaskpublic
-    execed = task.excecutedPop
+    execed = task.executedPop
     execed.should include "C:\\Windows\\Microsoft.NET\\Framework\\v2.0.50727\\msbuild.exe"
     execed.should have_build_property ({:k => "Configuration", :v => "Debug"})
     execed.should have_build_property ({:k => "TargetFrameworkVersion", :v => "v2.0"})

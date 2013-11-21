@@ -20,7 +20,7 @@ describe BradyW::ParaffinRunner do
 
     # act
     task.exectaskpublic
-    command = task.excecutedPop
+    command = task.executedPop
 
     # assert
     fail 'Write this test'

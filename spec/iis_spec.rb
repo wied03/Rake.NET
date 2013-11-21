@@ -10,7 +10,7 @@ describe BradyW::IIS do
     end
 
     task.exectaskpublic
-    task.excecutedPop.should == "net.exe start W3SVC"
+    task.executedPop.should == "net.exe start W3SVC"
   end
 
   it "Forgot Command" do
@@ -44,6 +44,6 @@ describe BradyW::IIS do
     end
 
     task.exectaskpublic
-    task.excecutedPop.should == "net.exe stop W3SVC"
+    task.executedPop.should == "net.exe stop W3SVC"
   end
 end
