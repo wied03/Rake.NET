@@ -1,5 +1,5 @@
 require 'base'
-require 'paraffin_fragment_updater'
+require 'paraffin/fragment_updater'
 require 'basetaskmocking'
 
 class ParaffinReportDifferentError
@@ -8,7 +8,7 @@ class ParaffinReportDifferentError
   end
 end
 
-describe BradyW::ParaffinFragmentUpdater do
+describe BradyW::Paraffin::FragmentUpdater do
   before(:each) do
     @mockBasePath = 'someParaffinPath\Paraffin.exe'
     stub_const 'BswTech::DnetInstallUtil::PARAFFIN_EXE', @mockBasePath
@@ -16,7 +16,7 @@ describe BradyW::ParaffinFragmentUpdater do
 
   it 'must supply the WXS value' do
     # arrange
-    task = BradyW::ParaffinFragmentUpdater.new
+    task = BradyW::Paraffin::FragmentUpdater.new
 
     # act + assert
     lambda { task.exectaskpublic }.should raise_exception ':fragment_file is required for this task'
@@ -24,7 +24,7 @@ describe BradyW::ParaffinFragmentUpdater do
 
   it 'should work OK when the WXS value is supplied and replace original is off' do
     # arrange
-    task = BradyW::ParaffinFragmentUpdater.new do |t|
+    task = BradyW::Paraffin::FragmentUpdater.new do |t|
       t.fragment_file = 'some_file.wxs'
       t.replace_original = false
     end
@@ -40,7 +40,7 @@ describe BradyW::ParaffinFragmentUpdater do
 
   it 'should work properly with the ReportIfDifferent error codes from Paraffin' do
     # arrange
-    task = BradyW::ParaffinFragmentUpdater.new do |t|
+    task = BradyW::Paraffin::FragmentUpdater.new do |t|
       t.fragment_file = 'some_file.wxs'
       t.replace_original = false
     end
@@ -53,7 +53,7 @@ describe BradyW::ParaffinFragmentUpdater do
 
   it 'should replace the output file with Paraffin''s generated file if told to do so' do
     # arrange
-    task = BradyW::ParaffinFragmentUpdater.new do |t|
+    task = BradyW::Paraffin::FragmentUpdater.new do |t|
       t.fragment_file = 'someDirectory/some_file.wxs'
     end
     original_file = nil
@@ -75,7 +75,7 @@ describe BradyW::ParaffinFragmentUpdater do
 
   it 'should handle an error in Paraffin OK when replacing the generated file' do
     # arrange
-    task = BradyW::ParaffinFragmentUpdater.new do |t|
+    task = BradyW::Paraffin::FragmentUpdater.new do |t|
       t.fragment_file = 'someDirectory/some_file.wxs'
     end
     task.stub!(:shell).and_yield(nil, SimulateProcessFailure.new)

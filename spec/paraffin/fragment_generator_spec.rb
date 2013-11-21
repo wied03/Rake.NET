@@ -1,8 +1,8 @@
 require 'base'
-require 'paraffin_fragment_generator'
+require 'paraffin/fragment_generator'
 require 'basetaskmocking'
 
-describe BradyW::ParaffinFragmentGenerator do
+describe BradyW::Paraffin::FragmentGenerator do
   before(:each) do
     @mockBasePath = 'someParaffinPath\Paraffin.exe'
     stub_const 'BswTech::DnetInstallUtil::PARAFFIN_EXE', @mockBasePath
@@ -10,7 +10,7 @@ describe BradyW::ParaffinFragmentGenerator do
 
   it 'should work properly when specifying dir ref' do
     # arrange
-    task = BradyW::ParaffinFragmentGenerator.new do |t|
+    task = BradyW::Paraffin::FragmentGenerator.new do |t|
       t.directory_reference = 'BinDir'
       t.component_group = 'ServiceBinariesGroup'
       t.alias = '$(var.Project.TargetDir)'
@@ -28,7 +28,7 @@ describe BradyW::ParaffinFragmentGenerator do
 
   it 'should require a component group, alias, output file, and directory to scan' do
     # arrange
-    task = BradyW::ParaffinFragmentGenerator.new
+    task = BradyW::Paraffin::FragmentGenerator.new
 
     # act + assert
     lambda { task.exectaskpublic }.should raise_exception "These required attributes must be set by your task: [:component_group, :alias, :output_file, :directory_to_scan]"
@@ -36,7 +36,7 @@ describe BradyW::ParaffinFragmentGenerator do
 
   it 'should use -NoRootDirectory' do
     # arrange
-    task = BradyW::ParaffinFragmentGenerator.new do |t|
+    task = BradyW::Paraffin::FragmentGenerator.new do |t|
       t.component_group = 'ServiceBinariesGroup'
       t.alias = '$(var.Project.TargetDir)'
       t.output_file = 'something.wxs'
@@ -54,7 +54,7 @@ describe BradyW::ParaffinFragmentGenerator do
 
   it 'should generate a WXS with 1 extension ignored, 1 directory excluded, 1 regex excluded' do
     # arrange
-    task = BradyW::ParaffinFragmentGenerator.new do |t|
+    task = BradyW::Paraffin::FragmentGenerator.new do |t|
       t.component_group = 'ServiceBinariesGroup'
       t.alias = '$(var.Project.TargetDir)'
       t.output_file = 'something.wxs'
@@ -74,7 +74,7 @@ describe BradyW::ParaffinFragmentGenerator do
 
   it 'should generate a WXS with 2 extensions ignored, 2 directories excluded, 2 regexes excluded' do
     # arrange
-    task = BradyW::ParaffinFragmentGenerator.new do |t|
+    task = BradyW::Paraffin::FragmentGenerator.new do |t|
       t.component_group = 'ServiceBinariesGroup'
       t.alias = '$(var.Project.TargetDir)'
       t.output_file = 'something.wxs'
