@@ -56,7 +56,7 @@ module BradyW
                     :directory_to_scan => @directory_to_scan}
         missing = required.reject { |k, v| v }
         .keys
-        raise "These required attributes must be set by your task: #{missing}" unless missing.empty?
+        fail "These required attributes must be set by your task: #{missing}" unless missing.empty?
       end
 
       def exclude_regexp

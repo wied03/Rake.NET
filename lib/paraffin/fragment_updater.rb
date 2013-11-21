@@ -14,10 +14,7 @@ module BradyW
       attr_accessor :replace_original
 
       def exectask
-        if !@fragment_file
-          raise ":fragment_file is required for this task"
-        end
-
+        validate
         params = ['-update',
                   quoted(@fragment_file),
                   '-verbose',
@@ -44,12 +41,19 @@ module BradyW
         end
       end
 
+
       def initialize
         @replace_original = true
         super
       end
 
       private
+
+      def validate
+        if !@fragment_file
+          fail ":fragment_file is required for this task"
+        end
+      end
 
       def report_if_different
         @replace_original ? String.new : '-ReportIfDifferent'

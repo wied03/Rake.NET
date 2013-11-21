@@ -32,6 +32,7 @@ module BradyW
     attr_accessor :tokens
 
     def exectask
+      validate
       generated_file_name = generate_xml_file
       params=[param('c', generated_file_name, :quote => true),
               param('o', @output, :quote => true),
@@ -47,6 +48,10 @@ module BradyW
     end
 
     private
+
+    def validate
+      fail ":xml_config and :output are required" if !@xml_config || !@output
+    end
 
     def generate_xml_file
       generated_file_name = TempXmlFileNameGenerator.filename @xml_config
