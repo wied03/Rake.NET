@@ -22,11 +22,23 @@ module BradyW
                 '-verbose',
                 report_if_different]
       params.reject! &:empty?
-      shell "\"#{path}\" #{params.join(' ')}"
+      base_path = File.dirname @fragment_file
+      file_name = File.basename @fragment_file
+      generated_file = File.join base_path, "#{file_name}.PARAFFIN"
+      shell "\"#{path}\" #{params.join(' ')}" do |ok, status|
+        if !ok
+          raise "#{@fragment_file} has changed and you don't have :replace_original enabled.  Manually update #{@fragment_file} using #{generated_file} or enable :replace_original" unless @replace_original
+
+          if @replace_original
+            log "Removing generated file #{generated_file} since Paraffin failed"
+            FileUtils.rm generated_file
+          end
+
+          raise "Paraffin failed with status code: '#{status.exitstatus}'"
+        end
+      end
       if @replace_original
-        base_path = File.dirname @fragment_file
-        file_name = File.basename @fragment_file
-        generated_file = File.join base_path, "#{file_name}.PARAFFIN"
+        log "Replacing #{@fragment_file} with #{generated_file}"
         FileUtils.mv generated_file, @fragment_file
       end
     end

@@ -28,6 +28,7 @@ describe BradyW::ParaffinFragmentUpdater do
       t.fragment_file = 'some_file.wxs'
       t.replace_original = false
     end
+    FileUtils.stub(:rm).and_throw 'Should not be removing any files'
 
     # act
     task.exectaskpublic
@@ -44,12 +45,13 @@ describe BradyW::ParaffinFragmentUpdater do
       t.replace_original = false
     end
     task.stub!(:shell).and_yield(nil, ParaffinReportDifferentError.new)
+    FileUtils.stub(:rm).and_throw 'Should not be removing any files'
 
     # act + assert
-    lambda { task.exectaskpublic }.should raise_exception 'some_file.wxs has changed and you don' 't have :replace_original enabled.  Manually update some_file.wxs using some_file.wxs.PARAFFIN or enabled :replace_original'
+    lambda { task.exectaskpublic }.should raise_exception 'some_file.wxs has changed and you don\'t have :replace_original enabled.  Manually update some_file.wxs using ./some_file.wxs.PARAFFIN or enable :replace_original'
   end
 
-  it 'should replace the output file with Paraffin' 's generated file if told to do so' do
+  it 'should replace the output file with Paraffin''s generated file if told to do so' do
     # arrange
     task = BradyW::ParaffinFragmentUpdater.new do |t|
       t.fragment_file = 'someDirectory/some_file.wxs'
@@ -74,7 +76,7 @@ describe BradyW::ParaffinFragmentUpdater do
   it 'should handle an error in Paraffin OK when replacing the generated file' do
     # arrange
     task = BradyW::ParaffinFragmentUpdater.new do |t|
-      t.fragment_file = 'someDirectory\some_file.wxs'
+      t.fragment_file = 'someDirectory/some_file.wxs'
     end
     task.stub!(:shell).and_yield(nil, SimulateProcessFailure.new)
     deleted_file = nil
@@ -83,7 +85,7 @@ describe BradyW::ParaffinFragmentUpdater do
     end
 
     # act + assert
-    lambda { task.exectaskpublic }.should raise_exception 'Error code ''blah'' from Paraffin'
+    lambda { task.exectaskpublic }.should raise_exception "Paraffin failed with status code: 'BW Rake Task Problem'"
     deleted_file.should == 'someDirectory/some_file.wxs.PARAFFIN'
   end
 end
