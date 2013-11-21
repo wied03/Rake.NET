@@ -29,4 +29,22 @@ describe BradyW::ParaffinFragmentUpdater do
     # assert
     command.should == '"someParaffinPath\Paraffin.exe" -update some_file.wxs -verbose'
   end
+
+  it 'should replace the output file with Paraffin''s generated file if Paraffin ran successfully' do
+    # arrange
+
+    # act
+
+    # assert
+    fail 'Write this test'
+  end
+
+  it 'should handle an error in Paraffin OK' do
+    # arrange
+
+    # act
+
+    # assert
+    fail 'Write this test'
+  end
 end
