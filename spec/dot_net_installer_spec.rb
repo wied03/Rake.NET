@@ -39,7 +39,7 @@ describe BradyW::DotNetInstaller do
     command = task.executedPop
 
     # assert
-    command.should == '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"somedir/dotnetinstaller.xml" /o:"somedir/Our.File.Exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
+    command.should == '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"generated_name.xml" /o:"somedir/Our.File.Exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
   end
 
   it 'should require xml_config and output' do
