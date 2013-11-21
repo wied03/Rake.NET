@@ -1,6 +1,6 @@
 require 'base'
-require 'basetaskmocking'
 require 'paraffin_fragment_generator'
+require 'basetaskmocking'
 
 describe BradyW::ParaffinFragmentGenerator do
   before(:each) do
@@ -23,7 +23,7 @@ describe BradyW::ParaffinFragmentGenerator do
     command = task.executedPop
 
     # assert
-    command.should equal('"someParaffinPath\Paraffin.exe" -dir "..\Bin\Release" -dr BinDir -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -verbose')
+    expect(command).to eq('"someParaffinPath\Paraffin.exe" -dir "..\Bin\Release" -dr BinDir -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -verbose')
   end
 
   it 'should require a component group, alias, output file, and directory to scan' do
