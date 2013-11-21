@@ -4,7 +4,7 @@ require 'basetaskmocking'
 
 describe BradyW::DotNetInstaller do
   before :each do
-    @should_delete = nil
+    @should_delete = 'generated_name.xml'
     BswTech::DnetInstallUtil.stub(:dot_net_installer_base_path).and_return('path/to/dnetinstaller')
     BradyW::TempXmlFileNameGenerator.stub(:filename).and_return 'generated_name.xml'
   end
@@ -30,7 +30,7 @@ describe BradyW::DotNetInstaller do
   it 'should render a proper command line' do
     # arrange
     task = BradyW::DotNetInstaller.new do |t|
-      t.xml_config = 'somedir/dotnetinstaller.xml'
+      t.xml_config = 'data/dot_net_installer/input.xml'
       t.output = 'somedir/Our.File.Exe'
     end
 
@@ -53,7 +53,7 @@ describe BradyW::DotNetInstaller do
   it 'should replace tokens in XML properly' do
     # arrange
     task = BradyW::DotNetInstaller.new do |t|
-      t.xml_config = 'somedir/dotnetinstaller.xml'
+      t.xml_config = 'data/dot_net_installer/input.xml'
       t.output = 'somedir/Our.File.Exe'
       t.tokens = {:token1 => 'value1', :token2 => 'value2'}
     end
@@ -74,7 +74,7 @@ describe BradyW::DotNetInstaller do
   it 'should remove the temporarily generated XML file if an error occurs in the executable' do
     # arrange
     task = BradyW::DotNetInstaller.new do |t|
-      t.xml_config = 'somedir/dotnetinstaller.xml'
+      t.xml_config = 'data/dot_net_installer/input.xml'
       t.output = 'somedir/Our.File.Exe'
     end
     task.stub!(:shell).and_yield(nil, SimulateProcessFailure.new)

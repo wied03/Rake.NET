@@ -28,8 +28,19 @@ module BradyW
     # *Required* The full path of the output EXE you want generated
     attr_accessor :output
 
+    # *Optional* Tokens to replace in the XML file before calling dotNetInstaller.  Use $(tokenName) syntax in your XML
+    attr_accessor :tokens
+
     def exectask
       generated_file_name = TempXmlFileNameGenerator.filename @xml_config
+      File.open(generated_file_name,'w') do |out|
+        File.open @xml_config, 'r' do |input|
+          input.each {|line|
+
+
+            out << line }
+        end
+      end
       params=[param('c', generated_file_name, :quote => true),
               param('o', @output, :quote => true),
               param('t', bootstrapper_path, :quote => true)]
