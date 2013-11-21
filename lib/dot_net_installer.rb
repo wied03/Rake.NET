@@ -1,7 +1,19 @@
 require 'basetask'
 require 'path_fetcher'
+require 'date'
 
 module BradyW
+  class TempXmlFileNameGenerator
+    def self.filename(originalFileName)
+      dir = File.dirname originalFileName
+      filename = File.basename originalFileName
+      ext = File.extname filename
+      withoutExt = filename.sub "#{ext}", ''
+      tempFileName = "#{withoutExt}_#{DateTime.now.strftime('%s')}#{ext}"
+      File.join dir, tempFileName
+    end
+  end
+
   class DotNetInstaller < BaseTask
 
     # TODO: Use the .net installer module as a default path for these tools
