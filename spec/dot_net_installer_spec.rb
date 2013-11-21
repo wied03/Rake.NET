@@ -55,6 +55,7 @@ describe BradyW::DotNetInstaller do
     task = BradyW::DotNetInstaller.new do |t|
       t.xml_config = 'somedir/dotnetinstaller.xml'
       t.output = 'somedir/Our.File.Exe'
+      t.tokens = {:token1 => 'value1', :token2 => 'value2'}
     end
     # Leave the temp file so we can compare it
     FileUtils.stub(:rm) do |f|
@@ -65,15 +66,21 @@ describe BradyW::DotNetInstaller do
     task.exectaskpublic
 
     # assert
-    fail 'Write this test'
+    expected = IO.readlines('data/dot_net_installer/expected_output.xml')
+    actual = IO.readlines(@should_delete)
+    actual.should == expected
   end
 
   it 'should remove the temporarily generated XML file if an error occurs in the executable' do
     # arrange
+    task = BradyW::DotNetInstaller.new do |t|
+      t.xml_config = 'somedir/dotnetinstaller.xml'
+      t.output = 'somedir/Our.File.Exe'
+    end
+    task.stub!(:shell).and_yield(nil, SimulateProcessFailure.new)
 
-    # act
-
-    # assert
-    fail 'Write this test'
+    # act + assert
+    lambda { task.exectaskpublic }.should raise_exception "Problem with dotNetInstaller.  Return code 'ddd'"
+    File.exists?('generated_name.xml').should be_false
   end
 end

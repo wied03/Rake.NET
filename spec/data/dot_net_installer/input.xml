@@ -1,0 +1,5 @@
+<stuff>
+  <someValue attr="$(token1)">
+  $(token2)
+  </someValue>
+</stuff>
