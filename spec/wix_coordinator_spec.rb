@@ -190,29 +190,7 @@ describe BradyW::WixCoordinator do
       end
 
       # assert
-    }.should raise_exception "You cannot supply :Debug for a :Configuration property.  Use the :release_mode property on the WixCoordinator task"
-  end
-
-  it 'should not allow the top level release_mode flag to be overridden by MSBuild config' do
-    # arrange + act
-
-    lambda {
-      BradyW::WixCoordinator.new do |t|
-        t.product_version = '1.0.0.0'
-        t.wix_project_directory = 'MyWixProject'
-        t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
-        t.paraffin_update_fragment = 'someDir/someFile.wxs'
-        t.dnetinstaller_xml_config = 'someDir/dnetinstall.xml'
-        t.dnetinstaller_output_exe = 'someDir/output.exe'
-        t.properties = {:setting1 => 'the setting', :setting2 => 'the setting 2'}
-        t.msbuild_configure = lambda { |m|
-          m.dotnet_bin_version = :v4_0
-          m.release_mode = false
-        }
-      end
-
-      # assert
-    }.should raise_exception "You supplied conflicting values for release_mode in your MSBuild setup and the WixCoordinator task.  Make sure these are the same"
+    }.should raise_exception "You cannot supply Debug for a :Configuration property.  Use the :release_mode property on the WixCoordinator task"
   end
 
   it 'execute each dependency' do

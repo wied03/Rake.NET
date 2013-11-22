@@ -46,6 +46,9 @@ module BradyW
       msb = BradyW::MSBuild.new "wixmsbld_#{@name}" do |m|
         m.release = @release_mode
         m.solution = @wix_project_directory
+        if @properties && @properties.include?(:Configuration) then
+          raise "You cannot supply #{@properties[:Configuration]} for a :Configuration property.  Use the :release_mode property on the WixCoordinator task"
+        end
         m.properties = @properties
         @msbuild_configure.call(m) if @msbuild_configure
       end
