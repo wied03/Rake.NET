@@ -13,6 +13,7 @@ describe BradyW::WixCoordinator do
     # arrange + act
     task = BradyW::WixCoordinator.new :coworking_installer do |t|
       t.product_version = '1.0.0.0'
+      t.wix_project_directory = 'MyWixProject'
       t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
       t.paraffin_update_fragment = 'someDir/someFile.wxs'
       t.dnetinstaller_xml_config = 'someDir/dnetinstall.xml'
@@ -25,7 +26,7 @@ describe BradyW::WixCoordinator do
                                  "dnetinst_#{task.name}"]
   end
 
-  it 'should require product_version, upgrade_code, Paraffin update fragment, xml config for dot net installer, and output exe file' do
+  it 'should require product_version, upgrade_code, wix_project_directory, Paraffin update fragment, xml config for dot net installer, and output exe file' do
     # arrange
 
     # act
@@ -47,6 +48,7 @@ describe BradyW::WixCoordinator do
     # act
     task = BradyW::WixCoordinator.new do |t|
       t.product_version = '1.0.0.0'
+      t.wix_project_directory = 'MyWixProject'
       t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
       t.paraffin_update_fragment = 'someDir/someFile.wxs'
       t.dnetinstaller_xml_config = 'someDir/dnetinstall.xml'
@@ -55,6 +57,8 @@ describe BradyW::WixCoordinator do
 
     # assert
     ms_build_mock.release.should be_true
+    # the space is due to MSBuild's parameter forming
+    ms_build_mock.send(:solution).should == ' MyWixProject'
   end
 
   it 'should configure the Paraffin task' do
@@ -68,6 +72,7 @@ describe BradyW::WixCoordinator do
     # act
     task = BradyW::WixCoordinator.new do |t|
       t.product_version = '1.0.0.0'
+      t.wix_project_directory = 'MyWixProject'
       t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
       t.paraffin_update_fragment = 'someDir/someFile.wxs'
       t.dnetinstaller_xml_config = 'someDir/dnetinstall.xml'

@@ -10,6 +10,9 @@ module BradyW
     # *Required* Product version to configure in the WIX/MSBUild + DotNetInstaller
     attr_accessor :product_version
 
+    # *Required* The directory containing your .wixproj file
+    attr_accessor :wix_project_directory
+
     # *Required* Upgrade code that is passed on to WIX and dotnetinstaller
     attr_accessor :upgrade_code
 
@@ -24,6 +27,7 @@ module BradyW
 
     def initialize(parameters = :task)
       parseParams parameters
+      # Need our parameters to instantiate the dependent tasks
       yield self if block_given?
       paraffin = Paraffin::FragmentUpdater.new "paraffin_#{@name}" do |pf|
         pf.fragment_file = @paraffin_update_fragment
@@ -31,6 +35,7 @@ module BradyW
 
       msb = BradyW::MSBuild.new "wixmsbld_#{@name}" do |msb|
         msb.release = true
+        msb.solution = @wix_project_directory
       end
 
       dnet_inst = BradyW::DotNetInstaller.new "dnetinst_#{@name}" do |inst|
