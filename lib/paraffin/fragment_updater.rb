@@ -42,9 +42,9 @@ module BradyW
       end
 
 
-      def initialize
+      def initialize(parameters = :task)
         @replace_original = true
-        super
+        super parameters
       end
 
       private
