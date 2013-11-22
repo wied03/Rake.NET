@@ -64,5 +64,9 @@ module BradyW
       # Specifying our own dependencies
       super(@name)
     end
+
+    def exectask
+      # We're just a task of dependencies
+    end
   end
 end

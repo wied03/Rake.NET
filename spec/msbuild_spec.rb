@@ -1,6 +1,6 @@
-require "base"
-require "msbuild"
-require "basetaskmocking"
+require 'base'
+require 'msbuild'
+require 'basetaskmocking'
 
 describe BradyW::MSBuild do
   RSpec::Matchers.define :have_build_property do |expected|

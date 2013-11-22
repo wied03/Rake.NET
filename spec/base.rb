@@ -19,6 +19,7 @@ RSpec.configure do |config|
   end
 
   config.before(:each) do
+    BradyW::BaseTask.clear_shell_stack
     @config = BradyW::BaseConfig.new
     class MockConfig
       include Singleton

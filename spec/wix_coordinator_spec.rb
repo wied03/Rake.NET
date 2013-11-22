@@ -9,6 +9,17 @@ module BradyW
 end
 
 describe BradyW::WixCoordinator do
+  before :each do
+    stub_const 'BswTech::DnetInstallUtil::PARAFFIN_EXE', 'path/to/paraffin.exe'
+    BswTech::DnetInstallUtil.stub(:dot_net_installer_base_path).and_return('path/to/dnetinstaller')
+  end
+
+  after :each do
+    FileUtils.rm 'someDir/someFile.wxs', :force => true
+    FileUtils.rm 'someDir/someFile.wxs.PARAFFIN', :force => true
+    FileUtils.rm 'someDir/dnetinstall.xml', :force => true
+  end
+
   it 'should declare a Paraffin update, MSBuild, and DotNetInstaller task as dependencies' do
     # arrange + act
     task = BradyW::WixCoordinator.new :coworking_installer do |t|
@@ -40,7 +51,6 @@ describe BradyW::WixCoordinator do
     # allow us to create an instance, then mock future creations of that instance while preserving the block
     ms_build_mock = BradyW::MSBuild.new
     BradyW::MSBuild.stub!(:new) do |&block|
-      # we should be supply a release config option in a block
       block[ms_build_mock]
       ms_build_mock
     end
@@ -114,7 +124,6 @@ describe BradyW::WixCoordinator do
     # arrange
     ms_build_mock = BradyW::MSBuild.new
     BradyW::MSBuild.stub!(:new) do |&block|
-      # we should be supply a release config option in a block
       block[ms_build_mock]
       ms_build_mock
     end
@@ -145,7 +154,6 @@ describe BradyW::WixCoordinator do
     # arrange
     ms_build_mock = BradyW::MSBuild.new
     BradyW::MSBuild.stub!(:new) do |&block|
-      # we should be supply a release config option in a block
       block[ms_build_mock]
       ms_build_mock
     end
@@ -159,7 +167,7 @@ describe BradyW::WixCoordinator do
       t.dnetinstaller_xml_config = 'someDir/dnetinstall.xml'
       t.dnetinstaller_output_exe = 'someDir/output.exe'
       t.properties = {:setting1 => 'the setting', :setting2 => 'the setting 2'}
-      t.msbuild_configure = lambda {|m| m.dotnet_bin_version = :v4_0}
+      t.msbuild_configure = lambda { |m| m.dotnet_bin_version = :v4_0 }
     end
 
     # assert
@@ -167,20 +175,80 @@ describe BradyW::WixCoordinator do
   end
 
   it 'should not allow the top level release_mode flag to be overridden by properties' do
-    # arrange
+    # arrange + act
 
-    # act
+    lambda {
+      BradyW::WixCoordinator.new do |t|
+        t.product_version = '1.0.0.0'
+        t.wix_project_directory = 'MyWixProject'
+        t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
+        t.paraffin_update_fragment = 'someDir/someFile.wxs'
+        t.dnetinstaller_xml_config = 'someDir/dnetinstall.xml'
+        t.dnetinstaller_output_exe = 'someDir/output.exe'
+        t.properties = {:setting1 => 'the setting', :setting2 => 'the setting 2', :Configuration => :Debug}
+        t.msbuild_configure = lambda { |m| m.dotnet_bin_version = :v4_0 }
+      end
 
-    # assert
-    fail 'Write this test'
+      # assert
+    }.should raise_exception "You cannot supply :Debug for a :Configuration property.  Use the :release_mode property on the WixCoordinator task"
+  end
+
+  it 'should not allow the top level release_mode flag to be overridden by MSBuild config' do
+    # arrange + act
+
+    lambda {
+      BradyW::WixCoordinator.new do |t|
+        t.product_version = '1.0.0.0'
+        t.wix_project_directory = 'MyWixProject'
+        t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
+        t.paraffin_update_fragment = 'someDir/someFile.wxs'
+        t.dnetinstaller_xml_config = 'someDir/dnetinstall.xml'
+        t.dnetinstaller_output_exe = 'someDir/output.exe'
+        t.properties = {:setting1 => 'the setting', :setting2 => 'the setting 2'}
+        t.msbuild_configure = lambda { |m|
+          m.dotnet_bin_version = :v4_0
+          m.release_mode = false
+        }
+      end
+
+      # assert
+    }.should raise_exception "You supplied conflicting values for release_mode in your MSBuild setup and the WixCoordinator task.  Make sure these are the same"
   end
 
   it 'execute each dependency' do
     # arrange
 
+    FileUtils.mkdir_p 'someDir'
+    FileUtils.touch 'someDir/someFile.wxs'
+    ms_build_mock = BradyW::MSBuild.new :msbuild_task
+    BradyW::MSBuild.stub!(:new) do |&block|
+      block[ms_build_mock]
+      ms_build_mock
+    end
+    task = BradyW::WixCoordinator.new do |t|
+      t.product_version = '1.0.0.0'
+      t.wix_project_directory = 'MyWixProject'
+      t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
+      t.paraffin_update_fragment = 'someDir/someFile.wxs'
+      t.dnetinstaller_xml_config = 'someDir/dnetinstall.xml'
+      t.dnetinstaller_output_exe = 'someDir/output.exe'
+      t.properties = {:setting1 => 'the setting', :setting2 => 'the setting 2'}
+    end
+    ms_build_mock.stub(:dotnet).and_return('path/to/')
+    FileUtils.touch 'someDir/someFile.wxs.PARAFFIN'
+    FileUtils.touch 'someDir/dnetinstall.xml'
+
     # act
 
+    Rake::Task[:task].invoke
+    command3 = task.executedPop
+    command2 = task.executedPop
+    command1 = task.executedPop
+
     # assert
-    fail 'Write this test'
+    command1.should == '"path/to/paraffin.exe" -update "someDir/someFile.wxs" -verbose'
+    command2.should == 'path/to/msbuild.exe /property:Configuration=Release;TargetFrameworkVersion=v4.5;setting1=the setting;setting2=the setting 2 MyWixProject'
+    command3.should include '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"someDir/dnetinstall'
+    command3.should include '/o:"someDir/output.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
   end
 end
