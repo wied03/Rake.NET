@@ -31,6 +31,9 @@ module BradyW
     # *Optional* Debug or Release.  By default true is used
     attr_accessor :release_mode
 
+    # *Optional* A lambda to do additional configuration on the MSBuild task (e.g. dotnet_bin_version)
+    attr_accessor :msbuild_configure
+
     def initialize(parameters = :task)
       @release_mode ||= true
       parseParams parameters
@@ -40,10 +43,11 @@ module BradyW
         pf.fragment_file = @paraffin_update_fragment
       end
 
-      msb = BradyW::MSBuild.new "wixmsbld_#{@name}" do |msb|
-        msb.release = @release_mode
-        msb.solution = @wix_project_directory
-        msb.properties = @properties
+      msb = BradyW::MSBuild.new "wixmsbld_#{@name}" do |m|
+        m.release = @release_mode
+        m.solution = @wix_project_directory
+        m.properties = @properties
+        @msbuild_configure.call(m) if @msbuild_configure
       end
 
       dnet_inst = BradyW::DotNetInstaller.new "dnetinst_#{@name}" do |inst|

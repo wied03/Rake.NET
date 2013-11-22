@@ -143,14 +143,30 @@ describe BradyW::WixCoordinator do
 
   it 'should allow MSBuild properties like .NET version, etc. to be passed along' do
     # arrange
+    ms_build_mock = BradyW::MSBuild.new
+    BradyW::MSBuild.stub!(:new) do |&block|
+      # we should be supply a release config option in a block
+      block[ms_build_mock]
+      ms_build_mock
+    end
 
     # act
+    BradyW::WixCoordinator.new do |t|
+      t.product_version = '1.0.0.0'
+      t.wix_project_directory = 'MyWixProject'
+      t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
+      t.paraffin_update_fragment = 'someDir/someFile.wxs'
+      t.dnetinstaller_xml_config = 'someDir/dnetinstall.xml'
+      t.dnetinstaller_output_exe = 'someDir/output.exe'
+      t.properties = {:setting1 => 'the setting', :setting2 => 'the setting 2'}
+      t.msbuild_configure = lambda {|m| m.dotnet_bin_version = :v4_0}
+    end
 
     # assert
-    fail 'Write this test'
+    ms_build_mock.dotnet_bin_version.should == :v4_0
   end
 
-  it 'should not allow the top level release_mode flag to be overriden by properties' do
+  it 'should not allow the top level release_mode flag to be overridden by properties' do
     # arrange
 
     # act
