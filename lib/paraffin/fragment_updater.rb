@@ -19,7 +19,7 @@ module BradyW
                   quoted(@fragment_file),
                   '-verbose',
                   report_if_different]
-        params.reject! &:empty?
+        params.reject!{|p| !p || p.empty?}
         base_path = File.dirname @fragment_file
         file_name = File.basename @fragment_file
         generated_file = File.join base_path, "#{file_name}.PARAFFIN"

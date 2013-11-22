@@ -42,7 +42,7 @@ module BradyW
                   exclude_regexp,
                   '-verbose',
                   no_root_directory]
-        params.reject! &:empty?
+        params.reject!{|p| !p || p.empty?}
         flat_params = params.join ' '
         shell "\"#{path}\" #{flat_params}"
       end
