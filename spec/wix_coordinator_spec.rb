@@ -15,6 +15,19 @@ describe BradyW::WixCoordinator do
   end
 
   after :each do
+    begin
+      BradyW::MSBuild.unstub(:new)
+    rescue RSpec::Mocks::MockExpectationError
+    end
+    begin
+      BradyW::Paraffin::FragmentUpdater.unstub(:new)
+    rescue RSpec::Mocks::MockExpectationError
+    end
+    begin
+      BradyW::DotNetInstaller.unstub(:new)
+    rescue RSpec::Mocks::MockExpectationError
+    end
+
     FileUtils.rm 'someDir/someFile.wxs', :force => true
     FileUtils.rm 'someDir/someFile.wxs.PARAFFIN', :force => true
     FileUtils.rm 'someDir/dnetinstall.xml', :force => true
@@ -50,7 +63,7 @@ describe BradyW::WixCoordinator do
     # arrange
     # allow us to create an instance, then mock future creations of that instance while preserving the block
     ms_build_mock = BradyW::MSBuild.new
-    BradyW::MSBuild.stub!(:new) do |&block|
+    BradyW::MSBuild.stub(:new) do |&block|
       block[ms_build_mock]
       ms_build_mock
     end
@@ -76,7 +89,7 @@ describe BradyW::WixCoordinator do
   it 'should configure the Paraffin task' do
     # arrange
     pf_mock = BradyW::Paraffin::FragmentUpdater.new
-    BradyW::Paraffin::FragmentUpdater.stub!(:new) do |&block|
+    BradyW::Paraffin::FragmentUpdater.stub(:new) do |&block|
       block[pf_mock]
       pf_mock
     end
@@ -98,7 +111,7 @@ describe BradyW::WixCoordinator do
   it 'should configure the DotNetInstaller task' do
     # arrange
     dnet_mock = BradyW::DotNetInstaller.new
-    BradyW::DotNetInstaller.stub!(:new) do |&block|
+    BradyW::DotNetInstaller.stub(:new) do |&block|
       block[dnet_mock]
       dnet_mock
     end
@@ -123,12 +136,12 @@ describe BradyW::WixCoordinator do
   it 'should allow Debug to be specified as the config' do
     # arrange
     ms_build_mock = BradyW::MSBuild.new
-    BradyW::MSBuild.stub!(:new) do |&block|
+    BradyW::MSBuild.stub(:new) do |&block|
       block[ms_build_mock]
       ms_build_mock
     end
     dnet_mock = BradyW::DotNetInstaller.new
-    BradyW::DotNetInstaller.stub!(:new) do |&block|
+    BradyW::DotNetInstaller.stub(:new) do |&block|
       block[dnet_mock]
       dnet_mock
     end
@@ -153,7 +166,7 @@ describe BradyW::WixCoordinator do
   it 'should allow MSBuild properties like .NET version, etc. to be passed along' do
     # arrange
     ms_build_mock = BradyW::MSBuild.new
-    BradyW::MSBuild.stub!(:new) do |&block|
+    BradyW::MSBuild.stub(:new) do |&block|
       block[ms_build_mock]
       ms_build_mock
     end
@@ -195,15 +208,14 @@ describe BradyW::WixCoordinator do
 
   it 'execute each dependency' do
     # arrange
-
     FileUtils.mkdir_p 'someDir'
     FileUtils.touch 'someDir/someFile.wxs'
     ms_build_mock = BradyW::MSBuild.new :msbuild_task
-    BradyW::MSBuild.stub!(:new) do |&block|
+    BradyW::MSBuild.stub(:new) do |&block|
       block[ms_build_mock]
       ms_build_mock
     end
-    task = BradyW::WixCoordinator.new do |t|
+    task = BradyW::WixCoordinator.new :integration_test do |t|
       t.product_version = '1.0.0.0'
       t.wix_project_directory = 'MyWixProject'
       t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
@@ -218,7 +230,7 @@ describe BradyW::WixCoordinator do
 
     # act
 
-    Rake::Task[:task].invoke
+    Rake::Task[:integration_test].invoke
     command3 = task.executedPop
     command2 = task.executedPop
     command1 = task.executedPop
