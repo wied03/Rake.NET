@@ -51,12 +51,12 @@ describe BradyW::WixCoordinator do
   end
 
   it 'should require product_version, upgrade_code, wix_project_directory, Paraffin update fragment, xml config for dot net installer, and output exe file' do
-    # arrange
+    # act + assert
+    lambda {
+      BradyW::WixCoordinator.new do |w|
 
-    # act
-
-    # assert
-    fail 'Write this test'
+      end
+    }.should raise_exception ':product_version, :upgrade_code, :paraffin_update_fragment, :wix_project_directory, :dnetinstaller_xml_config, and :dnetinstaller_output_exe are all required'
   end
 
   it 'should configure the MSBuild task' do

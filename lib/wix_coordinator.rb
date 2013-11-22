@@ -37,6 +37,9 @@ module BradyW
       parseParams parameters
       # Need our parameters to instantiate the dependent tasks
       yield self if block_given?
+
+      validate
+
       paraffin = Paraffin::FragmentUpdater.new "paraffin_#{@name}" do |pf|
         pf.fragment_file = @paraffin_update_fragment
       end
@@ -68,6 +71,12 @@ module BradyW
 
     def exectask
       # We're just a task of dependencies
+    end
+
+    private
+
+    def validate
+      raise ':product_version, :upgrade_code, :paraffin_update_fragment, :wix_project_directory, :dnetinstaller_xml_config, and :dnetinstaller_output_exe are all required' unless @product_version && @upgrade_code && @paraffin_update_fragment && @wix_project_directory && @dnetinstaller_xml_config && @dnetinstaller_output_exe
     end
   end
 end
