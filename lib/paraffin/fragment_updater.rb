@@ -50,9 +50,7 @@ module BradyW
       private
 
       def validate
-        if !@fragment_file
-          fail ":fragment_file is required for this task"
-        end
+        fail ":fragment_file is required for this task" unless @fragment_file
       end
 
       def report_if_different

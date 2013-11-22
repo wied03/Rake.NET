@@ -54,8 +54,7 @@ module BradyW
                     :alias => @alias,
                     :output_file => @output_file,
                     :directory_to_scan => @directory_to_scan}
-        missing = required.reject { |k, v| v }
-        .keys
+        missing = required.reject { |k, v| v }.keys
         fail "These required attributes must be set by your task: #{missing}" unless missing.empty?
       end
 
