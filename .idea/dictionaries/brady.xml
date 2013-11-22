@@ -2,7 +2,9 @@
   <dictionary name="brady">
     <words>
       <w>dnetinstall</w>
+      <w>fslash</w>
       <w>msbuild</w>
+      <w>regpath</w>
     </words>
   </dictionary>
 </component>

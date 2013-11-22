@@ -30,9 +30,9 @@ module BradyW
     def exectask
       validate
       generated_file_name = generate_xml_file
-      params=[param('c', generated_file_name, :quote => true),
-              param('o', @output, :quote => true),
-              param('t', bootstrapper_path, :quote => true)]
+      params=[param_fslash_colon('c', generated_file_name, :quote => true),
+              param_fslash_colon('o', @output, :quote => true),
+              param_fslash_colon('t', bootstrapper_path, :quote => true)]
       clean_file = lambda { FileUtils.rm generated_file_name }
       shell "\"#{linker_path}\" #{params.join(' ')}" do |ok, status|
         if !ok then
@@ -64,12 +64,6 @@ module BradyW
         end
       end
       generated_file_name
-    end
-
-    def param(switch, setting, options={})
-      return String.new if !setting
-      quoted = options[:quote] ? quoted(setting) : setting
-      "/#{switch}:#{quoted}"
     end
 
     def token_replace(token)

@@ -1,6 +1,7 @@
 require 'basetask'
 require 'windowspaths'
 require 'dotframeworksymbolhelp'
+require 'param_quotes'
 
 module BradyW
 
@@ -8,6 +9,7 @@ module BradyW
   class MSBuild < BaseTask
     include WindowsPaths
     include Dotframeworksymbolhelp
+    include ParamQuotes
 
     # *Optional* Targets to build.  Can be a single target or an array of targets
     attr_accessor :targets
@@ -37,7 +39,10 @@ module BradyW
     DOTNET2_HARDCODEDPATH = "C:\\Windows\\Microsoft.NET\\Framework\\v2.0.50727\\"
 
     def exectask
-      shell "#{path}msbuild.exe#{targets}#{propstr}#{solution}"
+      params = targets
+      params << merged_properties.map { |key, val| param_fslash_colon('property', property_kv(key, val)) }
+      params_flat = params.join ' '
+      shell "#{path}msbuild.exe #{params_flat}#{solution}"
     end
 
     def compile_version
@@ -47,38 +52,30 @@ module BradyW
     end
 
     def solution
-      if @solution
-        " " + @solution
-      end
+      " #{@solution}" if @solution
     end
 
     def targets
-      if @targets
-        " /target:#{flatTargets}"
-      end
-    end
-
-    def flatTargets
-      return nil unless @targets
-      @targets.is_a?(Array) ? @targets.join(",") : @targets
+      @targets ? [*@targets].map { |t| param_fslash_colon 'target', t } : []
     end
 
     def debugOrRelease
-      @release ? "Release" : "Debug"
+      @release ? :Release : :Debug
     end
 
-    def propsmerged
-      default = {}
-      default['Configuration'] = debugOrRelease
-      default['TargetFrameworkVersion'] = compile_version
-      default.merge @properties || {}
+    def property_kv(key, value)
+      "#{key}=#{handle_property_space(value)}"
     end
 
-    def propstr
-      keyvalue = propsmerged.map do |prop,set|
-        "#{prop}=#{set}"
-      end
-      " /property:"+keyvalue.join(";")
+    def handle_property_space(val)
+      val_str = val.to_s
+      val_str.include?(' ') ? quoted(val_str) : val_str
+    end
+
+    def merged_properties
+      default = {:Configuration => debugOrRelease,
+                 :TargetFrameworkVersion => compile_version}
+      default.merge (@properties || {})
     end
 
     def path
@@ -93,7 +90,7 @@ module BradyW
         when :v2_0
           DOTNET2_HARDCODEDPATH
         else
-          fail "You supplied a .NET MSBuild binary version that's not supported.  Please use :v4_0, :v3_5, or :v2_0"
+          fail 'You supplied a .NET MSBuild binary version that\'s not supported.  Please use :v4_0, :v3_5, or :v2_0'
       end
     end
   end

@@ -54,7 +54,7 @@ module BradyW
       end
 
       def report_if_different
-        @replace_original ? String.new : '-ReportIfDifferent'
+        '-ReportIfDifferent' unless @replace_original
       end
 
       def path

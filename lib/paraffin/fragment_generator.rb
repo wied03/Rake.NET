@@ -67,7 +67,7 @@ module BradyW
       end
 
       def no_root_directory
-        @no_root_directory ? "-NoRootDirectory" : String.new
+         '-NoRootDirectory' if @no_root_directory
       end
 
       def the_alias

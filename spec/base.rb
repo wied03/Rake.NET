@@ -1,5 +1,5 @@
 $: << File.expand_path(File.dirname(__FILE__) +"/../lib")
-require "rspec"
+require 'rspec/expectations'
 # Needed to mock out our config/props
 require 'config'
 require "singleton"
@@ -27,7 +27,7 @@ RSpec.configure do |config|
     end
 
     # Force only our base class to be returned
-    BradyW::Config.stub!(:instance).and_return(MockConfig.instance)
+    BradyW::Config.stub(:instance).and_return(MockConfig.instance)
     MockConfig.instance.values = @config
   end
 end
