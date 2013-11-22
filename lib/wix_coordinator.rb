@@ -28,7 +28,11 @@ module BradyW
     # *Optional* Properties to be used with MSBuild and DotNetInstaller
     attr_accessor :properties
 
+    # *Optional* Debug or Release.  By default true is used
+    attr_accessor :release_mode
+
     def initialize(parameters = :task)
+      @release_mode ||= true
       parseParams parameters
       # Need our parameters to instantiate the dependent tasks
       yield self if block_given?
@@ -37,14 +41,16 @@ module BradyW
       end
 
       msb = BradyW::MSBuild.new "wixmsbld_#{@name}" do |msb|
-        msb.release = true
+        msb.release = @release_mode
         msb.solution = @wix_project_directory
         msb.properties = @properties
       end
 
       dnet_inst = BradyW::DotNetInstaller.new "dnetinst_#{@name}" do |inst|
         inst.xml_config = @dnetinstaller_xml_config
-        inst.tokens = @properties
+        tokens = {:Configuration => @release_mode ? :Release : :Debug}
+        tokens = @properties.merge tokens if @properties
+        inst.tokens = tokens
         inst.output = @dnetinstaller_output_exe
       end
 
