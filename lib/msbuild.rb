@@ -75,9 +75,8 @@ module BradyW
     end
 
     def propstr
-      keyvalue = []
-      propsmerged.each do |prop, set|
-        keyvalue << "#{prop}=#{set}"
+      keyvalue = propsmerged.map do |prop,set|
+        "#{prop}=#{set}"
       end
       " /property:"+keyvalue.join(";")
     end
