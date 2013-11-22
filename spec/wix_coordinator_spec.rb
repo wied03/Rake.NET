@@ -37,40 +37,42 @@ describe BradyW::WixCoordinator do
 
   it 'should configure the MSBuild task' do
     # arrange
+    # allow us to create an instance, then mock future creations of that instance while preserving the block
     ms_build_mock = BradyW::MSBuild.new
-    BradyW::MSBuild.stub!(:new) do |task_name, &block|
-      puts "Stub reached for newly created MSBuild task #{task_name}"
+    BradyW::MSBuild.stub!(:new) do |&block|
       # we should be supply a release config option in a block
       block[ms_build_mock]
       ms_build_mock
     end
 
     # act
-    task = BradyW::WixCoordinator.new do |t|
+    BradyW::WixCoordinator.new do |t|
       t.product_version = '1.0.0.0'
       t.wix_project_directory = 'MyWixProject'
       t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
       t.paraffin_update_fragment = 'someDir/someFile.wxs'
       t.dnetinstaller_xml_config = 'someDir/dnetinstall.xml'
       t.dnetinstaller_output_exe = 'someDir/output.exe'
+      t.properties = {:setting1 => 'the setting', :setting2 => 'the setting 2'}
     end
 
     # assert
     ms_build_mock.release.should be_true
-    # the space is due to MSBuild's parameter forming
+    # the space is due to MSBuild task's parameter forming
     ms_build_mock.send(:solution).should == ' MyWixProject'
+    ms_build_mock.properties.should == {:setting1 => 'the setting', :setting2 => 'the setting 2'}
   end
 
   it 'should configure the Paraffin task' do
     # arrange
     pf_mock = BradyW::Paraffin::FragmentUpdater.new
-    BradyW::Paraffin::FragmentUpdater.stub!(:new) do |name, &block|
+    BradyW::Paraffin::FragmentUpdater.stub!(:new) do |&block|
       block[pf_mock]
       pf_mock
     end
 
     # act
-    task = BradyW::WixCoordinator.new do |t|
+    BradyW::WixCoordinator.new do |t|
       t.product_version = '1.0.0.0'
       t.wix_project_directory = 'MyWixProject'
       t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
@@ -85,11 +87,27 @@ describe BradyW::WixCoordinator do
 
   it 'should configure the DotNetInstaller task' do
     # arrange
+    dnet_mock = BradyW::DotNetInstaller.new
+    BradyW::DotNetInstaller.stub!(:new) do |&block|
+      block[dnet_mock]
+      dnet_mock
+    end
 
     # act
+    BradyW::WixCoordinator.new do |t|
+      t.product_version = '1.0.0.0'
+      t.wix_project_directory = 'MyWixProject'
+      t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
+      t.paraffin_update_fragment = 'someDir/someFile.wxs'
+      t.dnetinstaller_xml_config = 'someDir/dnetinstall.xml'
+      t.dnetinstaller_output_exe = 'someDir/output.exe'
+      t.properties = {:setting1 => 'the setting', :setting2 => 'the setting 2'}
+    end
 
     # assert
-    fail 'Write this test'
+    dnet_mock.tokens.should == {:setting1 => 'the setting', :setting2 => 'the setting 2'}
+    dnet_mock.output.should == 'someDir/output.exe'
+    dnet_mock.xml_config.should == 'someDir/dnetinstall.xml'
   end
 
   it 'should allow Debug to be specified as the config' do

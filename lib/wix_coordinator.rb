@@ -25,6 +25,9 @@ module BradyW
     # *Required* The name of the output file you want
     attr_accessor :dnetinstaller_output_exe
 
+    # *Optional* Properties to be used with MSBuild and DotNetInstaller
+    attr_accessor :properties
+
     def initialize(parameters = :task)
       parseParams parameters
       # Need our parameters to instantiate the dependent tasks
@@ -36,10 +39,13 @@ module BradyW
       msb = BradyW::MSBuild.new "wixmsbld_#{@name}" do |msb|
         msb.release = true
         msb.solution = @wix_project_directory
+        msb.properties = @properties
       end
 
       dnet_inst = BradyW::DotNetInstaller.new "dnetinst_#{@name}" do |inst|
-
+        inst.xml_config = @dnetinstaller_xml_config
+        inst.tokens = @properties
+        inst.output = @dnetinstaller_output_exe
       end
 
       @dependencies = [paraffin.name,
