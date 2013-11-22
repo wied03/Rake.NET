@@ -2,19 +2,9 @@ require 'basetask'
 require 'path_fetcher'
 require 'date'
 require 'param_quotes'
+require 'temp_file_name_generator'
 
 module BradyW
-  class TempXmlFileNameGenerator
-    def self.filename(originalFileName)
-      dir = File.dirname originalFileName
-      filename = File.basename originalFileName
-      ext = File.extname filename
-      withoutExt = filename.sub "#{ext}", ''
-      tempFileName = "#{withoutExt}_#{DateTime.now.strftime('%s')}#{ext}"
-      File.join dir, tempFileName
-    end
-  end
-
   class DotNetInstaller < BaseTask
     include ParamQuotes
 
@@ -50,7 +40,7 @@ module BradyW
     end
 
     def generate_xml_file
-      generated_file_name = TempXmlFileNameGenerator.filename @xml_config
+      generated_file_name = TempFileNameGenerator.filename @xml_config
       File.open(generated_file_name, 'w') do |out|
         File.open @xml_config, 'r' do |input|
           input.each do |line|

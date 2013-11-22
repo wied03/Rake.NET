@@ -6,23 +6,11 @@ describe BradyW::DotNetInstaller do
   before :each do
     @should_delete = 'generated_name.xml'
     BswTech::DnetInstallUtil.stub(:dot_net_installer_base_path).and_return('path/to/dnetinstaller')
-    BradyW::TempXmlFileNameGenerator.stub(:filename).and_return 'generated_name.xml'
+    BradyW::TempFileNameGenerator.stub(:filename).and_return 'generated_name.xml'
   end
 
   after :each do
-    FileUtils.rspec_reset
     rm @should_delete if (@should_delete && File.exists?(@should_delete))
-  end
-
-  it 'should generate a valid filename' do
-    # arrange
-    BradyW::TempXmlFileNameGenerator.rspec_reset
-    orig_file = '../dotnetinstaller.xml'
-
-    # act
-    @should_delete = BradyW::TempXmlFileNameGenerator.filename orig_file
-    puts "Got filename #{@should_delete}, trying to create to ensure it's a valid filename"
-    FileUtils.touch @should_delete
   end
 
   # TODO: Task 2: DotNetinstaller task.  should do token replace in XML,make a temp copy, then call something like this: "%DNET_INSTALLER_PATH%\InstallerLinker.exe" /c:dotnetinstaller.xml /o:bin\Release\Bsw.Coworking.Agent.Installer.exe /t:"%DNET_INSTALLER_PATH%\dotNetInstaller.exe"
