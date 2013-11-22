@@ -37,7 +37,7 @@ describe BradyW::WixCoordinator do
   it 'should configure the MSBuild task' do
     # arrange
     ms_build_mock = BradyW::MSBuild.new
-    BradyW::MSBuild.stub!(:new) do |task_name,&block|
+    BradyW::MSBuild.stub!(:new) do |task_name, &block|
       puts "Stub reached for newly created MSBuild task #{task_name}"
       # we should be supply a release config option in a block
       block[ms_build_mock]
@@ -59,11 +59,23 @@ describe BradyW::WixCoordinator do
 
   it 'should configure the Paraffin task' do
     # arrange
+    pf_mock = BradyW::Paraffin::FragmentUpdater.new
+    BradyW::Paraffin::FragmentUpdater.stub!(:new) do |name, &block|
+      block[pf_mock]
+      pf_mock
+    end
 
     # act
+    task = BradyW::WixCoordinator.new do |t|
+      t.product_version = '1.0.0.0'
+      t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
+      t.paraffin_update_fragment = 'someDir/someFile.wxs'
+      t.dnetinstaller_xml_config = 'someDir/dnetinstall.xml'
+      t.dnetinstaller_output_exe = 'someDir/output.exe'
+    end
 
     # assert
-    fail 'Write this test'
+    pf_mock.fragment_file.should == 'someDir/someFile.wxs'
   end
 
   it 'should configure the DotNetInstaller task' do

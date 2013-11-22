@@ -24,7 +24,9 @@ module BradyW
 
     def initialize(parameters = :task)
       parseParams parameters
+      yield self if block_given?
       paraffin = Paraffin::FragmentUpdater.new "paraffin_#{@name}" do |pf|
+        pf.fragment_file = @paraffin_update_fragment
       end
 
       msb = BradyW::MSBuild.new "wixmsbld_#{@name}" do |msb|
