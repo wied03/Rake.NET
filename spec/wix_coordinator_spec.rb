@@ -225,7 +225,7 @@ describe BradyW::WixCoordinator do
 
     # assert
     command1.should == '"path/to/paraffin.exe" -update "someDir/someFile.wxs" -verbose'
-    command2.should == 'path/to/msbuild.exe /property:Configuration=Release;TargetFrameworkVersion=v4.5;setting1="the setting";setting2="the setting 2" MyWixProject'
+    command2.should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:setting1="the setting" /property:setting2="the setting 2" MyWixProject'
     command3.should include '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"someDir/dnetinstall'
     command3.should include '/o:"someDir/output.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
   end
