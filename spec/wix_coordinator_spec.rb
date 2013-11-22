@@ -30,10 +30,26 @@ describe BradyW::WixCoordinator do
 
   it 'should have Release as the default config' do
     # arrange
+    ms_build_mock = BradyW::MSBuild.new
+    BradyW::MSBuild.stub!(:new) do |task_name,&block|
+      puts "Stub reached for newly created MSBuild task #{task_name}"
+      # we should be supply a release config option in a block
+      block[ms_build_mock]
+      ms_build_mock
+    end
 
     # act
+    task = BradyW::WixCoordinator.new do |t|
+      t.product_version = '1.0.0.0'
+      t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
+      t.paraffin_update_fragment = 'someDir/someFile.wxs'
+      t.dnetinstaller_xml_config = 'someDir/dnetinstall.xml'
+      t.dnetinstaller_output_exe = 'someDir/output.exe'
+    end
 
     # assert
+    ms_build_mock.release.should be_true
+
     fail 'Write this test'
   end
 
