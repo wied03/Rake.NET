@@ -1,5 +1,7 @@
 require 'basetask'
 require 'msbuild'
+require 'paraffin/fragment_updater'
+require 'dot_net_installer'
 
 module BradyW
   class WixCoordinator < BaseTask
@@ -22,11 +24,20 @@ module BradyW
 
     def initialize(parameters = :task)
       parseParams parameters
-      BradyW::MSBuild.new "wix_msbuild" do |msb|
+      paraffin = Paraffin::FragmentUpdater.new "paraffin_#{@name}" do |pf|
+      end
+
+      msb = BradyW::MSBuild.new "wixmsbld_#{@name}" do |msb|
         msb.release = true
       end
 
-      @dependencies = ["wix_msbuild"]
+      dnet_inst = BradyW::DotNetInstaller.new "dnetinst_#{@name}" do |inst|
+
+      end
+
+      @dependencies = [paraffin.name,
+                       msb.name,
+                       dnet_inst.name]
       # Specifying our own dependencies
       super(@name)
     end

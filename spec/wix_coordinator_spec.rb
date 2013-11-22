@@ -2,10 +2,16 @@ require 'base'
 require 'wix_coordinator'
 require 'basetaskmocking'
 
+module BradyW
+  class BaseTask < Rake::TaskLib
+    attr_accessor :dependencies
+  end
+end
+
 describe BradyW::WixCoordinator do
   it 'should declare a Paraffin update, MSBuild, and DotNetInstaller task as dependencies' do
     # arrange + act
-    task = BradyW::WixCoordinator.new do |t|
+    task = BradyW::WixCoordinator.new :coworking_installer do |t|
       t.product_version = '1.0.0.0'
       t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
       t.paraffin_update_fragment = 'someDir/someFile.wxs'
@@ -15,7 +21,7 @@ describe BradyW::WixCoordinator do
 
     # assert
     task.dependencies.should == ["paraffin_#{task.name}",
-                                 "wixmsbuild_#{task.name}",
+                                 "wixmsbld_#{task.name}",
                                  "dnetinst_#{task.name}"]
   end
 
@@ -28,7 +34,7 @@ describe BradyW::WixCoordinator do
     fail 'Write this test'
   end
 
-  it 'should have Release as the default config' do
+  it 'should configure the MSBuild task' do
     # arrange
     ms_build_mock = BradyW::MSBuild.new
     BradyW::MSBuild.stub!(:new) do |task_name,&block|
@@ -49,7 +55,23 @@ describe BradyW::WixCoordinator do
 
     # assert
     ms_build_mock.release.should be_true
+  end
 
+  it 'should configure the Paraffin task' do
+    # arrange
+
+    # act
+
+    # assert
+    fail 'Write this test'
+  end
+
+  it 'should configure the DotNetInstaller task' do
+    # arrange
+
+    # act
+
+    # assert
     fail 'Write this test'
   end
 
