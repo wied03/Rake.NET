@@ -41,7 +41,7 @@ describe BradyW::BCP do
     end
 
     # Don't want to depend on specific registry setting
-    task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
+    task.stub(:sql_tool).with("100").and_return("z:\\")
 
     task.exectaskpublic
     task.executedPop.should == "\"z:\\bcp.exe\" \"nexttable\" in 02-nexttable.csv -U theuser -P thepassword /Smyhostname -t \"|d3l1m1t3r|\" /c -m 1 -F 2"
@@ -72,7 +72,7 @@ describe BradyW::BCP do
     end
 
     # Don't want to depend on specific registry setting
-    task.should_receive(:sql_tool).any_number_of_times.with("852").and_return("z:\\")
+    task.stub(:sql_tool).with("852").and_return("z:\\")
 
     task.exectaskpublic
     task.executedPop.should == "\"z:\\bcp.exe\" \"regulardb.dbo.nexttable\" in 02-nexttable.csv -T -S myhostname -t \"foobar\" /c -m 1 -F 2"
@@ -108,9 +108,9 @@ describe BradyW::BCP do
     end
 
     # Don't want to depend on specific registry setting
-    task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
+    task.should_receive(:sql_tool).with("100").and_return("z:\\")
 
-    task.stub!(:shell).and_yield(nil, SimulateProcessFailure.new)
+    task.stub(:shell).and_yield(nil, SimulateProcessFailure.new)
 
     lambda { task.exectaskpublic }.should raise_exception("Command failed with status (BW Rake Task Problem):")
 
@@ -127,7 +127,7 @@ describe BradyW::BCP do
                            "data/bcp/02-nexttable.csv"]
     end
     # Don't want to depend on specific registry setting
-    task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
+    task.stub(:sql_tool).with("100").and_return("z:\\")
 
     task.exectaskpublic
     task.executedPop.should == "\"z:\\bcp.exe\" \"nexttable\" in 02-nexttable.csv -U theuser -P thepassword /Smyhostname -t \"|d3l1m1t3r|\" /c -E -m 1 -F 2"

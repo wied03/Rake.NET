@@ -79,7 +79,7 @@ describe BradyW::DotNetInstaller do
       t.xml_config = 'data/dot_net_installer/input.xml'
       t.output = 'somedir/Our.File.Exe'
     end
-    task.stub!(:shell).and_yield(nil, SimulateProcessFailure.new)
+    task.stub(:shell).and_yield(nil, SimulateProcessFailure.new)
 
     # act + assert
     lambda { task.exectaskpublic }.should raise_exception "Problem with dotNetInstaller.  Return code 'BW Rake Task Problem'"

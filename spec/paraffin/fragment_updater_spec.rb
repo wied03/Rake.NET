@@ -44,7 +44,7 @@ describe BradyW::Paraffin::FragmentUpdater do
       t.fragment_file = 'some_file.wxs'
       t.replace_original = false
     end
-    task.stub!(:shell).and_yield(nil, ParaffinReportDifferentError.new)
+    task.stub(:shell).and_yield(nil, ParaffinReportDifferentError.new)
     FileUtils.stub(:rm).and_throw 'Should not be removing any files'
 
     # act + assert
@@ -78,7 +78,7 @@ describe BradyW::Paraffin::FragmentUpdater do
     task = BradyW::Paraffin::FragmentUpdater.new do |t|
       t.fragment_file = 'someDirectory/some_file.wxs'
     end
-    task.stub!(:shell).and_yield(nil, SimulateProcessFailure.new)
+    task.stub(:shell).and_yield(nil, SimulateProcessFailure.new)
     deleted_file = nil
     FileUtils.stub(:rm) do |f|
       deleted_file = f
