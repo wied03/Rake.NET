@@ -46,7 +46,7 @@ module BradyW
           input.each do |line|
             if @tokens then
               @tokens.each do |k, v|
-                line.sub! token_replace(k), v
+                line.sub! token_replace(k), v.to_s
               end
             end
             out << line

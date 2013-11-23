@@ -13,8 +13,6 @@ describe BradyW::DotNetInstaller do
     rm @should_delete if (@should_delete && File.exists?(@should_delete))
   end
 
-  # TODO: Task 2: DotNetinstaller task.  should do token replace in XML,make a temp copy, then call something like this: "%DNET_INSTALLER_PATH%\InstallerLinker.exe" /c:dotnetinstaller.xml /o:bin\Release\Bsw.Coworking.Agent.Installer.exe /t:"%DNET_INSTALLER_PATH%\dotNetInstaller.exe"
-
   it 'should render a proper command line' do
     # arrange
     task = BradyW::DotNetInstaller.new do |t|
@@ -38,12 +36,35 @@ describe BradyW::DotNetInstaller do
     lambda { task.exectaskpublic }.should raise_exception ':xml_config and :output are required'
   end
 
+  it 'should handle symbols as token values' do
+    # arrange
+    task = BradyW::DotNetInstaller.new do |t|
+      t.xml_config = 'data/dot_net_installer/input.xml'
+      t.output = 'somedir/Our.File.Exe'
+      t.tokens = {:token1 => 'value1',
+                  :token2 => :some_value}
+    end
+    # Leave the temp file so we can compare it
+    FileUtils.stub(:rm) do |f|
+      @should_delete = f
+    end
+
+    # act
+    task.exectaskpublic
+
+    # assert
+    expected = IO.readlines('data/dot_net_installer/expected_output_symbol.xml')
+    actual = IO.readlines(@should_delete)
+    actual.should == expected
+  end
+
   it 'should replace tokens in XML properly' do
     # arrange
     task = BradyW::DotNetInstaller.new do |t|
       t.xml_config = 'data/dot_net_installer/input.xml'
       t.output = 'somedir/Our.File.Exe'
-      t.tokens = {:token1 => 'value1', :token2 => 'value2'}
+      t.tokens = {:token1 => 'value1',
+                  :token2 => 'value2'}
     end
     # Leave the temp file so we can compare it
     FileUtils.stub(:rm) do |f|
