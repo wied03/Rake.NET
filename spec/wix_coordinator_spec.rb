@@ -268,7 +268,7 @@ describe BradyW::WixCoordinator do
       t.properties = {:setting1 => 'the setting', :setting2 => 'the setting 2'}
     end
     ms_build_mock.stub(:dotnet).and_return('path/to/')
-    FileUtils.touch 'MyWixProject/paraffin/binaries.wxs.PARAFFIN'
+    FileUtils.touch 'MyWixProject/paraffin/binaries.PARAFFIN'
     FileUtils.touch 'MyWixProject/dnetinstaller.xml'
 
     # act

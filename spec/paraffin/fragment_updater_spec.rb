@@ -48,7 +48,7 @@ describe BradyW::Paraffin::FragmentUpdater do
     FileUtils.stub(:rm).and_throw 'Should not be removing any files'
 
     # act + assert
-    lambda { task.exectaskpublic }.should raise_exception 'some_file.wxs has changed and you don\'t have :replace_original enabled.  Manually update some_file.wxs using ./some_file.wxs.PARAFFIN or enable :replace_original'
+    lambda { task.exectaskpublic }.should raise_exception 'some_file.wxs has changed and you don\'t have :replace_original enabled.  Manually update some_file.wxs using ./some_file.PARAFFIN or enable :replace_original'
   end
 
   it 'should replace the output file with Paraffin''s generated file if told to do so' do
@@ -69,7 +69,7 @@ describe BradyW::Paraffin::FragmentUpdater do
 
     # assert
     command.should == '"someParaffinPath\Paraffin.exe" -update "someDirectory/some_file.wxs" -verbose'
-    original_file.should == 'someDirectory/some_file.wxs.PARAFFIN'
+    original_file.should == 'someDirectory/some_file.PARAFFIN'
     destination_file.should == 'someDirectory/some_file.wxs'
   end
 
@@ -86,6 +86,6 @@ describe BradyW::Paraffin::FragmentUpdater do
 
     # act + assert
     lambda { task.exectaskpublic }.should raise_exception "Paraffin failed with status code: 'BW Rake Task Problem'"
-    deleted_file.should == 'someDirectory/some_file.wxs.PARAFFIN'
+    deleted_file.should == 'someDirectory/some_file.PARAFFIN'
   end
 end

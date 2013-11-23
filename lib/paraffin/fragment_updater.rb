@@ -19,10 +19,7 @@ module BradyW
                   quoted(@fragment_file),
                   '-verbose',
                   report_if_different]
-        params.reject!{|p| !p || p.empty?}
-        base_path = File.dirname @fragment_file
-        file_name = File.basename @fragment_file
-        generated_file = File.join base_path, "#{file_name}.PARAFFIN"
+        params.reject! { |p| !p || p.empty? }
         shell "\"#{path}\" #{params.join(' ')}" do |ok, status|
           if !ok
             raise "#{@fragment_file} has changed and you don't have :replace_original enabled.  Manually update #{@fragment_file} using #{generated_file} or enable :replace_original" unless @replace_original
@@ -48,6 +45,20 @@ module BradyW
       end
 
       private
+
+      def generated_file
+        ext = File.extname file_name_only
+        without_ext = file_name_only.sub "#{ext}", ''
+        File.join base_path, "#{without_ext}.PARAFFIN"
+      end
+
+      def file_name_only
+        File.basename @fragment_file
+      end
+
+      def base_path
+        File.dirname @fragment_file
+      end
 
       def validate
         fail ":fragment_file is required for this task" unless @fragment_file
