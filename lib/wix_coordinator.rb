@@ -41,25 +41,22 @@ module BradyW
       validate
 
       paraffin = Paraffin::FragmentUpdater.new "paraffin_#{@name}" do |pf|
-        pf.fragment_file = @paraffin_update_fragment
+        pf.fragment_file = paraffin_update_fragment
       end
 
       msb = BradyW::MSBuild.new "wixmsbld_#{@name}" do |m|
         m.release = @release_mode
         m.solution = @wix_project_directory
-        if @properties && @properties.include?(:Configuration) then
-          raise "You cannot supply #{@properties[:Configuration]} for a :Configuration property.  Use the :release_mode property on the WixCoordinator task"
-        end
-        m.properties = @properties
+        m.properties = properties
         @msbuild_configure.call(m) if @msbuild_configure
       end
 
       dnet_inst = BradyW::DotNetInstaller.new "dnetinst_#{@name}" do |inst|
-        inst.xml_config = @dnetinstaller_xml_config
-        tokens = {:Configuration => @release_mode ? :Release : :Debug}
-        tokens = @properties.merge tokens if @properties
+        inst.xml_config = dnetinstaller_xml_config
+        tokens = {:Configuration => configuration}
+        tokens = properties.merge tokens
         inst.tokens = tokens
-        inst.output = @dnetinstaller_output_exe
+        inst.output = dnetinstaller_output_exe
       end
 
       @dependencies = [paraffin.name,
@@ -75,8 +72,37 @@ module BradyW
 
     private
 
+    def configuration
+      @release_mode ? :Release : :Debug
+    end
+
+    def dnetinstaller_output_exe
+      @dnetinstaller_output_exe || File.join(@wix_project_directory,
+                                             'bin',
+                                             configuration.to_s,
+                                             "#{@wix_project_directory} #{@product_version} Installer.exe")
+    end
+
+    def dnetinstaller_xml_config
+      @dnetinstaller_xml_config || File.join(@wix_project_directory,
+                                             'dnetinstaller.xml')
+    end
+
+    def properties
+      if @properties && @properties.include?(:Configuration) then
+        raise "You cannot supply #{@properties[:Configuration]} for a :Configuration property.  Use the :release_mode property on the WixCoordinator task"
+      end
+      standard_props = {:ProductVersion => @product_version,
+                        :UpgradeCode => @upgrade_code}
+      @properties ? standard_props.merge(@properties) : standard_props
+    end
+
+    def paraffin_update_fragment
+      @paraffin_update_fragment || File.join(@wix_project_directory, 'paraffin', 'binaries.wxs')
+    end
+
     def validate
-      raise ':product_version, :upgrade_code, :paraffin_update_fragment, :wix_project_directory, :dnetinstaller_xml_config, and :dnetinstaller_output_exe are all required' unless @product_version && @upgrade_code && @paraffin_update_fragment && @wix_project_directory && @dnetinstaller_xml_config && @dnetinstaller_output_exe
+      raise ':product_version, :upgrade_code, :wix_project_directory are all required' unless @product_version && @upgrade_code && @wix_project_directory
     end
   end
 end
