@@ -72,9 +72,12 @@ module BradyW
 
     private
 
+    def wix_project_dir_name_only
+      File.basename @wix_project_directory
+    end
+
     def wix_project_file
-      containing_dir_only = File.basename @wix_project_directory
-      File.join @wix_project_directory, "#{containing_dir_only}.wixproj"
+      File.join @wix_project_directory, "#{wix_project_dir_name_only}.wixproj"
     end
 
     def configuration
@@ -85,7 +88,7 @@ module BradyW
       @dnetinstaller_output_exe || File.join(@wix_project_directory,
                                              'bin',
                                              configuration.to_s,
-                                             "#{@wix_project_directory} #{@product_version} Installer.exe")
+                                             "#{wix_project_dir_name_only} #{@product_version} Installer.exe")
     end
 
     def dnetinstaller_xml_config

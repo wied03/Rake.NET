@@ -146,7 +146,7 @@ describe BradyW::WixCoordinator do
     # act
     BradyW::WixCoordinator.new do |t|
       t.product_version = '1.0.0.0'
-      t.wix_project_directory = 'MyWixProject'
+      t.wix_project_directory = 'src/MyWixProject'
       t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
       t.properties = {:setting1 => 'the setting', :setting2 => 'the setting 2'}
     end
@@ -157,8 +157,8 @@ describe BradyW::WixCoordinator do
                                 :Configuration => :Release,
                                 :ProductVersion => '1.0.0.0',
                                 :UpgradeCode => '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'}
-    dnet_mock.output.should == 'MyWixProject/bin/Release/MyWixProject 1.0.0.0 Installer.exe'
-    dnet_mock.xml_config.should == 'MyWixProject/dnetinstaller.xml'
+    dnet_mock.output.should == 'src/MyWixProject/bin/Release/MyWixProject 1.0.0.0 Installer.exe'
+    dnet_mock.xml_config.should == 'src/MyWixProject/dnetinstaller.xml'
   end
 
   it 'should allow Debug to be specified as the config' do
