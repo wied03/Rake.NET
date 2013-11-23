@@ -46,7 +46,7 @@ module BradyW
 
       msb = BradyW::MSBuild.new "wixmsbld_#{@name}" do |m|
         m.release = @release_mode
-        m.solution = @wix_project_directory
+        m.solution = wix_project_file
         m.properties = properties
         @msbuild_configure.call(m) if @msbuild_configure
       end
@@ -71,6 +71,11 @@ module BradyW
     end
 
     private
+
+    def wix_project_file
+      containing_dir_only = File.basename @wix_project_directory
+      File.join @wix_project_directory, "#{containing_dir_only}.wixproj"
+    end
 
     def configuration
       @release_mode ? :Release : :Debug

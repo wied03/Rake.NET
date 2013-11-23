@@ -109,7 +109,7 @@ describe BradyW::WixCoordinator do
     # assert
     ms_build_mock.release.should be_true
     # the space is due to MSBuild task's parameter forming
-    ms_build_mock.send(:solution).should == ' MyWixProject'
+    ms_build_mock.send(:solution).should == ' MyWixProject/MyWixProject.wixproj'
     ms_build_mock.properties.should == {:setting1 => 'the setting',
                                         :setting2 => 'the setting 2',
                                         :ProductVersion => '1.0.0.0',
@@ -286,7 +286,7 @@ describe BradyW::WixCoordinator do
 
     # assert
     command1.should == '"path/to/paraffin.exe" -update "MyWixProject/paraffin/binaries.wxs" -verbose'
-    command2.should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:setting1="the setting" /property:setting2="the setting 2" MyWixProject'
+    command2.should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:setting1="the setting" /property:setting2="the setting 2" MyWixProject/MyWixProject.wixproj'
     command3.should include '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"MyWixProject/dnetinstall'
     command3.should include '/o:"MyWixProject/bin/Release/MyWixProject 1.0.0.0 Installer.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
   end
@@ -322,7 +322,7 @@ describe BradyW::WixCoordinator do
     # assert
     command1.should == 'dependent_task'
     command2.should == '"path/to/paraffin.exe" -update "MyWixProject/paraffin/binaries.wxs" -verbose'
-    command3.should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:setting1="the setting" /property:setting2="the setting 2" MyWixProject'
+    command3.should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:setting1="the setting" /property:setting2="the setting 2" MyWixProject/MyWixProject.wixproj'
     command4.should include '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"MyWixProject/dnetinstall'
     command4.should include '/o:"MyWixProject/bin/Release/MyWixProject 1.0.0.0 Installer.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
   end
@@ -361,7 +361,7 @@ describe BradyW::WixCoordinator do
     command1.should == 'dependent_task'
     command2.should == 'dependent_task'
     command3.should == '"path/to/paraffin.exe" -update "MyWixProject/paraffin/binaries.wxs" -verbose'
-    command4.should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:setting1="the setting" /property:setting2="the setting 2" MyWixProject'
+    command4.should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:setting1="the setting" /property:setting2="the setting 2" MyWixProject/MyWixProject.wixproj'
     command5.should include '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"MyWixProject/dnetinstall'
     command5.should include '/o:"MyWixProject/bin/Release/MyWixProject 1.0.0.0 Installer.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
   end
