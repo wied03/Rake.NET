@@ -10,6 +10,10 @@ end
 
 describe BradyW::Paraffin::FragmentUpdater do
   before(:each) do
+    begin
+    File.unstub(:exists?)
+    rescue RSpec::Mocks::MockExpectationError
+    end
     @mockBasePath = 'someParaffinPath\Paraffin.exe'
     stub_const 'BswTech::DnetInstallUtil::PARAFFIN_EXE', @mockBasePath
   end
@@ -51,7 +55,7 @@ describe BradyW::Paraffin::FragmentUpdater do
     lambda { task.exectaskpublic }.should raise_exception 'some_file.wxs has changed and you don\'t have :replace_original enabled.  Manually update some_file.wxs using ./some_file.PARAFFIN or enable :replace_original'
   end
 
-  it 'should replace the output file with Paraffin''s generated file if told to do so' do
+  it 'should replace the output file with Paraffin' 's generated file if told to do so' do
     # arrange
     task = BradyW::Paraffin::FragmentUpdater.new do |t|
       t.fragment_file = 'someDirectory/some_file.wxs'
@@ -73,7 +77,7 @@ describe BradyW::Paraffin::FragmentUpdater do
     destination_file.should == 'someDirectory/some_file.wxs'
   end
 
-  it 'should handle an error in Paraffin OK when replacing the generated file' do
+  it 'should handle an error in Paraffin OK when replacing the generated file (if Paraffin generated the file)' do
     # arrange
     task = BradyW::Paraffin::FragmentUpdater.new do |t|
       t.fragment_file = 'someDirectory/some_file.wxs'
@@ -83,9 +87,27 @@ describe BradyW::Paraffin::FragmentUpdater do
     FileUtils.stub(:rm) do |f|
       deleted_file = f
     end
+    File.stub(:exists?).and_return(true)
 
     # act + assert
     lambda { task.exectaskpublic }.should raise_exception "Paraffin failed with status code: 'BW Rake Task Problem'"
     deleted_file.should == 'someDirectory/some_file.PARAFFIN'
+  end
+
+  it 'should handle an error in Paraffin OK when replacing the generated file (and Paraffin did NOT generate the file)' do
+    # arrange
+    task = BradyW::Paraffin::FragmentUpdater.new do |t|
+      t.fragment_file = 'someDirectory/some_file.wxs'
+    end
+    task.stub(:shell).and_yield(nil, SimulateProcessFailure.new)
+    deleted_file = nil
+    FileUtils.stub(:rm) do |f|
+      deleted_file = f
+    end
+    File.stub(:exists?).and_return(false)
+
+    # act + assert
+    lambda { task.exectaskpublic }.should raise_exception "Paraffin failed with status code: 'BW Rake Task Problem'"
+    deleted_file.should be_nil
   end
 end

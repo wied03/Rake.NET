@@ -26,7 +26,7 @@ module BradyW
 
             if @replace_original
               log "Removing generated file #{generated_file} since Paraffin failed"
-              FileUtils.rm generated_file
+              FileUtils.rm generated_file if File.exists? generated_file
             end
 
             fail "Paraffin failed with status code: '#{status.exitstatus}'"
