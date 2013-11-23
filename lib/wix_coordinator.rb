@@ -59,9 +59,9 @@ module BradyW
         inst.output = dnetinstaller_output_exe
       end
 
-      @dependencies = [paraffin.name,
-                       msb.name,
-                       dnet_inst.name]
+      @dependencies = [*@dependencies] + [paraffin.name,
+                                          msb.name,
+                                          dnet_inst.name]
       # Specifying our own dependencies
       super(@name)
     end

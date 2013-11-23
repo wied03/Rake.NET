@@ -8,6 +8,12 @@ module BradyW
   end
 end
 
+class TestTask < BradyW::BaseTask
+  def exectask
+    shell 'dependent_task'
+  end
+end
+
 describe BradyW::WixCoordinator do
   before :each do
     stub_const 'BswTech::DnetInstallUtil::PARAFFIN_EXE', 'path/to/paraffin.exe'
@@ -252,7 +258,7 @@ describe BradyW::WixCoordinator do
                                         :UpgradeCode => '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'}
   end
 
-  it 'execute each dependency' do
+  it 'executes each dependency it defines' do
     # arrange
     FileUtils.mkdir_p 'MyWixProject/paraffin'
     FileUtils.touch 'MyWixProject/paraffin/binaries.wxs'
@@ -283,5 +289,80 @@ describe BradyW::WixCoordinator do
     command2.should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:setting1="the setting" /property:setting2="the setting 2" MyWixProject'
     command3.should include '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"MyWixProject/dnetinstall'
     command3.should include '/o:"MyWixProject/bin/Release/MyWixProject 1.0.0.0 Installer.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
+  end
+
+  it 'should execute dependency (singular) of the overall task before the dependencies it defines' do
+    # arrange
+    FileUtils.mkdir_p 'MyWixProject/paraffin'
+    FileUtils.touch 'MyWixProject/paraffin/binaries.wxs'
+    ms_build_mock = BradyW::MSBuild.new :msbuild_task_2
+    BradyW::MSBuild.stub(:new) do |&block|
+      block[ms_build_mock]
+      ms_build_mock
+    end
+
+    TestTask.new :test_task
+    BradyW::WixCoordinator.new :integration_test2 => :test_task do |t|
+      t.product_version = '1.0.0.0'
+      t.wix_project_directory = 'MyWixProject'
+      t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
+      t.properties = {:setting1 => 'the setting', :setting2 => 'the setting 2'}
+    end
+    ms_build_mock.stub(:dotnet).and_return('path/to/')
+    FileUtils.touch 'MyWixProject/paraffin/binaries.PARAFFIN'
+    FileUtils.touch 'MyWixProject/dnetinstaller.xml'
+
+    # act
+    Rake::Task[:integration_test2].invoke
+    command4 = BradyW::BaseTask.pop_executed_command
+    command3 = BradyW::BaseTask.pop_executed_command
+    command2 = BradyW::BaseTask.pop_executed_command
+    command1 = BradyW::BaseTask.pop_executed_command
+
+    # assert
+    command1.should == 'dependent_task'
+    command2.should == '"path/to/paraffin.exe" -update "MyWixProject/paraffin/binaries.wxs" -verbose'
+    command3.should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:setting1="the setting" /property:setting2="the setting 2" MyWixProject'
+    command4.should include '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"MyWixProject/dnetinstall'
+    command4.should include '/o:"MyWixProject/bin/Release/MyWixProject 1.0.0.0 Installer.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
+  end
+
+  it 'should execute dependencies (plural) of the overall task before the dependencies it defines' do
+    # arrange
+    FileUtils.mkdir_p 'MyWixProject/paraffin'
+    FileUtils.touch 'MyWixProject/paraffin/binaries.wxs'
+    ms_build_mock = BradyW::MSBuild.new :msbuild_task_3
+    BradyW::MSBuild.stub(:new) do |&block|
+      block[ms_build_mock]
+      ms_build_mock
+    end
+
+    TestTask.new :test_task_3
+    TestTask.new :test_task_4
+    BradyW::WixCoordinator.new :integration_test3 => [:test_task_3, :test_task_4] do |t|
+      t.product_version = '1.0.0.0'
+      t.wix_project_directory = 'MyWixProject'
+      t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
+      t.properties = {:setting1 => 'the setting', :setting2 => 'the setting 2'}
+    end
+    ms_build_mock.stub(:dotnet).and_return('path/to/')
+    FileUtils.touch 'MyWixProject/paraffin/binaries.PARAFFIN'
+    FileUtils.touch 'MyWixProject/dnetinstaller.xml'
+
+    # act
+    Rake::Task[:integration_test3].invoke
+    command5 = BradyW::BaseTask.pop_executed_command
+    command4 = BradyW::BaseTask.pop_executed_command
+    command3 = BradyW::BaseTask.pop_executed_command
+    command2 = BradyW::BaseTask.pop_executed_command
+    command1 = BradyW::BaseTask.pop_executed_command
+
+    # assert
+    command1.should == 'dependent_task'
+    command2.should == 'dependent_task'
+    command3.should == '"path/to/paraffin.exe" -update "MyWixProject/paraffin/binaries.wxs" -verbose'
+    command4.should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:setting1="the setting" /property:setting2="the setting 2" MyWixProject'
+    command5.should include '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"MyWixProject/dnetinstall'
+    command5.should include '/o:"MyWixProject/bin/Release/MyWixProject 1.0.0.0 Installer.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
   end
 end
