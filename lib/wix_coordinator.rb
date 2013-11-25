@@ -14,13 +14,13 @@ module BradyW
     # *Required* Upgrade code that is passed on to WIX and dotnetinstaller
     attr_accessor :upgrade_code
 
-    # *Required* Fragment file that will be updated with Paraffin before calling MSBuild
+    # *Optional* Fragment file that will be updated with Paraffin before calling MSBuild.  By default it's @wix_project_directory/paraffin/binaries.wxs
     attr_accessor :paraffin_update_fragment
 
-    # *Required* Location of the DotNetInstaller XML config file
+    # *Optional* Location of the DotNetInstaller XML config file.  By default it's @wix_project_directory/dnetinstaller.xml
     attr_accessor :dnetinstaller_xml_config
 
-    # *Required* The name of the output file you want
+    # *Optional* The name of the output file you want.  By default it's @wix_project_directory/bin/[Debug|Release]/Project Name v[version] Installer.exe
     attr_accessor :dnetinstaller_output_exe
 
     # *Optional* Properties to be used with MSBuild and DotNetInstaller
@@ -84,10 +84,14 @@ module BradyW
       @release_mode ? :Release : :Debug
     end
 
+    def bin_dir
+      File.join(@wix_project_directory,
+                'bin',
+                configuration.to_s)
+    end
+
     def dnetinstaller_output_exe
-      @dnetinstaller_output_exe || File.join(@wix_project_directory,
-                                             'bin',
-                                             configuration.to_s,
+      @dnetinstaller_output_exe || File.join(bin_dir,
                                              "#{wix_project_dir_name_only} #{@product_version} Installer.exe")
     end
 
