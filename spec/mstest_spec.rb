@@ -10,7 +10,7 @@ describe BradyW::MSTest do
     end
     task.should_receive(:visual_studio).with("10.0").and_return("C:\\yespath\\")
     task.exectaskpublic
-    task.excecutedPop.should == "\"C:\\yespath\\MSTest.exe\" /testcontainer:file1.dll /testcontainer:file2.dll"
+    task.executedPop.should == "\"C:\\yespath\\MSTest.exe\" /testcontainer:file1.dll /testcontainer:file2.dll"
   end
 
   it "Should work with custom settings" do
@@ -20,6 +20,6 @@ describe BradyW::MSTest do
     end
     task.should_receive(:visual_studio).with("8.0").and_return("C:\\yespath2\\")
     task.exectaskpublic
-    task.excecutedPop.should == "\"C:\\yespath2\\MSTest.exe\" /testcontainer:file1.dll"    
+    task.executedPop.should == "\"C:\\yespath2\\MSTest.exe\" /testcontainer:file1.dll"
   end
 end

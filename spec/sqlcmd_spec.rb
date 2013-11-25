@@ -35,7 +35,7 @@ describe BradyW::Sqlcmd do
 
   before(:each) do
     # It uses the current date, which is harder to test
-    BradyW::Sqlcmd.stub!(:generatetempfilename).and_return "tempfile.sql"
+    BradyW::Sqlcmd.stub(:generatetempfilename).and_return "tempfile.sql"
   end
 
   before(:each) do
@@ -105,10 +105,10 @@ describe BradyW::Sqlcmd do
       sql.files = testdata
     end
 
-    task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
+    task.should_receive(:sql_tool).with("100").and_return("z:\\")
 
     task.exectaskpublic
-    execed = task.excecutedPop
+    execed = task.executedPop
     execed.should match(/"z:\\sqlcmd\.exe" -U theuser -P thepassword -S myhostname -e -b -v .* -i tempfile.sql/)
 
     execed.should have_sql_property ({:k => "dbname", :v => "regulardb"})
@@ -131,11 +131,11 @@ describe BradyW::Sqlcmd do
       sql.version = "902"
     end
 
-    task.should_receive(:sql_tool).any_number_of_times.with("902").and_return("z:\\")
+    task.should_receive(:sql_tool).with("902").and_return("z:\\")
 
     task.exectaskpublic
 
-    execed = task.excecutedPop
+    execed = task.executedPop
     execed.should match(/"z:\\sqlcmd\.exe" -E -S myhostname -e -b -v .* -i tempfile.sql/)
 
     execed.should have_sql_property ({:k => "dbname", :v => "regulardb"})
@@ -154,10 +154,10 @@ describe BradyW::Sqlcmd do
       sql.credentials = :system
     end
 
-    task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
+    task.should_receive(:sql_tool).with("100").and_return("z:\\")
 
     task.exectaskpublic
-    execed = task.excecutedPop
+    execed = task.executedPop
     execed.should match(/"z:\\sqlcmd\.exe" -U systemuser -P systempassword -S myhostname -e -b -v .* -i tempfile.sql/)
 
     execed.should have_sql_property ({:k => "dbuser", :v => "theuser"})
@@ -184,11 +184,11 @@ describe BradyW::Sqlcmd do
       sql.credentials = :objectcreation
     end
 
-    task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
+    task.should_receive(:sql_tool).with("100").and_return("z:\\")
 
     task.exectaskpublic
 
-    execed = task.excecutedPop
+    execed = task.executedPop
     execed.should match(/"z:\\sqlcmd\.exe" -U objectcreateuser -P objectcreatepassword -S myhostname -e -b -v .* -i tempfile.sql/)
 
     execed.should have_sql_property ({:k => "dbname", :v => "regulardb"})
@@ -211,10 +211,10 @@ describe BradyW::Sqlcmd do
       sql.credentials = :system
     end
 
-    task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
+    task.should_receive(:sql_tool).with("100").and_return("z:\\")
 
     task.exectaskpublic
-    execed = task.excecutedPop
+    execed = task.executedPop
     execed.should match(/"z:\\sqlcmd\.exe" -E -S myhostname -e -b -v .* -i tempfile.sql/)
 
     execed.should have_sql_property ({:k => "dbname", :v => "regulardb"})
@@ -238,10 +238,10 @@ describe BradyW::Sqlcmd do
                        "spacevar" => "deals with space right"}
     end
 
-    task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
+    task.should_receive(:sql_tool).with("100").and_return("z:\\")
 
     task.exectaskpublic
-    execed = task.excecutedPop
+    execed = task.executedPop
     execed.should match(/"z:\\sqlcmd\.exe" -U systemuser -P systempassword -S myhostname -e -b -v .* -i tempfile.sql/)
 
     execed.should have_sql_property ({:k => "dbname", :v => "regulardb"})
@@ -267,10 +267,10 @@ describe BradyW::Sqlcmd do
                        "spacevar" => "deals with space right"}
     end
 
-    task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
+    task.should_receive(:sql_tool).with("100").and_return("z:\\")
 
     task.exectaskpublic
-    execed = task.excecutedPop
+    execed = task.executedPop
     execed.should match(/"z:\\sqlcmd\.exe" -U theuser -P thepassword -S myhostname -e -b -v .* -i tempfile.sql/)
 
     execed.should have_sql_property ({:k => "dbname", :v => "regulardb"})
@@ -292,8 +292,8 @@ describe BradyW::Sqlcmd do
       sql.files = testdata
     end
 
-    task.should_receive(:sql_tool).any_number_of_times.with("100").and_return("z:\\")
-    task.stub!(:shell).and_yield(nil, SimulateProcessFailure.new)
+    task.should_receive(:sql_tool).with("100").and_return("z:\\")
+    task.stub(:shell).and_yield(nil, SimulateProcessFailure.new)
 
     lambda { task.exectaskpublic }.should raise_exception("Command failed with status (BW Rake Task Problem):")
 
@@ -313,7 +313,7 @@ describe BradyW::Sqlcmd do
 
     task.exectaskpublic
 
-    task.excecutedPop.should == nil
+    task.executedPop.should == nil
 
     expected = IO.readlines("data/sqlcmd/dynamic_expected.sql")
     actual = IO.readlines("data/output/makedynamic/01-tables/dynamic_input.sql")

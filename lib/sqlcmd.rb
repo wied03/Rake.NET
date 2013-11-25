@@ -1,6 +1,7 @@
 require 'basetask'
 require 'windowspaths'
 require 'database'
+require 'temp_file_name_generator'
 
 module BradyW
 
@@ -147,7 +148,7 @@ module BradyW
     end
 
     def Sqlcmd.generatetempfilename
-      "sqlload_"+DateTime.now.strftime("%Y%m%d%H%M%S") +".sql"
+      TempFileNameGenerator.filename 'sqlload.sql'
     end
 
     def path

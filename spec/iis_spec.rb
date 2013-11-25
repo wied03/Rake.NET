@@ -10,7 +10,7 @@ describe BradyW::IIS do
     end
 
     task.exectaskpublic
-    task.excecutedPop.should == "net.exe start W3SVC"
+    task.executedPop.should == "net.exe start W3SVC"
   end
 
   it "Forgot Command" do
@@ -24,7 +24,7 @@ describe BradyW::IIS do
       task.service = "SVC"
     end
 
-    task.stub!(:shell).and_yield(nil, SimulateProcessFailure.new)
+    task.stub(:shell).and_yield(nil, SimulateProcessFailure.new)
     task.exectaskpublic
   end
 
@@ -33,7 +33,7 @@ describe BradyW::IIS do
       task.command = :start
     end
 
-    task.stub!(:shell).and_yield(nil, SimulateProcessFailure.new)
+    task.stub(:shell).and_yield(nil, SimulateProcessFailure.new)
     lambda {task.exectaskpublic}.should raise_exception(RuntimeError,
                                                          "Command failed with status (BW Rake Task Problem):")
   end
@@ -44,6 +44,6 @@ describe BradyW::IIS do
     end
 
     task.exectaskpublic
-    task.excecutedPop.should == "net.exe stop W3SVC"
+    task.executedPop.should == "net.exe stop W3SVC"
   end
 end

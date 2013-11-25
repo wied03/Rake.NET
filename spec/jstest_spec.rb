@@ -44,7 +44,7 @@ describe BradyW::JsTest do
     end
 
     task.exectaskpublic
-    task.excecutedPop.should == "java -jar lib/jsTestDriver-1.2.1.jar --port 9876 "+
+    task.executedPop.should == "java -jar lib/jsTestDriver-1.2.1.jar --port 9876 "+
             "--browser iexplore.exe,firefox.exe --tests all"
 
     "data/output/jsTestDriver.conf".should have_same_config_as "data/jstest/jsTestDriver_expected.conf"
@@ -58,7 +58,7 @@ describe BradyW::JsTest do
     end
 
     task.exectaskpublic
-    task.excecutedPop.should == "java -jar lib/jsTestDriver-1.2.1.jar --port 9876 "+
+    task.executedPop.should == "java -jar lib/jsTestDriver-1.2.1.jar --port 9876 "+
             "--browser iexplore.exe,firefox.exe --tests all --testOutput ."
 
     "data/output/jsTestDriver.conf".should have_same_config_as "data/jstest/jsTestDriver_expected.conf"
@@ -72,7 +72,7 @@ describe BradyW::JsTest do
     end
 
     task.exectaskpublic
-    task.excecutedPop.should == "java -jar lib/jsTestDriver-1.2.1.jar --port 9876 "+
+    task.executedPop.should == "java -jar lib/jsTestDriver-1.2.1.jar --port 9876 "+
             "--browser iexplore.exe,firefox.exe --tests all --testOutput ."
 
     "data/output/jsTestDriver.conf".should have_same_config_as "data/jstest/jsTestDriver_expected.conf"
@@ -89,7 +89,7 @@ describe BradyW::JsTest do
     end
 
     task.exectaskpublic
-    task.excecutedPop.should == "java -jar newpath/jsTestDriver-1.2.1.jar "+
+    task.executedPop.should == "java -jar newpath/jsTestDriver-1.2.1.jar "+
             "--tests all --testOutput testdir"
 
     "data/output/jsTestDriver.conf".should have_same_config_as "data/jstest/jsTestDriver_expected_custom.conf"
@@ -101,7 +101,7 @@ describe BradyW::JsTest do
       js.files = jspath
     end
 
-    task.stub!(:shell).and_yield(nil, SimulateProcessFailure.new)
+    task.stub(:shell).and_yield(nil, SimulateProcessFailure.new)
 
     lambda {task.exectaskpublic}.should raise_exception("Command failed with status (BW Rake Task Problem):")
 
