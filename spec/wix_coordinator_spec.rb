@@ -81,12 +81,17 @@ describe BradyW::WixCoordinator do
       t.paraffin_update_fragment = 'custom.wxs'
       t.dnetinstaller_output_exe = 'some.exe'
       t.dnetinstaller_xml_config = 'some.xml'
+      t.msi_path = 'path/to/msi'
     end
 
     # assert
     pf_mock.fragment_file.should == 'custom.wxs'
     dnet_mock.output.should == 'some.exe'
     dnet_mock.xml_config.should == 'some.xml'
+    dnet_mock.tokens.should == {:Configuration => :Release,
+                                :ProductVersion => '1.0.0.0',
+                                :UpgradeCode => '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7',
+                                :MsiPath => 'path/to/msi'}
   end
 
   it 'should configure the MSBuild task' do
@@ -156,7 +161,8 @@ describe BradyW::WixCoordinator do
                                 :setting2 => 'the setting 2',
                                 :Configuration => :Release,
                                 :ProductVersion => '1.0.0.0',
-                                :UpgradeCode => '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'}
+                                :UpgradeCode => '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7',
+                                :MsiPath => 'src/MyWixProject/bin/Release/MyWixProject.msi'}
     dnet_mock.output.should == 'src/MyWixProject/bin/Release/MyWixProject 1.0.0.0 Installer.exe'
     dnet_mock.xml_config.should == 'src/MyWixProject/dnetinstaller.xml'
   end
@@ -188,7 +194,8 @@ describe BradyW::WixCoordinator do
                                 :setting2 => 'the setting 2',
                                 :Configuration => :Debug,
                                 :ProductVersion => '1.0.0.0',
-                                :UpgradeCode => '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'}
+                                :UpgradeCode => '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7',
+                                :MsiPath => 'MyWixProject/bin/Debug/MyWixProject.msi'}
     dnet_mock.output.should == 'MyWixProject/bin/Debug/MyWixProject 1.0.0.0 Installer.exe'
     ms_build_mock.release.should be_false
   end
@@ -253,7 +260,8 @@ describe BradyW::WixCoordinator do
     # assert
     dnet_mock.tokens.should == {:Configuration => :Release,
                                 :ProductVersion => '1.0.0.0',
-                                :UpgradeCode => '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'}
+                                :UpgradeCode => '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7',
+                                :MsiPath => 'MyWixProject/bin/Release/MyWixProject.msi'}
     ms_build_mock.properties.should == {:ProductVersion => '1.0.0.0',
                                         :UpgradeCode => '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'}
   end
