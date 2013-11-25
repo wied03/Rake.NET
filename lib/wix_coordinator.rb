@@ -101,7 +101,7 @@ module BradyW
 
     def dnetinstaller_output_exe
       @dnetinstaller_output_exe || File.join(bin_dir,
-                                             "#{wix_project_dir_name_only} #{@product_version} Installer.exe")
+                                             "#{wix_project_dir_name_only} #{@product_version}.exe")
     end
 
     def dnetinstaller_xml_config

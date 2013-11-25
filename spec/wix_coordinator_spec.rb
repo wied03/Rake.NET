@@ -163,7 +163,7 @@ describe BradyW::WixCoordinator do
                                 :ProductVersion => '1.0.0.0',
                                 :UpgradeCode => '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7',
                                 :MsiPath => 'src/MyWixProject/bin/Release/MyWixProject.msi'}
-    dnet_mock.output.should == 'src/MyWixProject/bin/Release/MyWixProject 1.0.0.0 Installer.exe'
+    dnet_mock.output.should == 'src/MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe'
     dnet_mock.xml_config.should == 'src/MyWixProject/dnetinstaller.xml'
   end
 
@@ -196,7 +196,7 @@ describe BradyW::WixCoordinator do
                                 :ProductVersion => '1.0.0.0',
                                 :UpgradeCode => '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7',
                                 :MsiPath => 'MyWixProject/bin/Debug/MyWixProject.msi'}
-    dnet_mock.output.should == 'MyWixProject/bin/Debug/MyWixProject 1.0.0.0 Installer.exe'
+    dnet_mock.output.should == 'MyWixProject/bin/Debug/MyWixProject 1.0.0.0.exe'
     ms_build_mock.release.should be_false
   end
 
@@ -296,7 +296,7 @@ describe BradyW::WixCoordinator do
     command1.should == '"path/to/paraffin.exe" -update "MyWixProject/paraffin/binaries.wxs" -verbose'
     command2.should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:setting1="the setting" /property:setting2="the setting 2" MyWixProject/MyWixProject.wixproj'
     command3.should include '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"MyWixProject/dnetinstall'
-    command3.should include '/o:"MyWixProject/bin/Release/MyWixProject 1.0.0.0 Installer.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
+    command3.should include '/o:"MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
   end
 
   it 'should execute dependency (singular) of the overall task before the dependencies it defines' do
@@ -332,7 +332,7 @@ describe BradyW::WixCoordinator do
     command2.should == '"path/to/paraffin.exe" -update "MyWixProject/paraffin/binaries.wxs" -verbose'
     command3.should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:setting1="the setting" /property:setting2="the setting 2" MyWixProject/MyWixProject.wixproj'
     command4.should include '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"MyWixProject/dnetinstall'
-    command4.should include '/o:"MyWixProject/bin/Release/MyWixProject 1.0.0.0 Installer.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
+    command4.should include '/o:"MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
   end
 
   it 'should execute dependencies (plural) of the overall task before the dependencies it defines' do
@@ -371,6 +371,6 @@ describe BradyW::WixCoordinator do
     command3.should == '"path/to/paraffin.exe" -update "MyWixProject/paraffin/binaries.wxs" -verbose'
     command4.should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:setting1="the setting" /property:setting2="the setting 2" MyWixProject/MyWixProject.wixproj'
     command5.should include '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"MyWixProject/dnetinstall'
-    command5.should include '/o:"MyWixProject/bin/Release/MyWixProject 1.0.0.0 Installer.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
+    command5.should include '/o:"MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
   end
 end
