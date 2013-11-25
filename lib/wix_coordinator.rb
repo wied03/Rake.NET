@@ -37,11 +37,18 @@ module BradyW
 
     def initialize(parameters = :task)
       @release_mode ||= true
-      parseParams parameters
-      # Need our parameters to instantiate the dependent tasks
-      yield self if block_given?
 
-      validate
+      yield self if block_given?
+      # Need our parameters to instantiate the dependent tasks
+      parseParams parameters
+
+      if not is_valid then
+        log "WixCoordinator task is missing required parameters, will raise exception if executed"
+        # This task specifies its own dependencies and in this case, won't specify any since we want an error to be thrown upon execution
+        @dependencies = nil
+        super(@name)
+        return
+      end
 
       paraffin = Paraffin::FragmentUpdater.new "paraffin_#{@name}" do |pf|
         pf.fragment_file = paraffin_update_fragment
@@ -72,6 +79,7 @@ module BradyW
 
     def exectask
       # We're just a task of dependencies
+      validate
     end
 
     private
@@ -123,7 +131,11 @@ module BradyW
     end
 
     def validate
-      raise ':product_version, :upgrade_code, :wix_project_directory are all required' unless @product_version && @upgrade_code && @wix_project_directory
+      raise ':product_version, :upgrade_code, :wix_project_directory are all required' unless is_valid
+    end
+
+    def is_valid
+      @product_version && @upgrade_code && @wix_project_directory
     end
   end
 end

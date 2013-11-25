@@ -52,11 +52,12 @@ describe BradyW::WixCoordinator do
   end
 
   it 'should require product_version, upgrade_code, wix_project_directory' do
+    # arrange
+    task = BradyW::WixCoordinator.new
+
     # act + assert
     lambda {
-      BradyW::WixCoordinator.new do |w|
-
-      end
+      task.exectaskpublic
     }.should raise_exception ':product_version, :upgrade_code, :wix_project_directory are all required'
   end
 
@@ -372,5 +373,23 @@ describe BradyW::WixCoordinator do
     command4.should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:setting1="the setting" /property:setting2="the setting 2" MyWixProject/MyWixProject.wixproj'
     command5.should include '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"MyWixProject/dnetinstall'
     command5.should include '/o:"MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
+  end
+
+  it "should fail to execute the task when we don't have required parameters" do
+    # arrange
+    puts "Arranging"
+    TestTask.new :test_task_5
+    task = BradyW::WixCoordinator.new(:integration_test4 => :test_task_5)
+
+    # assert
+    expect(task.dependencies).to be_nil
+
+    # act
+    puts "Acting"
+    lambda {Rake::Task[:integration_test4].invoke}.should raise_exception ':product_version, :upgrade_code, :wix_project_directory are all required'
+    command1 = BradyW::BaseTask.pop_executed_command
+
+    # assert
+    command1.should be_nil
   end
 end
