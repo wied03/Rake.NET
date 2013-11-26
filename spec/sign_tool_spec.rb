@@ -2,6 +2,14 @@ require 'base'
 require 'sign_tool'
 
 describe BradyW::SignTool do
+  it 'should require subject, description, and sign_this' do
+    # arrange
+    task = BradyW::SignTool.new
+
+    # act + assert
+    lambda {task.exectaskpublic}.should raise_exception ':subject, :description, and :sign_this are required'
+  end
+
   it 'should execute properly with a certificate in the certificate store and defualt timestamp' do
     # arrange
     task = BradyW::SignTool.new do |t|

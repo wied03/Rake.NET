@@ -23,6 +23,7 @@ module BradyW
     attr_accessor :architecture
 
     def exectask
+      validate
       params = ['sign',
                 param_fslash('n', @subject, :quote => true),
                 param_fslash('t', timestamp_url),
@@ -32,6 +33,10 @@ module BradyW
     end
 
     private
+
+    def validate
+       fail ':subject, :description, and :sign_this are required' unless @subject && @description && @sign_this
+    end
 
     def path
       signtool_exe architecture
