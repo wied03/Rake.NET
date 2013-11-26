@@ -1,6 +1,5 @@
 require 'base'
 require 'msbuild'
-require 'basetaskmocking'
 
 describe BradyW::MSBuild do
   it 'should build OK vanilla (.NET 4.5)' do

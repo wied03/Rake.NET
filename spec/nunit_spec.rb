@@ -1,6 +1,5 @@
-require "base"
-require "nunit"
-require "basetaskmocking"
+require 'base'
+require 'nunit'
 
 describe BradyW::Nunit do
   before(:each) do

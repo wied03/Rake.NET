@@ -1,6 +1,5 @@
 require 'base'
 require 'dot_net_installer'
-require 'basetaskmocking'
 
 describe BradyW::DotNetInstaller do
   before :each do

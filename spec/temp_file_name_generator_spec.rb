@@ -1,6 +1,5 @@
 require 'base'
 require 'temp_file_name_generator'
-require 'basetaskmocking'
 
 describe BradyW::TempFileNameGenerator do
   after :each do

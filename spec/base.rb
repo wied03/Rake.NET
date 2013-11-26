@@ -2,7 +2,9 @@ $: << File.expand_path(File.dirname(__FILE__) +"/../lib")
 require 'rspec/expectations'
 # Needed to mock out our config/props
 require 'config'
-require "singleton"
+require 'singleton'
+require 'basetask'
+require 'basetaskmocking'
 
 include FileUtils
 

@@ -1,5 +1,5 @@
-require "base"
-require "config"
+require 'base'
+require 'config'
 
 describe "Configuration Works Properly" do
   before(:all) do

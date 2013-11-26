@@ -1,6 +1,5 @@
-require "base"
-require "minifyjs"
-require "basetaskmocking"
+require 'base'
+require 'minifyjs'
 
 describe BradyW::MinifyJs do
 
