@@ -68,15 +68,18 @@ module BradyW
         @msbuild_configure.call(m) if @msbuild_configure
       end
 
-      sign_msi_task = "signmsi_#{@name}"
-      BradyW::SignTool.new sign_msi_task do |s|
-        s.subject = @certificate_subject
-        s.description = @description
-        s.sign_this = msi_path
+      if signing_code? then
+        sign_msi_task_name = "signmsi_#{@name}"
+        BradyW::SignTool.new sign_msi_task_name do |s|
+          s.subject = @certificate_subject
+          s.description = @description
+          s.sign_this = msi_path
+        end
       end
 
-      dnet_inst_task = "dnetinst_#{@name}"
-      dnet_inst = BradyW::DotNetInstaller.new dnet_inst_task => sign_msi_task do |inst|
+      dnet_inst_task_name = "dnetinst_#{@name}"
+      dnet_name_deps = signing_code? ? {dnet_inst_task_name => sign_msi_task_name} : dnet_inst_task_name
+      BradyW::DotNetInstaller.new dnet_name_deps do |inst|
         inst.xml_config = dnetinstaller_xml_config
         tokens = {:Configuration => configuration,
                   :MsiPath => msi_path}
@@ -85,17 +88,20 @@ module BradyW
         inst.output = dnetinstaller_output_exe
       end
 
-      sign_exe_task = "signexe_#{@name}"
-      sign_exe = BradyW::SignTool.new sign_exe_task => dnet_inst_task do |s|
-        s.subject = @certificate_subject
-        s.description = @description
-        s.sign_this = dnetinstaller_output_exe
-      end
-
       @dependencies = [*@dependencies] + [paraffin.name,
                                           msb.name,
-                                          dnet_inst.name,
-                                          sign_exe.name]
+                                          dnet_inst_task_name]
+
+      if signing_code? then
+        sign_exe_task_name = "signexe_#{@name}"
+        BradyW::SignTool.new sign_exe_task_name => dnet_inst_task_name do |s|
+          s.subject = @certificate_subject
+          s.description = @description
+          s.sign_this = dnetinstaller_output_exe
+        end
+        @dependencies << sign_exe_task_name
+      end
+
       # Specifying our own dependencies
       super(@name)
     end
@@ -106,6 +112,10 @@ module BradyW
     end
 
     private
+
+    def signing_code?
+      @certificate_subject && @description
+    end
 
     def wix_project_dir_name_only
       File.basename @wix_project_directory
