@@ -7,6 +7,10 @@ module BradyW
       "#{specifier}#{switch} #{quoted}"
     end
 
+    def param_fslash(switch, setting, options={})
+      switch_and_param(switch, setting, options.merge({:specifier => '/'}))
+    end
+
     def param_fslash_colon(switch, setting, options={})
       return String.new if !setting
       quoted = options[:quote] ? quoted(setting) : setting
