@@ -29,7 +29,7 @@ module BradyW
                 param_fslash('t', timestamp_url),
                 param_fslash('d', @description, :quote => true),
                 quoted(@sign_this)]
-      shell "#{path} #{params.join(' ')}"
+      shell "#{quoted(path)} #{params.join(' ')}"
     end
 
     private

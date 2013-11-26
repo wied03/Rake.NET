@@ -433,9 +433,9 @@ describe BradyW::WixCoordinator do
     commands[1].should == 'dependent_task'
     commands[2].should == '"path/to/paraffin.exe" -update "MyWixProject/paraffin/binaries.wxs" -verbose'
     commands[3].should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 MyWixProject/MyWixProject.wixproj'
-    commands[4].should == 'windowskit/path/bin/x64/signtool.exe sign /n "The Subject" /t http://timestamp.verisign.com/scripts/timestamp.dll /d "The description" "MyWixProject/bin/Release/MyWixProject.msi"'
+    commands[4].should == '"windowskit/path/bin/x64/signtool.exe" sign /n "The Subject" /t http://timestamp.verisign.com/scripts/timestamp.dll /d "The description" "MyWixProject/bin/Release/MyWixProject.msi"'
     commands[5].should include '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"MyWixProject/dnetinstall'
     commands[5].should include '/o:"MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
-    commands[6].should == 'windowskit/path/bin/x64/signtool.exe sign /n "The Subject" /t http://timestamp.verisign.com/scripts/timestamp.dll /d "The description" "MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe"'
+    commands[6].should == '"windowskit/path/bin/x64/signtool.exe" sign /n "The Subject" /t http://timestamp.verisign.com/scripts/timestamp.dll /d "The description" "MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe"'
   end
 end
