@@ -1,6 +1,5 @@
-require "base"
-require "jstest"
-require "basetaskmocking"
+require 'base'
+require 'jstest'
 
 def jspath
   FileList["data/jstest/path/**/*.js"]

@@ -1,6 +1,5 @@
-require "base"
-require "sqlcmd"
-require "basetaskmocking"
+require 'base'
+require 'sqlcmd'
 
 def testdata
   FileList["data/sqlcmd/input/**/*"]

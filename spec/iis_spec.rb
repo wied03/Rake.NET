@@ -1,6 +1,5 @@
-require "base"
-require "iis"
-require "basetaskmocking"
+require 'base'
+require 'iis'
 
 describe BradyW::IIS do
 

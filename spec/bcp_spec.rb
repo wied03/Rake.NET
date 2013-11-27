@@ -1,6 +1,5 @@
-require "base"
-require "bcp"
-require "basetaskmocking"
+require 'base'
+require 'bcp'
 
 describe BradyW::BCP do
   before(:each) do

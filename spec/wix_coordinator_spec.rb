@@ -1,6 +1,5 @@
 require 'base'
 require 'wix_coordinator'
-require 'basetaskmocking'
 
 module BradyW
   class BaseTask < Rake::TaskLib
@@ -18,6 +17,9 @@ describe BradyW::WixCoordinator do
   before :each do
     stub_const 'BswTech::DnetInstallUtil::PARAFFIN_EXE', 'path/to/paraffin.exe'
     BswTech::DnetInstallUtil.stub(:dot_net_installer_base_path).and_return('path/to/dnetinstaller')
+    @mock_accessor = BradyW::RegistryAccessor.new
+    # No dependency injection framework required :)
+    BradyW::RegistryAccessor.stub(:new).and_return(@mock_accessor)
   end
 
   after :each do
@@ -33,11 +35,15 @@ describe BradyW::WixCoordinator do
       BradyW::DotNetInstaller.unstub(:new)
     rescue RSpec::Mocks::MockExpectationError
     end
+    begin
+      BradyW::SignTool.unstub(:new)
+    rescue RSpec::Mocks::MockExpectationError
+    end
 
     FileUtils.rm_rf 'MyWixProject'
   end
 
-  it 'should declare a Paraffin update, MSBuild, and DotNetInstaller task as dependencies' do
+  it 'should declare Paraffin update, MSBuild, DotNetInstaller tasks as dependencies' do
     # arrange + act
     task = BradyW::WixCoordinator.new :coworking_installer do |t|
       t.product_version = '1.0.0.0'
@@ -386,10 +392,50 @@ describe BradyW::WixCoordinator do
 
     # act
     puts "Acting"
-    lambda {Rake::Task[:integration_test4].invoke}.should raise_exception ':product_version, :upgrade_code, :wix_project_directory are all required'
+    lambda { Rake::Task[:integration_test4].invoke }.should raise_exception ':product_version, :upgrade_code, :wix_project_directory are all required'
     command1 = BradyW::BaseTask.pop_executed_command
 
     # assert
     command1.should be_nil
+  end
+
+  it 'should optionally perform code signing if description and certificate_subject are provided' do
+    # arrange
+    FileUtils.mkdir_p 'MyWixProject/paraffin'
+    FileUtils.touch 'MyWixProject/paraffin/binaries.wxs'
+    ms_build_mock = BradyW::MSBuild.new :msbuild_task_4
+    BradyW::MSBuild.stub(:new) do |&block|
+      block[ms_build_mock]
+      ms_build_mock
+    end
+    @mock_accessor.stub(:reg_value).with('SOFTWARE\\Microsoft\\Windows Kits\\Installed Roots', 'KitsRoot').and_return('windowskit/path')
+
+    TestTask.new :test_task_6
+    TestTask.new :test_task_7
+    BradyW::WixCoordinator.new :integration_test5 => [:test_task_6, :test_task_7] do |t|
+      t.product_version = '1.0.0.0'
+      t.wix_project_directory = 'MyWixProject'
+      t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
+      t.certificate_subject = 'The Subject'
+      t.description = 'The description'
+    end
+    ms_build_mock.stub(:dotnet).and_return('path/to/')
+    FileUtils.touch 'MyWixProject/paraffin/binaries.PARAFFIN'
+    FileUtils.touch 'MyWixProject/dnetinstaller.xml'
+
+    # act
+    Rake::Task[:integration_test5].invoke
+    commands = 7.times.collect { BradyW::BaseTask.pop_executed_command }
+    commands = commands.reverse
+
+    # assert
+    commands[0].should == 'dependent_task'
+    commands[1].should == 'dependent_task'
+    commands[2].should == '"path/to/paraffin.exe" -update "MyWixProject/paraffin/binaries.wxs" -verbose'
+    commands[3].should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 MyWixProject/MyWixProject.wixproj'
+    commands[4].should == '"windowskit/path/bin/x64/signtool.exe" sign /n "The Subject" /t http://timestamp.verisign.com/scripts/timestamp.dll /d "The description" "MyWixProject/bin/Release/MyWixProject.msi"'
+    commands[5].should include '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"MyWixProject/dnetinstall'
+    commands[5].should include '/o:"MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
+    commands[6].should == '"windowskit/path/bin/x64/signtool.exe" sign /n "The Subject" /t http://timestamp.verisign.com/scripts/timestamp.dll /d "The description" "MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe"'
   end
 end
