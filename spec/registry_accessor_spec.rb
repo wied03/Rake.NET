@@ -30,25 +30,14 @@ describe BradyW::RegistryAccessor, :if => ENV['windows_test'] do
     lambda { accessor.reg_value('SOFTWARE\\foobar', 'regvalue') }.should raise_exception("Unable to find registry key: SOFTWARE\\foobar")
   end
 
-  it 'should retrieve registry keys properly from a 32bit entry' do
+  it 'should retrieve registry keys properly' do
     # arrange
     accessor = BradyW::RegistryAccessor.new
-    
+
     # act
     keys = accessor.sub_keys('SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows')
 
     # assert
-    expect(keys).to eq(['v7.1A', 'v8.0A', 'v8.1', 'v8.1A'])
+    expect(keys).to eq(['v7.1A', 'v8.0A', 'v8.1A', 'v8.1'])
   end
-
-  it 'should retrieve registry keys properly from a 64bit entry' do
-      # arrange
-      accessor = BradyW::RegistryAccessor.new
-
-      # act
-      keys = accessor.sub_keys('SOFTWARE\\MozillaPlugins')
-
-      # assert
-      expect(keys).to eq(['@microsoft.com/OfficeAuthz,version=14.0'])
-    end
 end

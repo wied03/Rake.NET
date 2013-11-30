@@ -12,28 +12,35 @@ module BradyW
     end
 
     def sub_keys(key)
-      keys = nil
+      keys = []
       reg_key(key) do |reg|
-        keys = reg.keys
+        keys += reg.keys
       end
-      keys
+      keys.uniq
     end
 
     private
 
     def reg_key(key)
       begin
-      reg_key_64(key) do |reg|
-        yield reg
-      end
-      return
-      rescue
+        reg_key_64(key) do |reg|
+          yield reg
+        end
         begin
           reg_key_32(key) do |reg|
             yield reg
           end
         rescue
-          raise "Unable to find registry key: #{key}"
+          # No problem, we already succeeded in getting a 64 bit value
+        end
+      rescue
+        begin
+          reg_key_32(key) do |reg|
+            yield reg
+          end
+        rescue Exception => e
+          raise "Unable to find registry key: #{key}" if e.message == 'The system cannot find the file specified.'
+          raise e
         end
       end
     end
