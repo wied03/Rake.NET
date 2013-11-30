@@ -10,7 +10,7 @@ describe BradyW::RegistryAccessor, :if => ENV['windows_test'] do
     value = accessor.reg_value 'SOFTWARE\\7-Zip', 'Path'
 
     # assert
-    expect(value).to eq('foo')
+    expect(value).to eq('C:\\Program Files\\7-Zip\\')
   end
 
   it 'should use standard 32 bit registry mode if 64 fails' do
@@ -46,9 +46,9 @@ describe BradyW::RegistryAccessor, :if => ENV['windows_test'] do
       accessor = BradyW::RegistryAccessor.new
 
       # act
-      keys = accessor.sub_keys('SOFTWARE\\7-Zip')
+      keys = accessor.sub_keys('SOFTWARE\\MozillaPlugins')
 
       # assert
-      expect(keys).to eq(['v7.1A', 'v8.0A', 'v8.1', 'v8.1A'])
+      expect(keys).to eq(['@microsoft.com/OfficeAuthz,version=14.0'])
     end
 end

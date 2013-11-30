@@ -1,4 +1,5 @@
 require 'win32/registry'
+require 'windows/registry'
 
 module BradyW
   class RegistryAccessor
@@ -22,10 +23,10 @@ module BradyW
 
     def reg_key(key)
       begin
-        reg_key_64(key) do |reg|
-          yield reg
-        end
-        return
+      reg_key_64(key) do |reg|
+        yield reg
+      end
+      return
       rescue
         begin
           reg_key_32(key) do |reg|
@@ -39,18 +40,15 @@ module BradyW
 
     def reg_key_64(key)
       # workaround to make sure we have 64 bit registry access
-      ourKeyRead = Win32::Registry::Constants::KEY_READ |
-          Windows::Registry::KEY_WOW64_64KEY
-      Win32::Registry.open(Win32::Registry::HKEY_LOCAL_MACHINE,
-                           key,
-                           ourKeyRead) do |reg|
+      reg_type = Win32::Registry::KEY_READ | Windows::Registry::KEY_WOW64_64KEY
+      Win32::Registry::HKEY_LOCAL_MACHINE.open(key,
+                                               reg_type) do |reg|
         yield reg
       end
     end
 
     def reg_key_32(key)
-      Win32::Registry.open(Win32::Registry::HKEY_LOCAL_MACHINE,
-                           key) do |reg|
+      Win32::Registry::HKEY_LOCAL_MACHINE.open(key) do |reg|
         yield reg
       end
     end
