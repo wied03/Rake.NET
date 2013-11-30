@@ -24,13 +24,5 @@ module BradyW
       regacc = BradyW::RegistryAccessor.new
       regacc.reg_value(key, value)
     end
-
-    def signtool_exe(architecture)
-      base_path = reg_value 'SOFTWARE\\Microsoft\\Windows Kits\\Installed Roots', 'KitsRoot'
-      File.join base_path,
-                'bin',
-                architecture.to_s,
-                'signtool.exe'
-    end
   end
 end

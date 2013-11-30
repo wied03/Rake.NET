@@ -2,12 +2,22 @@ require 'base'
 require 'sign_tool'
 
 describe BradyW::SignTool do
+  before :each do
+    @mock_registry = BradyW::RegistryAccessor.new
+    # No dependency injection framework required :)
+    BradyW::RegistryAccessor.stub(:new).and_return(@mock_registry)
+  end
+
+  after(:each) do
+    BradyW::RegistryAccessor.unstub(:new)
+  end
+
   it 'should require subject, description, and sign_this' do
     # arrange
     task = BradyW::SignTool.new
 
     # act + assert
-    lambda {task.exectaskpublic}.should raise_exception ':subject, :description, and :sign_this are required'
+    lambda { task.exectaskpublic }.should raise_exception ':subject, :description, and :sign_this are required'
   end
 
   it 'should execute properly with a certificate in the certificate store and default timestamp' do
@@ -17,17 +27,21 @@ describe BradyW::SignTool do
       t.description = 'The description'
       t.sign_this = 'something.exe'
     end
-    task.stub(:signtool_exe).with(:x64).and_return('path/to/x64/signtool.exe')
+    @mock_registry.stub(:reg_value).with('SOFTWARE\\Microsoft\\Windows Kits\\Installed Roots', 'KitsRoot').and_return('path/to')
 
     # act
     task.exectaskpublic
     command = task.executedPop
 
     # assert
-    command.should == '"path/to/x64/signtool.exe" sign /n "The Subject" /t http://timestamp.verisign.com/scripts/timestamp.dll /d "The description" "something.exe"'
+    command.should == '"path/to/bin/x64/signtool.exe" sign /n "The Subject" /t http://timestamp.verisign.com/scripts/timestamp.dll /d "The description" "something.exe"'
   end
 
-  it 'should work properly with a custom timestamp and custom architecture' do
+  # TODO: Get the registry accessor tests working on windows (including both 64 and 32 bit access)
+  # TODO: Fix registry accessor usage in windowspaths (and elsewhere)
+  # TODO: Adjust signtool to 1) Fetch latest SDK version installed as default and 2) Use the SDK version and architecture to locate the EXE
+
+  it 'should work properly with a custom timestamp, SDK version, and custom architecture' do
     # arrange
     task = BradyW::SignTool.new do |t|
       t.subject = 'The Subject'

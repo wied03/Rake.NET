@@ -48,28 +48,4 @@ describe BradyW::WindowsPaths do
     @key.should == 'SOFTWARE\\Microsoft\\NET Framework Setup\\NDP\\verhere'
     @value.should == 'InstallPath'
   end
-
-  it 'should retrieve the location of signtool.exe for :x86' do
-    # arrange
-
-    # act
-    result = @windowPathsWrapper.send(:signtool_exe, :x86)
-
-    # assert
-    expect(result).to eq('hi/bin/x86/signtool.exe')
-    @key.should == 'SOFTWARE\\Microsoft\\Windows Kits\\Installed Roots'
-    @value.should == 'KitsRoot'
-  end
-
-  it 'should retrieve the location of signtool.exe for :x64' do
-    # arrange
-
-    # act
-    result = @windowPathsWrapper.send(:signtool_exe, :x64)
-
-    # assert
-    expect(result).to eq('hi/bin/x64/signtool.exe')
-    @key.should == 'SOFTWARE\\Microsoft\\Windows Kits\\Installed Roots'
-    @value.should == 'KitsRoot'
-  end
 end

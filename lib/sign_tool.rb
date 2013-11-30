@@ -1,10 +1,9 @@
 require 'basetask'
-require 'windowspaths'
 require 'param_quotes'
+require 'registry_accessor'
 
 module BradyW
   class SignTool < BaseTask
-    include WindowsPaths
     include ParamQuotes
 
     # *Required* The subject of the certificate in your certificate store to use for signing
@@ -22,6 +21,11 @@ module BradyW
     # *Optional* Architecture of signtool.exe to use (either :x86 or :x64). :x64 by default
     attr_accessor :architecture
 
+    def initialize
+      @registry = BradyW::RegistryAccessor.new
+      super
+    end
+
     def exectask
       validate
       params = ['sign',
@@ -35,11 +39,7 @@ module BradyW
     private
 
     def validate
-       fail ':subject, :description, and :sign_this are required' unless @subject && @description && @sign_this
-    end
-
-    def path
-      signtool_exe architecture
+      fail ':subject, :description, and :sign_this are required' unless @subject && @description && @sign_this
     end
 
     def timestamp_url
@@ -48,6 +48,14 @@ module BradyW
 
     def architecture
       @architecture || :x64
+    end
+
+    def path
+      base_path = @registry.reg_value 'SOFTWARE\\Microsoft\\Windows Kits\\Installed Roots', 'KitsRoot'
+      File.join base_path,
+                'bin',
+                architecture.to_s,
+                'signtool.exe'
     end
   end
 end
