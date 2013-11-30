@@ -1,10 +1,9 @@
 require 'basetask'
-require 'windowspaths'
 require 'param_quotes'
+require 'registry_accessor'
 
 module BradyW
   class SignTool < BaseTask
-    include WindowsPaths
     include ParamQuotes
 
     # *Required* The subject of the certificate in your certificate store to use for signing
@@ -22,6 +21,14 @@ module BradyW
     # *Optional* Architecture of signtool.exe to use (either :x86 or :x64). :x64 by default
     attr_accessor :architecture
 
+    # *Optional* Version of the SDK to use signtool from, defaults to latest version on your machine
+    attr_accessor :sdk_version
+
+    def initialize(parameters = :task)
+      @registry = BradyW::RegistryAccessor.new
+      super
+    end
+
     def exectask
       validate
       params = ['sign',
@@ -35,11 +42,7 @@ module BradyW
     private
 
     def validate
-       fail ':subject, :description, and :sign_this are required' unless @subject && @description && @sign_this
-    end
-
-    def path
-      signtool_exe architecture
+      fail ':subject, :description, and :sign_this are required' unless @subject && @description && @sign_this
     end
 
     def timestamp_url
@@ -48,6 +51,29 @@ module BradyW
 
     def architecture
       @architecture || :x64
+    end
+
+    def sdk_version
+      @sdk_version ? "v#{@sdk_version}" : latest_sdk_version
+    end
+
+    def latest_sdk_version
+      versions = @registry.get_sub_keys 'SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows'
+      numbers_only = versions.map { |i|
+        match = /v(\d+\.{0,1}\d+)(?!\w)/.match(i)
+        match ? match[1] : nil
+      }.uniq
+      numbers_only.reject! {|item| !item}
+      latest_version = numbers_only.max
+      "v#{latest_version}"
+    end
+
+    def path
+      base_path = @registry.get_value "SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows\\#{sdk_version}", 'InstallationFolder'
+      File.join base_path,
+                'bin',
+                architecture.to_s,
+                'signtool.exe'
     end
   end
 end

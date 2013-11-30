@@ -21,7 +21,7 @@ describe BradyW::WindowsPaths do
     mock_accessor = BradyW::RegistryAccessor.new
     # No dependency injection framework required :)
     BradyW::RegistryAccessor.stub(:new).and_return(mock_accessor)
-    mock_accessor.stub(:reg_value) do |key, value|
+    mock_accessor.stub(:get_value) do |key, value|
       @key = key
       @value = value
       'hi'
@@ -47,29 +47,5 @@ describe BradyW::WindowsPaths do
     result.should == 'hi'
     @key.should == 'SOFTWARE\\Microsoft\\NET Framework Setup\\NDP\\verhere'
     @value.should == 'InstallPath'
-  end
-
-  it 'should retrieve the location of signtool.exe for :x86' do
-    # arrange
-
-    # act
-    result = @windowPathsWrapper.send(:signtool_exe, :x86)
-
-    # assert
-    expect(result).to eq('hi/bin/x86/signtool.exe')
-    @key.should == 'SOFTWARE\\Microsoft\\Windows Kits\\Installed Roots'
-    @value.should == 'KitsRoot'
-  end
-
-  it 'should retrieve the location of signtool.exe for :x64' do
-    # arrange
-
-    # act
-    result = @windowPathsWrapper.send(:signtool_exe, :x64)
-
-    # assert
-    expect(result).to eq('hi/bin/x64/signtool.exe')
-    @key.should == 'SOFTWARE\\Microsoft\\Windows Kits\\Installed Roots'
-    @value.should == 'KitsRoot'
   end
 end

@@ -408,7 +408,8 @@ describe BradyW::WixCoordinator do
       block[ms_build_mock]
       ms_build_mock
     end
-    @mock_accessor.stub(:reg_value).with('SOFTWARE\\Microsoft\\Windows Kits\\Installed Roots', 'KitsRoot').and_return('windowskit/path')
+    @mock_accessor.stub(:get_sub_keys).with('SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows').and_return(['v7.1A', 'v8.0A', 'v8.1A', 'v8.1'])
+    @mock_accessor.stub(:get_value).with('SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows\\v8.1', 'InstallationFolder').and_return('windowskit/path')
 
     TestTask.new :test_task_6
     TestTask.new :test_task_7
