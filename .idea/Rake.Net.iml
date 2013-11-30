@@ -105,6 +105,7 @@
     <orderEntry type="library" scope="PROVIDED" name="rubyzip (v1.1.0, RVM: ruby-1.9.3-p484 [rakenet]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="sinatra (v1.4.4, RVM: ruby-1.9.3-p484 [rakenet]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="tilt (v1.4.1, RVM: ruby-1.9.3-p484 [rakenet]) [gem]" level="application" />
+    <orderEntry type="library" scope="PROVIDED" name="win32stub (v1.0.1@9aa7f0, RVM: ruby-1.9.3-p484 [rakenet]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="windows-api (v0.4.2, RVM: ruby-1.9.3-p484 [rakenet]) [gem]" level="application" />
     <orderEntry type="library" scope="PROVIDED" name="windows-pr (v1.2.2, RVM: ruby-1.9.3-p484 [rakenet]) [gem]" level="application" />
   </component>
