@@ -21,7 +21,7 @@ describe BradyW::WindowsPaths do
     mock_accessor = BradyW::RegistryAccessor.new
     # No dependency injection framework required :)
     BradyW::RegistryAccessor.stub(:new).and_return(mock_accessor)
-    mock_accessor.stub(:reg_value) do |key, value|
+    mock_accessor.stub(:get_value) do |key, value|
       @key = key
       @value = value
       'hi'

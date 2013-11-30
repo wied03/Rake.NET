@@ -27,7 +27,7 @@ describe BradyW::SignTool do
       t.description = 'The description'
       t.sign_this = 'something.exe'
     end
-    @mock_registry.stub(:reg_value).with('SOFTWARE\\Microsoft\\Windows Kits\\Installed Roots', 'KitsRoot').and_return('path/to')
+    @mock_registry.stub(:get_value).with('SOFTWARE\\Microsoft\\Windows Kits\\Installed Roots', 'KitsRoot').and_return('path/to')
 
     # act
     task.exectaskpublic
@@ -37,8 +37,6 @@ describe BradyW::SignTool do
     command.should == '"path/to/bin/x64/signtool.exe" sign /n "The Subject" /t http://timestamp.verisign.com/scripts/timestamp.dll /d "The description" "something.exe"'
   end
 
-  # TODO: Get the registry accessor tests working on windows (including both 64 and 32 bit access)
-  # TODO: Fix registry accessor usage in windowspaths (and elsewhere)
   # TODO: Adjust signtool to 1) Fetch latest SDK version installed as default and 2) Use the SDK version and architecture to locate the EXE
 
   it 'should work properly with a custom timestamp, SDK version, and custom architecture' do

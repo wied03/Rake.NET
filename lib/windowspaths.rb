@@ -21,8 +21,8 @@ module BradyW
     def reg_value(key, value)
       keyAndVal = "#{key}\\#{value}"
       log "Retrieving registry key #{keyAndVal}"
-      regacc = BradyW::RegistryAccessor.new
-      regacc.reg_value(key, value)
+      accessor = BradyW::RegistryAccessor.new
+      accessor.get_value(key, value)
     end
   end
 end
