@@ -24,7 +24,7 @@ module BradyW
     # *Optional* Version of the SDK to use signtool from, defaults to latest version on your machine
     attr_accessor :sdk_version
 
-    def initialize
+    def initialize(parameters = :task)
       @registry = BradyW::RegistryAccessor.new
       super
     end
