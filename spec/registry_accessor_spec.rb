@@ -7,7 +7,7 @@ describe BradyW::RegistryAccessor, :if => ENV['windows_test'] do
     accessor = BradyW::RegistryAccessor.new
 
     # act
-    value = accessor.reg_value 'SOFTWARE\\7-Zip', 'Path'
+    value = accessor.get_value 'SOFTWARE\\7-Zip', 'Path'
 
     # assert
     expect(value).to eq('C:\\Program Files\\7-Zip\\')
@@ -18,7 +18,7 @@ describe BradyW::RegistryAccessor, :if => ENV['windows_test'] do
     accessor = BradyW::RegistryAccessor.new
 
     # act
-    value = accessor.reg_value 'SOFTWARE\\JetBrains\\ReSharper\\v8.0', 'CompanyName'
+    value = accessor.get_value 'SOFTWARE\\JetBrains\\ReSharper\\v8.0', 'CompanyName'
 
     # assert
     expect(value).to eq('JetBrains')
@@ -27,7 +27,7 @@ describe BradyW::RegistryAccessor, :if => ENV['windows_test'] do
   it 'should fail if it doesnt exist' do
     # partial mocking is done with this
     accessor = BradyW::RegistryAccessor.new
-    lambda { accessor.reg_value('SOFTWARE\\foobar', 'regvalue') }.should raise_exception("Unable to find registry key: SOFTWARE\\foobar")
+    lambda { accessor.get_value('SOFTWARE\\foobar', 'regvalue') }.should raise_exception("Unable to find registry key: SOFTWARE\\foobar")
   end
 
   it 'should retrieve registry keys properly' do
@@ -35,7 +35,7 @@ describe BradyW::RegistryAccessor, :if => ENV['windows_test'] do
     accessor = BradyW::RegistryAccessor.new
 
     # act
-    keys = accessor.sub_keys('SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows')
+    keys = accessor.get_sub_keys('SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows')
 
     # assert
     expect(keys).to eq(['v7.1A', 'v8.0A', 'v8.1A', 'v8.1'])

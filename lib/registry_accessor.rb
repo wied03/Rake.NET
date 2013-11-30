@@ -3,7 +3,7 @@ require 'windows/registry'
 
 module BradyW
   class RegistryAccessor
-    def reg_value(key, value)
+    def get_value(key, value)
       val = nil
       reg_key(key) do |reg|
         val = reg[value]
@@ -11,7 +11,7 @@ module BradyW
       val
     end
 
-    def sub_keys(key)
+    def get_sub_keys(key)
       keys = []
       reg_key(key) do |reg|
         keys += reg.keys
@@ -21,23 +21,18 @@ module BradyW
 
     private
 
-    def reg_key(key)
+    def reg_key(key, &block)
       begin
-        reg_key_64(key) do |reg|
-          yield reg
-        end
+        reg_key_64(key, &block)
+        # Try and get a 32 bit value as well in case merging needs to be done
         begin
-          reg_key_32(key) do |reg|
-            yield reg
-          end
+          reg_key_32(key, &block)
         rescue
           # No problem, we already succeeded in getting a 64 bit value
         end
       rescue
         begin
-          reg_key_32(key) do |reg|
-            yield reg
-          end
+          reg_key_32(key, &block)
         rescue Exception => e
           raise "Unable to find registry key: #{key}" if e.message == 'The system cannot find the file specified.'
           raise e
