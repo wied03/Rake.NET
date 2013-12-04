@@ -49,6 +49,14 @@ module BradyW
       # Need our parameters to instantiate the dependent tasks
       parseParams parameters
 
+      # Allow Paraffin to run separately
+      if @wix_project_directory || @paraffin_update_fragment then
+        desc 'Updates Paraffin fragment on its own (without doing a build first)'
+        paraffin = Paraffin::FragmentUpdater.new "paraffin_#{@name}" do |pf|
+          pf.fragment_file = paraffin_update_fragment
+        end
+      end
+
       if not is_valid then
         log "WixCoordinator task is missing required parameters, will raise exception if executed"
         # This task specifies its own dependencies and in this case, won't specify any since we want an error to be thrown upon execution
@@ -57,10 +65,7 @@ module BradyW
         return
       end
 
-      paraffin = Paraffin::FragmentUpdater.new "paraffin_#{@name}" do |pf|
-        pf.fragment_file = paraffin_update_fragment
-      end
-
+      desc 'Run MSBUild and produce an MSI for the WIX project'
       msb = BradyW::MSBuild.new "wixmsbld_#{@name}" do |m|
         m.release = @release_mode
         m.solution = wix_project_file
@@ -70,7 +75,8 @@ module BradyW
 
       if signing_code? then
         sign_msi_task_name = "signmsi_#{@name}"
-        BradyW::SignTool.new sign_msi_task_name do |s|
+        desc 'Signs the MSI produced by MSBuild'
+        BradyW::SignTool.new sign_msi_task_name => msb.name do |s|
           s.subject = @certificate_subject
           s.description = @description
           s.sign_this = msi_path
@@ -79,6 +85,7 @@ module BradyW
 
       dnet_inst_task_name = "dnetinst_#{@name}"
       dnet_name_deps = signing_code? ? {dnet_inst_task_name => sign_msi_task_name} : dnet_inst_task_name
+      desc 'Produces a complete .NET installer build'
       BradyW::DotNetInstaller.new dnet_name_deps do |inst|
         inst.xml_config = dnetinstaller_xml_config
         tokens = {:Configuration => configuration,
@@ -94,6 +101,7 @@ module BradyW
 
       if signing_code? then
         sign_exe_task_name = "signexe_#{@name}"
+        desc 'Signs the finished EXE produced by the .NET installer'
         BradyW::SignTool.new sign_exe_task_name => dnet_inst_task_name do |s|
           s.subject = @certificate_subject
           s.description = @description

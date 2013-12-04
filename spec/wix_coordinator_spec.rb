@@ -399,6 +399,24 @@ describe BradyW::WixCoordinator do
     command1.should be_nil
   end
 
+  it 'should allow executing the Paraffin task on its own (without a version number)' do
+    # arrange
+    FileUtils.mkdir_p 'MyWixProject/paraffin'
+    FileUtils.touch 'MyWixProject/paraffin/binaries.wxs'
+    BradyW::WixCoordinator.new :integration_test6  do |t|
+      t.wix_project_directory = 'MyWixProject'
+    end
+    FileUtils.touch 'MyWixProject/paraffin/binaries.PARAFFIN'
+    FileUtils.touch 'MyWixProject/dnetinstaller.xml'
+
+    # act
+    Rake::Task[:paraffin_integration_test6].invoke
+    command = BradyW::BaseTask.pop_executed_command
+
+    # assert
+    command.should == '"path/to/paraffin.exe" -update "MyWixProject/paraffin/binaries.wxs" -verbose'
+  end
+
   it 'should optionally perform code signing if description and certificate_subject are provided' do
     # arrange
     FileUtils.mkdir_p 'MyWixProject/paraffin'
