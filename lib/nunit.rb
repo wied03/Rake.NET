@@ -1,15 +1,17 @@
 require 'basetask'
 require 'dotframeworksymbolhelp'
+require 'param_quotes'
 
 module BradyW
   class Nunit < BaseTask
     include Dotframeworksymbolhelp
+    include ParamQuotes
     PROGRAM_FILES_DIR = "C:/Program Files (x86)"
 
-    # *Required* Files/assemblies to test
+    # *Required* Files/assemblies to test.  You can also override this each time by setting the environment variable 'nunit_filelist' to a glob pattern
     attr_accessor :files
 
-    # *Optional* Version of NUnit in use, defaults to 2.6.2
+    # *Optional* Version of NUnit in use, defaults to 2.6.3
     attr_accessor :version
 
     # *Optional* What version of the .NET framework to use for the tests?  :v2_0, :v3_5, :v4_0, :v4_5, defaults to :v4_5
@@ -42,20 +44,32 @@ module BradyW
     private
 
     def exectask
-      assemblies = files.uniq.join(" ")
-      shell "\"#{full_path}\"#{output}#{errors}#{labels_flat}#{xml_output_flat}/framework=#{framework_version} /timeout=#{timeout}#{testsparam}#{assemblies}"
+      override = ENV['nunit_filelist']
+      file_list = override ? FileList[override] : files
+      assemblies = file_list.uniq.join(' ')
+      tparm = testsparam
+      params = [output,
+                errors,
+                labels_flat,
+                xml_output_flat,
+                param_fslash_eq('framework', framework_version),
+                param_fslash_eq('timeout', timeout),
+                tparm ? param_fslash_eq('run', tparm) : '']
+      params << assemblies
+      params.reject!{|p| !p || p.empty?}
+      shell "\"#{full_path}\" #{params.join(' ')}"
     end
 
     def executable
-      arch == :anycpu ? "nunit-console.exe" : "nunit-console-x86.exe"
+      arch == :any_cpu ? 'nunit-console.exe' : 'nunit-console-x86.exe'
     end
 
     def arch
-      @arch || :anycpu
+      @arch || :any_cpu
     end
 
     def xml_output_flat
-      xml_output == :disabled ? " /noxml " : " "
+      xml_output == :disabled ? '/noxml' : nil
     end
 
     def xml_output
@@ -63,15 +77,15 @@ module BradyW
     end
 
     def output
-      @output ? " /output=#{@output}" : ""
+      @output ? "/output=#{@output}" : nil
     end
 
     def errors
-      @errors ? " /err=#{@errors}" : ""
+      @errors ? "/err=#{@errors}" : nil
     end
 
     def version
-      @version || "2.6.3"
+      @version || '2.6.3'
     end
 
     def labels
@@ -79,13 +93,12 @@ module BradyW
     end
 
     def labels_flat
-      labels == :include_labels ? " /labels" : ""
+      labels == :include_labels ? '/labels' : nil
     end
 
     def testsparam
-      return " " unless @tests
-      flat = @tests.is_a?(Array) ? @tests.join(",") : @tests
-      " /run=#{flat} "
+      return nil unless @tests
+      @tests.is_a?(Array) ? @tests.join(',') : @tests
     end
 
     def framework_version
@@ -93,9 +106,9 @@ module BradyW
     end
 
     def full_path
-      possibleDirectories = ["NUnit #{version}","NUnit-#{version}"]
-      candidates = @path ? [@path] : possibleDirectories.map {|p| File.join(PROGRAM_FILES_DIR,p,"bin",executable) }
-      found = candidates.detect {|c| File.exists? c}
+      possibleDirectories = ["NUnit #{version}", "NUnit-#{version}"]
+      candidates = @path ? [@path] : possibleDirectories.map { |p| File.join(PROGRAM_FILES_DIR, p, "bin", executable) }
+      found = candidates.detect { |c| File.exists? c }
       return found if found
       raise "We checked the following locations and could not find nunit-console.exe #{candidates}"
     end
