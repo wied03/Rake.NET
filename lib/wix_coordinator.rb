@@ -42,6 +42,9 @@ module BradyW
     # *Optional* Description to use with the signtool task when signing the MSI + exe
     attr_accessor :description
 
+    # *Optional* Timestamp URL for code signing, if not specified, will use default of code sign task
+    attr_accessor :code_sign_timestamp_server
+
     def initialize(parameters = :task)
       @release_mode ||= true
 
@@ -73,14 +76,19 @@ module BradyW
         @msbuild_configure.call(m) if @msbuild_configure
       end
 
-      if signing_code? then
-        sign_msi_task_name = "signmsi_#{@name}"
-        desc 'Signs the MSI produced by MSBuild'
-        BradyW::SignTool.new sign_msi_task_name => msb.name do |s|
+      sign_code_task = lambda do |task_name_dependencies, sign_this|
+        desc "Signs the #{sign_this} as part of the build process"
+        BradyW::SignTool.new task_name_dependencies do |s|
           s.subject = @certificate_subject
           s.description = @description
-          s.sign_this = msi_path
+          s.sign_this = sign_this
+          s.timestamp_url = @code_sign_timestamp_server
         end
+      end
+
+      if signing_code? then
+        sign_msi_task_name = "signmsi_#{@name}"
+        sign_code_task[{sign_msi_task_name => msb.name}, msi_path]
       end
 
       dnet_inst_task_name = "dnetinst_#{@name}"
@@ -101,12 +109,7 @@ module BradyW
 
       if signing_code? then
         sign_exe_task_name = "signexe_#{@name}"
-        desc 'Signs the finished EXE produced by the .NET installer'
-        BradyW::SignTool.new sign_exe_task_name => dnet_inst_task_name do |s|
-          s.subject = @certificate_subject
-          s.description = @description
-          s.sign_this = dnetinstaller_output_exe
-        end
+        sign_code_task[{sign_exe_task_name => dnet_inst_task_name}, dnetinstaller_output_exe]
         @dependencies << sign_exe_task_name
       end
 

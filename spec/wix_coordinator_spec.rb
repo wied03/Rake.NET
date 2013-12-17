@@ -399,24 +399,6 @@ describe BradyW::WixCoordinator do
     command1.should be_nil
   end
 
-  it 'should allow executing the Paraffin task on its own (without a version number)' do
-    # arrange
-    FileUtils.mkdir_p 'MyWixProject/paraffin'
-    FileUtils.touch 'MyWixProject/paraffin/binaries.wxs'
-    BradyW::WixCoordinator.new :integration_test6  do |t|
-      t.wix_project_directory = 'MyWixProject'
-    end
-    FileUtils.touch 'MyWixProject/paraffin/binaries.PARAFFIN'
-    FileUtils.touch 'MyWixProject/dnetinstaller.xml'
-
-    # act
-    Rake::Task[:paraffin_integration_test6].invoke
-    command = BradyW::BaseTask.pop_executed_command
-
-    # assert
-    command.should == '"path/to/paraffin.exe" -update "MyWixProject/paraffin/binaries.wxs" -verbose'
-  end
-
   it 'should optionally perform code signing if description and certificate_subject are provided' do
     # arrange
     FileUtils.mkdir_p 'MyWixProject/paraffin'
@@ -456,5 +438,59 @@ describe BradyW::WixCoordinator do
     commands[5].should include '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"MyWixProject/dnetinstall'
     commands[5].should include '/o:"MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
     commands[6].should == '"windowskit/path/bin/x64/signtool.exe" sign /n "The Subject" /t http://timestamp.verisign.com/scripts/timestamp.dll /d "The description" "MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe"'
+  end
+
+  it 'should allow executing the Paraffin task on its own (without a version number)' do
+    # arrange
+    FileUtils.mkdir_p 'MyWixProject/paraffin'
+    FileUtils.touch 'MyWixProject/paraffin/binaries.wxs'
+    BradyW::WixCoordinator.new :integration_test6 do |t|
+      t.wix_project_directory = 'MyWixProject'
+    end
+    FileUtils.touch 'MyWixProject/paraffin/binaries.PARAFFIN'
+    FileUtils.touch 'MyWixProject/dnetinstaller.xml'
+
+    # act
+    Rake::Task[:paraffin_integration_test6].invoke
+    command = BradyW::BaseTask.pop_executed_command
+
+    # assert
+    command.should == '"path/to/paraffin.exe" -update "MyWixProject/paraffin/binaries.wxs" -verbose'
+  end
+
+  it 'should allow a custom timestamp URL' do
+    # arrange
+    FileUtils.mkdir_p 'MyWixProject/paraffin'
+    FileUtils.touch 'MyWixProject/paraffin/binaries.wxs'
+    ms_build_mock = BradyW::MSBuild.new :msbuild_task_5
+    BradyW::MSBuild.stub(:new) do |&block|
+      block[ms_build_mock]
+      ms_build_mock
+    end
+    @mock_accessor.stub(:get_sub_keys).with('SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows').and_return(['v7.1A', 'v8.0A', 'v8.1A', 'v8.1'])
+    @mock_accessor.stub(:get_value).with('SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows\\v8.1', 'InstallationFolder').and_return('windowskit/path')
+
+    TestTask.new :test_task_8
+    TestTask.new :test_task_9
+    BradyW::WixCoordinator.new :integration_test7 => [:test_task_8, :test_task_9] do |t|
+      t.product_version = '1.0.0.0'
+      t.wix_project_directory = 'MyWixProject'
+      t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
+      t.certificate_subject = 'The Subject'
+      t.description = 'The description'
+      t.code_sign_timestamp_server = 'http://something.else'
+    end
+    ms_build_mock.stub(:dotnet).and_return('path/to/')
+    FileUtils.touch 'MyWixProject/paraffin/binaries.PARAFFIN'
+    FileUtils.touch 'MyWixProject/dnetinstaller.xml'
+
+    # act
+    Rake::Task[:integration_test7].invoke
+    commands = 7.times.collect { BradyW::BaseTask.pop_executed_command }
+    commands = commands.reverse
+
+    # assert
+    commands[4].should == '"windowskit/path/bin/x64/signtool.exe" sign /n "The Subject" /t http://something.else /d "The description" "MyWixProject/bin/Release/MyWixProject.msi"'
+    commands[6].should == '"windowskit/path/bin/x64/signtool.exe" sign /n "The Subject" /t http://something.else /d "The description" "MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe"'
   end
 end
