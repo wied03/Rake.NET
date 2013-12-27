@@ -15,14 +15,20 @@ module BradyW
     attr_accessor :path
 
     def exectask
+      validate
       params = ["/#{mode_switch}"]
-      params << param_fslash('ComponentArgs', properties_flat) if @mode == :install
+      params << param_fslash('ComponentArgs', properties_flat) if @properties && @mode == :install
       params << '/q'
       params_flat = params.join ' '
       shell "#{path} #{params_flat}"
     end
 
     private
+
+    def validate
+      raise 'mode and path are required' unless @mode && @path
+      raise "mode cannot be :#{@mode}, must be either :install or :uninstall" unless [:install, :uninstall].include?(@mode)
+    end
 
     def double_the_quotes value
       value.gsub /\"/, '""'
