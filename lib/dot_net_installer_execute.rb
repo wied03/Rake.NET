@@ -16,7 +16,7 @@ module BradyW
 
     def exectask
       params = ["/#{mode_switch}"]
-      params << param_fslash('ComponentArgs', properties_flat)
+      params << param_fslash('ComponentArgs', properties_flat) if @mode == :install
       params << '/q'
       params_flat = params.join ' '
       shell "#{path} #{params_flat}"
