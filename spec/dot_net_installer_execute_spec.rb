@@ -14,7 +14,7 @@ describe BradyW::DotNetInstallerExecute do
     command = task.executedPop
 
     # assert
-    expect(command).to eq('some.exe /i /q')
+    expect(command).to eq('"some.exe" /i /q')
   end
 
   it 'should work properly in install mode with a single property' do
@@ -30,7 +30,7 @@ describe BradyW::DotNetInstallerExecute do
     command = task.executedPop
 
     # assert
-    expect(command).to eq('some.exe /i /ComponentArgs *:"SOMETHING=stuff" /q')
+    expect(command).to eq('"some.exe" /i /ComponentArgs *:"SOMETHING=stuff" /q')
   end
 
   it 'should work properly in install mode with multiple properties with whitespace and quotes' do
@@ -46,7 +46,7 @@ describe BradyW::DotNetInstallerExecute do
     command = task.executedPop
 
     # assert
-    expect(command).to eq('some.exe /i /ComponentArgs *:"SOMETHING=stuff SPACES=""hi there"" QUOTES=""hello """"there"""" joe""" /q')
+    expect(command).to eq('"some.exe" /i /ComponentArgs *:"SOMETHING=stuff SPACES=""hi there"" QUOTES=""hello """"there"""" joe""" /q')
   end
 
   it 'should work properly with uninstall' do
@@ -61,7 +61,7 @@ describe BradyW::DotNetInstallerExecute do
     command = task.executedPop
 
     # assert
-    expect(command).to eq('some.exe /x /q')
+    expect(command).to eq('"some.exe" /x /q')
   end
 
   it 'should require mode and path' do

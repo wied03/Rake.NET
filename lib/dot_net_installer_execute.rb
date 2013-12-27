@@ -20,7 +20,7 @@ module BradyW
       params << param_fslash('ComponentArgs', properties_flat) if @properties && @mode == :install
       params << '/q'
       params_flat = params.join ' '
-      shell "#{path} #{params_flat}"
+      shell "\"#{path}\" #{params_flat}"
     end
 
     private
