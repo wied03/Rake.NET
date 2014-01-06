@@ -6,6 +6,7 @@ describe BradyW::DotNetInstaller do
     @should_delete = 'generated_name.xml'
     BswTech::DnetInstallUtil.stub(:dot_net_installer_base_path).and_return('path/to/dnetinstaller')
     BradyW::TempFileNameGenerator.stub(:filename).and_return 'generated_name.xml'
+    ENV['PRESERVE_TEMP'] = nil
   end
 
   after :each do
@@ -91,6 +92,21 @@ describe BradyW::DotNetInstaller do
 
     # assert
     File.should_not be_exist(@should_delete)
+  end
+
+  it 'should leave the temporarily generated XML file around if PRESERVE_TEMP env is set' do
+    # arrange
+    ENV['PRESERVE_TEMP'] = 'true'
+    task = BradyW::DotNetInstaller.new do |t|
+      t.xml_config = 'data/dot_net_installer/input.xml'
+      t.output = 'somedir/Our.File.Exe'
+    end
+
+    # act
+    task.exectaskpublic
+
+    # assert
+    File.should be_exist(@should_delete)
   end
 
   it 'should remove the temporarily generated XML file even if an error occurs in the executable' do

@@ -23,7 +23,7 @@ module BradyW
       params=[param_fslash_colon('c', generated_file_name, :quote => true),
               param_fslash_colon('o', @output, :quote => true),
               param_fslash_colon('t', bootstrapper_path, :quote => true)]
-      clean_file = lambda { FileUtils.rm generated_file_name }
+      clean_file = lambda { FileUtils.rm generated_file_name unless ENV['PRESERVE_TEMP'] }
       shell "\"#{linker_path}\" #{params.join(' ')}" do |ok, status|
         if !ok then
           clean_file.call
