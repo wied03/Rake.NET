@@ -27,8 +27,8 @@ module BradyW
     # *Optional* Properties to be used with MSBuild and DotNetInstaller
     attr_accessor :properties
 
-    # *Optional* Debug or Release.  By default true is used
-    attr_accessor :release_mode
+    # *Optional* :Debug or :Release.  By default :Release is used
+    attr_accessor :build_config
 
     # *Optional* A lambda to do additional configuration on the MSBuild task (e.g. dotnet_bin_version)
     attr_accessor :msbuild_configure
@@ -70,7 +70,7 @@ module BradyW
 
       desc 'Run MSBUild and produce an MSI for the WIX project'
       msb = BradyW::MSBuild.new "wixmsbld_#{@name}" do |m|
-        m.release = @release_mode
+        m.build_config = configuration
         m.solution = wix_project_file
         m.properties = properties
         @msbuild_configure.call(m) if @msbuild_configure
@@ -137,7 +137,7 @@ module BradyW
     end
 
     def configuration
-      @release_mode ? :Release : :Debug
+      @build_config || :Release
     end
 
     def bin_dir

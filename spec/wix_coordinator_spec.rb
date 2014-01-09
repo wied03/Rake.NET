@@ -119,7 +119,7 @@ describe BradyW::WixCoordinator do
     end
 
     # assert
-    ms_build_mock.release.should be_true
+    expect(ms_build_mock.build_config).to eq(:Release)
     # the space is due to MSBuild task's parameter forming
     ms_build_mock.send(:solution).should == ' MyWixProject/MyWixProject.wixproj'
     ms_build_mock.properties.should == {:setting1 => 'the setting',
@@ -193,7 +193,7 @@ describe BradyW::WixCoordinator do
       t.wix_project_directory = 'MyWixProject'
       t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
       t.properties = {:setting1 => 'the setting', :setting2 => 'the setting 2'}
-      t.release_mode = false
+      t.build_config = :Debug
     end
 
     # assert
@@ -204,7 +204,7 @@ describe BradyW::WixCoordinator do
                                 :UpgradeCode => '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7',
                                 :MsiPath => 'MyWixProject/bin/Debug/MyWixProject.msi'}
     dnet_mock.output.should == 'MyWixProject/bin/Debug/MyWixProject 1.0.0.0.exe'
-    ms_build_mock.release.should be_false
+    ms_build_mock.build_config.should == :Debug
   end
 
   it 'should allow MSBuild properties like .NET version, etc. to be passed along' do

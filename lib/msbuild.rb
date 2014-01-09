@@ -29,8 +29,14 @@ module BradyW
     # 'TargetFrameworkVersion' will be set based on the other attributes of this class.
     attr_accessor :properties
 
-    # *Optional* Do a release build?  By default, this is false.
-    attr_accessor :release
+    # *Optional* :Release or :Debug build, :Debug by default
+    attr_accessor :build_config
+
+
+    def initialize (parameters = :task)
+      super parameters
+      @build_config ||= :Debug
+    end
 
     private
 
@@ -59,10 +65,6 @@ module BradyW
       @targets ? [*@targets].map { |t| param_fslash_colon 'target', t } : []
     end
 
-    def debugOrRelease
-      @release ? :Release : :Debug
-    end
-
     def property_kv(key, value)
       "#{key}=#{handle_property_space(value)}"
     end
@@ -73,7 +75,7 @@ module BradyW
     end
 
     def merged_properties
-      default = {:Configuration => debugOrRelease,
+      default = {:Configuration => build_config,
                  :TargetFrameworkVersion => compile_version}
       default.merge (@properties || {})
     end
