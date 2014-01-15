@@ -44,7 +44,7 @@ describe BradyW::DotNetInstallerExecute do
     command = task.executedPop
 
     # assert
-    expect(@commands.first).to eq('/Users/brady/.rvm/gems/ruby-1.9.3-p484@rakenet/gems/bsw_dnet_install_util-1.1.3/lib/elevate-1.3.0/elevate.exe -w "stuff\\some.exe" /i /q /Log /LogFile generated_name_1.xml')
+    expect(@commands.first).to eq("#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w \"stuff\\some.exe\" /i /q /Log /LogFile generated_name_1.xml")
   end
 
   it 'should work properly in install mode with a single property' do
@@ -61,7 +61,7 @@ describe BradyW::DotNetInstallerExecute do
     command = task.executedPop
 
     # assert
-    expect(@commands.first).to eq('/Users/brady/.rvm/gems/ruby-1.9.3-p484@rakenet/gems/bsw_dnet_install_util-1.1.3/lib/elevate-1.3.0/elevate.exe -w "some.exe" /i /ComponentArgs *:"SOMETHING=stuff" /q /Log /LogFile generated_name_1.xml')
+    expect(@commands.first).to eq("#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w \"some.exe\" /i /ComponentArgs *:\"SOMETHING=stuff\" /q /Log /LogFile generated_name_1.xml")
   end
 
   it 'should work properly in install mode with multiple properties with whitespace and quotes' do
@@ -78,7 +78,7 @@ describe BradyW::DotNetInstallerExecute do
     command = task.executedPop
 
     # assert
-    expect(@commands.first).to eq('/Users/brady/.rvm/gems/ruby-1.9.3-p484@rakenet/gems/bsw_dnet_install_util-1.1.3/lib/elevate-1.3.0/elevate.exe -w "some.exe" /i /ComponentArgs *:"SOMETHING=stuff SPACES=""hi there"" QUOTES=""hello """"there"""" joe""" /q /Log /LogFile generated_name_1.xml')
+    expect(@commands.first).to eq(BswTech::DnetInstallUtil::ELEVATE_EXE+' -w "some.exe" /i /ComponentArgs *:"SOMETHING=stuff SPACES=""hi there"" QUOTES=""hello """"there"""" joe""" /q /Log /LogFile generated_name_1.xml')
   end
 
   it 'should work properly with uninstall' do
@@ -94,7 +94,7 @@ describe BradyW::DotNetInstallerExecute do
     command = task.executedPop
 
     # assert
-    expect(@commands.first).to eq('/Users/brady/.rvm/gems/ruby-1.9.3-p484@rakenet/gems/bsw_dnet_install_util-1.1.3/lib/elevate-1.3.0/elevate.exe -w "some.exe" /x /q /Log /LogFile generated_name_1.xml')
+    expect(@commands.first).to eq("#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w \"some.exe\" /x /q /Log /LogFile generated_name_1.xml")
   end
 
   it 'should require mode and path' do
