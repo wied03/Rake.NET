@@ -1,5 +1,6 @@
 require 'basetask'
 require 'param_quotes'
+require 'temp_file_name_generator'
 
 module BradyW
   class DotNetInstallerExecute < BaseTask
@@ -19,11 +20,35 @@ module BradyW
       params = ["/#{mode_switch}"]
       params << param_fslash('ComponentArgs', properties_flat) if @properties && @mode == :install
       params << '/q'
+      log_file = TempFileNameGenerator.filename 'log.txt'
+      clean_file = lambda { FileUtils.rm log_file unless ENV['PRESERVE_TEMP'] }
+      params << '/Log'
+      params << param_fslash('LogFile', log_file)
       params_flat = params.join ' '
-      shell "\"#{path}\" #{params_flat}"
+      # Elevate.exe needs windows style backslash path here and needs to wait for elevation to complete
+      win_path = path.gsub(/\//,'\\')
+      shell "elevate -w \"#{win_path}\" #{params_flat}" do |ok, status|
+        contents = get_file_contents log_file
+        puts contents
+        puts 'Ignoring return code since these seem to invalid, instead checking log file for success'
+        success = contents.match(/dotNetInstaller finished, return code: 0 \(0x0\)/)
+        clean_file.call
+        puts 'Successful return code, task finished' if success
+        fail 'Due to failure message in logs, this task has failed' unless success
+      end
     end
 
     private
+
+    def get_file_contents(src_file_name)
+      text = ''
+      File.open src_file_name, 'r' do |input|
+        input.each do |line|
+          text << line
+        end
+      end
+      text
+    end
 
     def validate
       raise 'mode and path are required' unless @mode && @path
