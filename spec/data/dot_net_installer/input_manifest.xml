@@ -1,0 +1,5 @@
+<manifest>
+  <someValue attr="$(token1)">
+  $(token2)
+  </someValue>
+</manifest>

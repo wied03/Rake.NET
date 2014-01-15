@@ -22,12 +22,18 @@ module BradyW
 
     def exectask
       validate
-      generated_file_name = generate_xml_file
-      params=[param_fslash_colon('c', generated_file_name, :quote => true),
+      generated_core_xml_file = generate_core_xml_file
+      manifest_temp_file = generate_manifest_xml_file if @manifest
+      params=[param_fslash_colon('c', generated_core_xml_file, :quote => true),
               param_fslash_colon('o', @output, :quote => true),
               param_fslash_colon('t', bootstrapper_path, :quote => true)]
-      params << param_fslash_colon('Manifest', manifest, :quote => true) if manifest
-      clean_file = lambda { FileUtils.rm generated_file_name unless ENV['PRESERVE_TEMP'] }
+      params << param_fslash_colon('Manifest', manifest_temp_file, :quote => true) if manifest_temp_file
+      clean_file = lambda {
+        if !ENV['PRESERVE_TEMP']
+          FileUtils.rm generated_core_xml_file
+          FileUtils.rm manifest_temp_file if @manifest
+        end
+      }
       shell "\"#{linker_path}\" #{params.join(' ')}" do |ok, status|
         if !ok then
           clean_file.call
@@ -43,10 +49,21 @@ module BradyW
       fail ":xml_config and :output are required" if !@xml_config || !@output
     end
 
-    def generate_xml_file
+    def generate_core_xml_file
       generated_file_name = TempFileNameGenerator.filename @xml_config
+      tokenize_file @xml_config, generated_file_name
+      generated_file_name
+    end
+
+    def generate_manifest_xml_file
+      generated_file_name = TempFileNameGenerator.filename @manifest
+      tokenize_file @manifest, generated_file_name
+      generated_file_name
+    end
+
+    def tokenize_file(src_file_name,generated_file_name)
       File.open(generated_file_name, 'w') do |out|
-        File.open @xml_config, 'r' do |input|
+        File.open src_file_name, 'r' do |input|
           input.each do |line|
             if @tokens then
               @tokens.each do |k, v|
@@ -57,7 +74,6 @@ module BradyW
           end
         end
       end
-      generated_file_name
     end
 
     def token_replace(token)
