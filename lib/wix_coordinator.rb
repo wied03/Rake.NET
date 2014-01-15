@@ -93,11 +93,12 @@ module BradyW
 
       dnet_inst_task_name = "dnetinst_#{@name}"
       dnet_name_deps = signing_code? ? {dnet_inst_task_name => sign_msi_task_name} : dnet_inst_task_name
-      desc 'Produces a complete .NET installer build'
+      desc 'Produces a complete .NET installer build using dotNetInstaller as bootstrapper'
       BradyW::DotNetInstaller.new dnet_name_deps do |inst|
         inst.xml_config = dnetinstaller_xml_config
         tokens = {:Configuration => configuration,
-                  :MsiPath => msi_path}
+                  :MsiPath => msi_path,
+                  :MsiFileName => File.basename(msi_path)}
         tokens = properties.merge tokens
         inst.tokens = tokens
         inst.output = dnetinstaller_output_exe
@@ -163,7 +164,7 @@ module BradyW
 
     def handle_property_semicolon(val)
       val_str = val.to_s
-      val_str.gsub(/;/,'%3B')
+      val_str.gsub(/;/, '%3B')
     end
 
     def property_kv(key, value)

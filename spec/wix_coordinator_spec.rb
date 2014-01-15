@@ -98,7 +98,8 @@ describe BradyW::WixCoordinator do
     dnet_mock.tokens.should == {:Configuration => :Release,
                                 :ProductVersion => '1.0.0.0',
                                 :UpgradeCode => '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7',
-                                :MsiPath => 'path/to/msi'}
+                                :MsiPath => 'path/to/msi',
+                                :MsiFileName => 'msi'}
   end
 
   it 'should configure the MSBuild task with proper WIX variables when spaces exist in property values' do
@@ -254,7 +255,8 @@ describe BradyW::WixCoordinator do
                                 :Configuration => :Release,
                                 :ProductVersion => '1.0.0.0',
                                 :UpgradeCode => '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7',
-                                :MsiPath => 'src/MyWixProject/bin/Release/MyWixProject.msi'}
+                                :MsiPath => 'src/MyWixProject/bin/Release/MyWixProject.msi',
+                                :MsiFileName => 'MyWixProject.msi'}
     dnet_mock.output.should == 'src/MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe'
     dnet_mock.xml_config.should == 'src/MyWixProject/dnetinstaller.xml'
   end
@@ -287,7 +289,8 @@ describe BradyW::WixCoordinator do
                                 :Configuration => :Debug,
                                 :ProductVersion => '1.0.0.0',
                                 :UpgradeCode => '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7',
-                                :MsiPath => 'MyWixProject/bin/Debug/MyWixProject.msi'}
+                                :MsiPath => 'MyWixProject/bin/Debug/MyWixProject.msi',
+                                :MsiFileName => 'MyWixProject.msi'}
     dnet_mock.output.should == 'MyWixProject/bin/Debug/MyWixProject 1.0.0.0.exe'
     ms_build_mock.build_config.should == :Debug
     ms_build_mock.properties.should == {:setting1 => 'the setting',
@@ -358,7 +361,8 @@ describe BradyW::WixCoordinator do
     dnet_mock.tokens.should == {:Configuration => :Release,
                                 :ProductVersion => '1.0.0.0',
                                 :UpgradeCode => '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7',
-                                :MsiPath => 'MyWixProject/bin/Release/MyWixProject.msi'}
+                                :MsiPath => 'MyWixProject/bin/Release/MyWixProject.msi',
+                                :MsiFileName => 'MyWixProject.msi'}
     ms_build_mock.properties.should == {:ProductVersion => '1.0.0.0',
                                         :UpgradeCode => '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7',
                                         :DefineConstants => 'ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'}
