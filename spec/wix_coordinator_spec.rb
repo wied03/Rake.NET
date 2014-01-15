@@ -101,6 +101,62 @@ describe BradyW::WixCoordinator do
                                 :MsiPath => 'path/to/msi'}
   end
 
+  it 'should configure the MSBuild task with proper WIX variables when spaces exist in property values' do
+    # arrange
+    # allow us to create an instance, then mock future creations of that instance while preserving the block
+    ms_build_mock = BradyW::MSBuild.new
+    BradyW::MSBuild.stub(:new) do |&block|
+      block[ms_build_mock]
+      ms_build_mock
+    end
+
+    # act
+    BradyW::WixCoordinator.new do |t|
+      t.product_version = '1.0.0.0'
+      t.wix_project_directory = 'MyWixProject'
+      t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
+      t.properties = {:setting1 => 'the setting', :setting2 => 'the set ting 2'}
+    end
+
+    # assert
+    expect(ms_build_mock.build_config).to eq(:Release)
+    # the space is due to MSBuild task's parameter forming
+    ms_build_mock.send(:solution).should == ' MyWixProject/MyWixProject.wixproj'
+    ms_build_mock.properties.should == {:setting1 => 'the setting',
+                                        :setting2 => 'the set ting 2',
+                                        :ProductVersion => '1.0.0.0',
+                                        :UpgradeCode => '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7',
+                                        :DefineConstants => 'ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;setting1=the setting;setting2=the set ting 2'}
+  end
+
+  it 'should configure the MSBuild task with proper WIX variables when semicolons exist in property values' do
+    # arrange
+    # allow us to create an instance, then mock future creations of that instance while preserving the block
+    ms_build_mock = BradyW::MSBuild.new
+    BradyW::MSBuild.stub(:new) do |&block|
+      block[ms_build_mock]
+      ms_build_mock
+    end
+
+    # act
+    BradyW::WixCoordinator.new do |t|
+      t.product_version = '1.0.0.0'
+      t.wix_project_directory = 'MyWixProject'
+      t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
+      t.properties = {:setting1 => 'the setting', :setting2 => 'the set;ting 2'}
+    end
+
+    # assert
+    expect(ms_build_mock.build_config).to eq(:Release)
+    # the space is due to MSBuild task's parameter forming
+    ms_build_mock.send(:solution).should == ' MyWixProject/MyWixProject.wixproj'
+    ms_build_mock.properties.should == {:setting1 => 'the setting',
+                                        :setting2 => 'the set;ting 2',
+                                        :ProductVersion => '1.0.0.0',
+                                        :UpgradeCode => '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7',
+                                        :DefineConstants => 'ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;setting1=the setting;setting2=the set%3Bting 2'}
+  end
+
   it 'should configure the MSBuild task' do
     # arrange
     # allow us to create an instance, then mock future creations of that instance while preserving the block
@@ -125,7 +181,8 @@ describe BradyW::WixCoordinator do
     ms_build_mock.properties.should == {:setting1 => 'the setting',
                                         :setting2 => 'the setting 2',
                                         :ProductVersion => '1.0.0.0',
-                                        :UpgradeCode => '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'}
+                                        :UpgradeCode => '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7',
+                                        :DefineConstants => 'setting1=the setting;setting2=the setting 2;ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'}
   end
 
   it 'should configure the Paraffin task' do
@@ -202,7 +259,8 @@ describe BradyW::WixCoordinator do
                                 :Configuration => :Debug,
                                 :ProductVersion => '1.0.0.0',
                                 :UpgradeCode => '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7',
-                                :MsiPath => 'MyWixProject/bin/Debug/MyWixProject.msi'}
+                                :MsiPath => 'MyWixProject/bin/Debug/MyWixProject.msi',
+                                :DefineConstants => 'Debug;setting1=the setting;setting2=the setting 2;Configuration=Debug;ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;MsiPath=MyWixProject/bin/Debug/MyWixProject.msi'}
     dnet_mock.output.should == 'MyWixProject/bin/Debug/MyWixProject 1.0.0.0.exe'
     ms_build_mock.build_config.should == :Debug
   end
@@ -228,7 +286,7 @@ describe BradyW::WixCoordinator do
     ms_build_mock.dotnet_bin_version.should == :v4_0
   end
 
-  it 'should not allow the top level release_mode flag to be overridden by properties' do
+  it 'should not allow the top level release_mode flag to be overridden by properties since we need to interpret the config for defineConstants' do
     # arrange + act
 
     lambda {
@@ -241,7 +299,7 @@ describe BradyW::WixCoordinator do
       end
 
       # assert
-    }.should raise_exception "You cannot supply Debug for a :Configuration property.  Use the :release_mode property on the WixCoordinator task"
+    }.should raise_exception "You cannot supply Debug for a :Configuration property.  Use the :build_config property on the WixCoordinator task"
   end
 
   it 'should work properly with no additional properties supplied' do
@@ -391,7 +449,7 @@ describe BradyW::WixCoordinator do
     expect(task.dependencies).to be_nil
 
     # act
-    puts "Acting"
+    puts 'Acting'
     lambda { Rake::Task[:integration_test4].invoke }.should raise_exception ':product_version, :upgrade_code, :wix_project_directory are all required'
     command1 = BradyW::BaseTask.pop_executed_command
 

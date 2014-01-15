@@ -72,7 +72,7 @@ module BradyW
       msb = BradyW::MSBuild.new "wixmsbld_#{@name}" do |m|
         m.build_config = configuration
         m.solution = wix_project_file
-        m.properties = properties
+        m.properties = properties.merge(wix_constants)
         @msbuild_configure.call(m) if @msbuild_configure
       end
 
@@ -161,9 +161,26 @@ module BradyW
                                              'dnetinstaller.xml')
     end
 
+    def handle_property_semicolon(val)
+      val_str = val.to_s
+      val_str.gsub(/;/,'%3B')
+    end
+
+    def property_kv(key, value)
+      "#{key}=#{handle_property_semicolon(value)}"
+    end
+
+    def wix_constants
+      props_array = properties.map { |k, v| property_kv(k, v) }
+      props_flat = props_array.join ';'
+      {
+          :DefineConstants => props_flat
+      }
+    end
+
     def properties
       if @properties && @properties.include?(:Configuration) then
-        raise "You cannot supply #{@properties[:Configuration]} for a :Configuration property.  Use the :release_mode property on the WixCoordinator task"
+        raise "You cannot supply #{@properties[:Configuration]} for a :Configuration property.  Use the :build_config property on the WixCoordinator task"
       end
       standard_props = {:ProductVersion => @product_version,
                         :UpgradeCode => @upgrade_code}
