@@ -182,7 +182,7 @@ describe BradyW::WixCoordinator do
                                         :setting2 => 'the setting 2',
                                         :ProductVersion => '1.0.0.0',
                                         :UpgradeCode => '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7',
-                                        :DefineConstants => 'setting1=the setting;setting2=the setting 2;ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'}
+                                        :DefineConstants => 'ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;setting1=the setting;setting2=the setting 2'}
   end
 
   it 'should configure the Paraffin task' do
@@ -259,10 +259,14 @@ describe BradyW::WixCoordinator do
                                 :Configuration => :Debug,
                                 :ProductVersion => '1.0.0.0',
                                 :UpgradeCode => '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7',
-                                :MsiPath => 'MyWixProject/bin/Debug/MyWixProject.msi',
-                                :DefineConstants => 'Debug;setting1=the setting;setting2=the setting 2;Configuration=Debug;ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;MsiPath=MyWixProject/bin/Debug/MyWixProject.msi'}
+                                :MsiPath => 'MyWixProject/bin/Debug/MyWixProject.msi'}
     dnet_mock.output.should == 'MyWixProject/bin/Debug/MyWixProject 1.0.0.0.exe'
     ms_build_mock.build_config.should == :Debug
+    ms_build_mock.properties.should == {:setting1 => 'the setting',
+                                        :setting2 => 'the setting 2',
+                                        :ProductVersion => '1.0.0.0',
+                                        :UpgradeCode => '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7',
+                                        :DefineConstants => 'Debug;ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;setting1=the setting;setting2=the setting 2'}
   end
 
   it 'should allow MSBuild properties like .NET version, etc. to be passed along' do

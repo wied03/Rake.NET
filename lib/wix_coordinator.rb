@@ -68,7 +68,7 @@ module BradyW
         return
       end
 
-      desc 'Run MSBUild and produce an MSI for the WIX project'
+      desc 'Run MSBuild and produce an MSI for the WIX project'
       msb = BradyW::MSBuild.new "wixmsbld_#{@name}" do |m|
         m.build_config = configuration
         m.solution = wix_project_file
@@ -171,7 +171,9 @@ module BradyW
     end
 
     def wix_constants
-      props_array = properties.map { |k, v| property_kv(k, v) }
+      props_array = []
+      props_array << 'Debug' if @build_config == :Debug
+      props_array << properties.map { |k, v| property_kv(k, v) }
       props_flat = props_array.join ';'
       {
           :DefineConstants => props_flat
