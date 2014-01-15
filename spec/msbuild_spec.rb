@@ -31,6 +31,22 @@ describe BradyW::MSBuild do
     execed.should include '/property:Configuration=Debug /property:TargetFrameworkVersion=v4.5 /property:prop1="the value"'
   end
 
+  it 'should work OK with semicolons in the property value since MSBuild will otherwise interpret them as multiple property values' do
+    # arrange
+    task = BradyW::MSBuild.new do |m|
+      m.properties = {:prop1 => 'the;value'}
+      m.solution = 'stuff.sln'
+    end
+    task.should_receive(:dotnet).with("v4\\Client").and_return("C:\\yespath\\")
+
+    # act
+    task.exectaskpublic
+    execed = task.executedPop
+
+    # assert
+    execed.should include '/property:Configuration=Debug /property:TargetFrameworkVersion=v4.5 /property:prop1="the;value"'
+  end
+
   it 'should build OK (.NET 4.0)' do
     task = BradyW::MSBuild.new do |t|
       t.dotnet_bin_version = :v4_0

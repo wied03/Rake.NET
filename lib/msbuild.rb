@@ -66,12 +66,12 @@ module BradyW
     end
 
     def property_kv(key, value)
-      "#{key}=#{handle_property_space(value)}"
+      "#{key}=#{handle_property_quotes(value)}"
     end
 
-    def handle_property_space(val)
+    def handle_property_quotes(val)
       val_str = val.to_s
-      val_str.include?(' ') ? quoted(val_str) : val_str
+      val_str.match(/[\s;]/) ? quoted(val_str) : val_str
     end
 
     def merged_properties
