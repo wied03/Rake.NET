@@ -332,7 +332,8 @@ describe BradyW::WixCoordinator do
                                 :UpgradeCode => '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7',
                                 :MsiPath => 'MyWixProject/bin/Release/MyWixProject.msi'}
     ms_build_mock.properties.should == {:ProductVersion => '1.0.0.0',
-                                        :UpgradeCode => '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'}
+                                        :UpgradeCode => '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7',
+                                        :DefineConstants => 'ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'}
   end
 
   it 'executes each dependency it defines' do
@@ -363,7 +364,7 @@ describe BradyW::WixCoordinator do
 
     # assert
     command1.should == '"path/to/paraffin.exe" -update "MyWixProject/paraffin/binaries.wxs" -verbose'
-    command2.should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:setting1="the setting" /property:setting2="the setting 2" MyWixProject/MyWixProject.wixproj'
+    command2.should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:setting1="the setting" /property:setting2="the setting 2" /property:DefineConstants="ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;setting1=the setting;setting2=the setting 2" MyWixProject/MyWixProject.wixproj'
     command3.should include '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"MyWixProject/dnetinstall'
     command3.should include '/o:"MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
   end
