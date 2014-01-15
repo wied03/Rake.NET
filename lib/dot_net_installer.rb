@@ -17,12 +17,16 @@ module BradyW
     # *Optional* Tokens to replace in the XML file before calling dotNetInstaller.  Use $(tokenName) syntax in your XML
     attr_accessor :tokens
 
+    # *Optional* Manifest file to use when building the EXE
+    attr_accessor :manifest
+
     def exectask
       validate
       generated_file_name = generate_xml_file
       params=[param_fslash_colon('c', generated_file_name, :quote => true),
               param_fslash_colon('o', @output, :quote => true),
               param_fslash_colon('t', bootstrapper_path, :quote => true)]
+      params << param_fslash_colon('Manifest', manifest, :quote => true) if manifest
       clean_file = lambda { FileUtils.rm generated_file_name unless ENV['PRESERVE_TEMP'] }
       shell "\"#{linker_path}\" #{params.join(' ')}" do |ok, status|
         if !ok then

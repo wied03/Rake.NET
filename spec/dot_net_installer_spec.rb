@@ -28,6 +28,22 @@ describe BradyW::DotNetInstaller do
     command.should == '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"generated_name.xml" /o:"somedir/Our.File.Exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
   end
 
+  it 'should work properly with a specified manifest file' do
+    # arrange
+    task = BradyW::DotNetInstaller.new do |t|
+      t.xml_config = 'data/dot_net_installer/input.xml'
+      t.output = 'somedir/Our.File.Exe'
+      t.manifest = 'somedir/manifest.xml'
+    end
+
+    # act
+    task.exectaskpublic
+    command = task.executedPop
+
+    # assert
+    command.should == '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"generated_name.xml" /o:"somedir/Our.File.Exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe" /Manifest:"somedir/manifest.xml"'
+  end
+
   it 'should require xml_config and output' do
     # arrange
     task = BradyW::DotNetInstaller.new

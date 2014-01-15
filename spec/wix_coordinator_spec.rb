@@ -261,6 +261,28 @@ describe BradyW::WixCoordinator do
     dnet_mock.xml_config.should == 'src/MyWixProject/dnetinstaller.xml'
   end
 
+  it 'should configure the DotNetInstaller task with a manifest if specified' do
+    # arrange
+    dnet_mock = BradyW::DotNetInstaller.new
+    BradyW::DotNetInstaller.stub(:new) do |&block|
+      block[dnet_mock]
+      dnet_mock
+    end
+
+    # act
+    BradyW::WixCoordinator.new do |t|
+      t.product_version = '1.0.0.0'
+      t.wix_project_directory = 'src/MyWixProject'
+      t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
+      t.bootstrapper_manifest = 'the/manifest.xml'
+    end
+
+    # assert
+    dnet_mock.output.should == 'src/MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe'
+    dnet_mock.xml_config.should == 'src/MyWixProject/dnetinstaller.xml'
+    dnet_mock.manifest.should == 'the/manifest.xml'
+  end
+
   it 'should allow Debug to be specified as the config' do
     # arrange
     ms_build_mock = BradyW::MSBuild.new
