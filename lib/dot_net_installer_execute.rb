@@ -1,6 +1,7 @@
 require 'basetask'
 require 'param_quotes'
 require 'temp_file_name_generator'
+require 'path_fetcher'
 
 module BradyW
   class DotNetInstallerExecute < BaseTask
@@ -25,9 +26,7 @@ module BradyW
       params << '/Log'
       params << param_fslash('LogFile', log_file)
       params_flat = params.join ' '
-      # Elevate.exe needs windows style backslash path here and needs to wait for elevation to complete
-      win_path = path.gsub(/\//,'\\')
-      shell "elevate -w \"#{win_path}\" #{params_flat}" do |ok, status|
+      shell "#{elevate_and_exe_path} #{params_flat}" do |ok, status|
         contents = get_file_contents log_file
         puts contents
         puts 'Ignoring return code since these seem to invalid, instead checking log file for success'
@@ -48,6 +47,12 @@ module BradyW
         end
       end
       text
+    end
+
+    def elevate_and_exe_path
+      # Elevate.exe needs windows style backslash path here and needs to wait for elevation to complete
+      exe_path = path.gsub(/\//, '\\')
+      "#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w \"#{exe_path}\""
     end
 
     def validate
