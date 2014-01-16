@@ -1,6 +1,7 @@
 require 'basetask'
 require 'dotframeworksymbolhelp'
 require 'param_quotes'
+require 'path_fetcher'
 
 module BradyW
   class Nunit < BaseTask
@@ -41,6 +42,9 @@ module BradyW
     # *Optional* Should :x86 or :anycpu archiecture be used?  Default is :anycpu
     attr_accessor :arch
 
+    # *Optional* :elevated or :normal, :normal by default
+    attr_accessor :security_mode
+
     private
 
     def exectask
@@ -56,12 +60,23 @@ module BradyW
                 param_fslash_eq('timeout', timeout),
                 tparm ? param_fslash_eq('run', tparm) : '']
       params << assemblies
-      params.reject!{|p| !p || p.empty?}
-      shell "\"#{full_path}\" #{params.join(' ')}"
+      params.reject! { |p| !p || p.empty? }
+      path_based_on_mode = security_mode == :elevated ? elevate_and_exe_path : "\"#{full_path}\""
+      shell "#{path_based_on_mode} #{params.join(' ')}"
+    end
+
+    def security_mode
+      @security_mode || :normal
     end
 
     def executable
       arch == :any_cpu ? 'nunit-console.exe' : 'nunit-console-x86.exe'
+    end
+
+    def elevate_and_exe_path
+      # Elevate.exe needs windows style backslash path here and needs to wait for elevation to complete
+      exe_path = full_path.gsub(/\//, '\\')
+      "#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w \"#{exe_path}\""
     end
 
     def arch

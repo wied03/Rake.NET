@@ -3,6 +3,7 @@ require 'nunit'
 
 describe BradyW::Nunit do
   before(:each) do
+    ENV['nunit_filelist'] = nil
     File.stub(:exists?).with('C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe').and_return(true)
   end
 
@@ -163,5 +164,33 @@ describe BradyW::Nunit do
 
     # assert
     task.executedPop.should == "\"C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe\" /labels /noxml /framework=4.5 /timeout=35000 nunit_spec.rb"
+  end
+
+  it 'should work with normal security mode explicitly specified' do
+    # arrange
+    task = BradyW::Nunit.new do |test|
+      test.files = %w(file1.dll file2.dll)
+      test.security_mode = :normal
+    end
+
+    # act
+    task.exectaskpublic
+
+    # assert
+    task.executedPop.should == "\"C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe\" /labels /noxml /framework=4.5 /timeout=35000 file1.dll file2.dll"
+  end
+
+  it 'should work with elevated security mode specified' do
+    # arrange
+    task = BradyW::Nunit.new do |test|
+      test.files = %w(file1.dll file2.dll)
+      test.security_mode = :elevated
+    end
+
+    # act
+    task.exectaskpublic
+
+    # assert
+    task.executedPop.should == "#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w \"C:\\Program Files (x86)\\NUnit 2.6.3\\bin\\nunit-console.exe\" /labels /noxml /framework=4.5 /timeout=35000 file1.dll file2.dll"
   end
 end
