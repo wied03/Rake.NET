@@ -14,6 +14,13 @@ describe BradyW::Nunit do
     }
   end
 
+  after(:each) do
+    begin
+     File.delete 'something.txt'
+    rescue
+    end
+  end
+
   it 'throws error when NUnit could not be found' do
     File.stub(:exists?).with('C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe').and_return(false)
     File.stub(:exists?).with('C:/Program Files (x86)/NUnit-2.6.3/bin/nunit-console.exe').and_return(false)
