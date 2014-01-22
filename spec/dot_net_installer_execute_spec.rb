@@ -5,7 +5,7 @@ describe BradyW::DotNetInstallerExecute do
   before :each do
     @should_deletes = []
     @file_index = 0
-    BradyW::TempFileNameGenerator.stub(:filename) {
+    BradyW::TempFileNameGenerator.stub(:from_existing_file) {
       @file_index += 1
       file = "generated_name_#{@file_index}.xml"
       @should_deletes << file

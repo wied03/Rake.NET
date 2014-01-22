@@ -50,13 +50,13 @@ module BradyW
     end
 
     def generate_core_xml_file
-      generated_file_name = TempFileNameGenerator.filename @xml_config
+      generated_file_name = TempFileNameGenerator.from_existing_file @xml_config
       tokenize_file @xml_config, generated_file_name
       generated_file_name
     end
 
     def generate_manifest_xml_file
-      generated_file_name = TempFileNameGenerator.filename @manifest
+      generated_file_name = TempFileNameGenerator.from_existing_file @manifest
       tokenize_file @manifest, generated_file_name
       generated_file_name
     end

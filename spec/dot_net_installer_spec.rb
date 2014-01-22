@@ -6,7 +6,7 @@ describe BradyW::DotNetInstaller do
     @should_deletes = ['generated_name_1.xml', 'generated_name_2.xml']
     BswTech::DnetInstallUtil.stub(:dot_net_installer_base_path).and_return('path/to/dnetinstaller')
     @file_index = 0
-    BradyW::TempFileNameGenerator.stub(:filename) {
+    BradyW::TempFileNameGenerator.stub(:from_existing_file) {
       @file_index += 1
       "generated_name_#{@file_index}.xml"
     }

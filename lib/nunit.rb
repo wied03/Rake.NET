@@ -2,6 +2,7 @@ require 'basetask'
 require 'dotframeworksymbolhelp'
 require 'param_quotes'
 require 'path_fetcher'
+require 'temp_file_name_generator'
 
 module BradyW
   class Nunit < BaseTask
@@ -42,7 +43,7 @@ module BradyW
     # *Optional* Should :x86 or :anycpu archiecture be used?  Default is :anycpu
     attr_accessor :arch
 
-    # *Optional* :elevated or :normal, :normal by default
+    # *Optional* :elevated or :normal, :normal by default.  if :elevated, XML output will be enabled
     attr_accessor :security_mode
 
     private
@@ -51,6 +52,12 @@ module BradyW
       override = ENV['nunit_filelist']
       file_list = override ? FileList[override] : files
       assemblies = file_list.uniq.join(' ')
+      # Elevated NUnit runs in a separate window and we won't see its output in the build script
+      if security_mode == :elevated
+        @xml_output = :enabled
+        temp_file = TempFileNameGenerator.random_filename('nunitoutput','txt') unless @output
+        @output = temp_file if temp_file
+      end
       tparm = testsparam
       params = [output,
                 errors,
@@ -63,6 +70,21 @@ module BradyW
       params.reject! { |p| !p || p.empty? }
       path_based_on_mode = security_mode == :elevated ? elevate_and_exe_path : "\"#{full_path}\""
       shell "#{path_based_on_mode} #{params.join(' ')}"
+      # Elevated NUnit runs in a separate window and we won't see its output in the build script
+      if security_mode == :elevated
+        log get_file_contents(@output)
+        FileUtils.rm @output if temp_file
+      end
+    end
+
+    def get_file_contents(src_file_name)
+      text = ''
+      File.open src_file_name, 'r' do |input|
+        input.each do |line|
+          text << line
+        end
+      end
+      text
     end
 
     def security_mode

@@ -21,7 +21,7 @@ module BradyW
       params = ["/#{mode_switch}"]
       params << param_fslash('ComponentArgs', properties_flat) if @properties && @mode == :install
       params << '/q'
-      log_file = TempFileNameGenerator.filename 'log.txt'
+      log_file = TempFileNameGenerator.from_existing_file 'log.txt'
       clean_file = lambda { FileUtils.rm log_file unless ENV['PRESERVE_TEMP'] }
       params << '/Log'
       params << param_fslash('LogFile', log_file)

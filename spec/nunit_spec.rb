@@ -4,7 +4,14 @@ require 'nunit'
 describe BradyW::Nunit do
   before(:each) do
     ENV['nunit_filelist'] = nil
+    FileUtils.rm 'something.txt' if File.exists?('something.txt')
     File.stub(:exists?).with('C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe').and_return(true)
+    @should_deletes = ['generated_name_1.xml', 'generated_name_2.xml']
+    @file_index = 0
+    BradyW::TempFileNameGenerator.stub(:random_filename) {
+      @file_index += 1
+      "generated_name_#{@file_index}.xml"
+    }
   end
 
   it 'throws error when NUnit could not be found' do
@@ -186,11 +193,40 @@ describe BradyW::Nunit do
       test.files = %w(file1.dll file2.dll)
       test.security_mode = :elevated
     end
+    File.open 'generated_name_1.xml', 'w' do |f|
+      f << 'stuff from nunit'
+    end
+    console_text = []
+    task.stub(:log) { |text| console_text << text }
 
     # act
     task.exectaskpublic
 
     # assert
-    task.executedPop.should == "#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w \"C:\\Program Files (x86)\\NUnit 2.6.3\\bin\\nunit-console.exe\" /labels /noxml /framework=4.5 /timeout=35000 file1.dll file2.dll"
+    task.executedPop.should == "#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w \"C:\\Program Files (x86)\\NUnit 2.6.3\\bin\\nunit-console.exe\" /output=generated_name_1.xml /labels /framework=4.5 /timeout=35000 file1.dll file2.dll"
+    expect(console_text).to include('stuff from nunit')
+    File.should_not be_exist(@should_deletes[0])
+  end
+
+  it 'should allow the output file to be overridden in elevated mode' do
+    # arrange
+    task = BradyW::Nunit.new do |test|
+      test.files = %w(file1.dll file2.dll)
+      test.security_mode = :elevated
+      test.output = 'something.txt'
+    end
+    File.open 'something.txt', 'w' do |f|
+      f << 'stuff from nunit'
+    end
+    console_text = []
+    task.stub(:log) { |text| console_text << text }
+
+    # act
+    task.exectaskpublic
+
+    # assert
+    task.executedPop.should == "#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w \"C:\\Program Files (x86)\\NUnit 2.6.3\\bin\\nunit-console.exe\" /output=something.txt /labels /framework=4.5 /timeout=35000 file1.dll file2.dll"
+    expect(console_text).to include('stuff from nunit')
+    File.should be_exist('something.txt')
   end
 end

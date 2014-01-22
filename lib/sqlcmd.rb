@@ -148,7 +148,7 @@ module BradyW
     end
 
     def Sqlcmd.generatetempfilename
-      TempFileNameGenerator.filename 'sqlload.sql'
+      TempFileNameGenerator.from_existing_file 'sqlload.sql'
     end
 
     def path

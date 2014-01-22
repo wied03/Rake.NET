@@ -11,7 +11,7 @@ describe BradyW::TempFileNameGenerator do
     orig_file = '../dotnetinstaller.xml'
 
     # act
-    @should_delete = BradyW::TempFileNameGenerator.filename orig_file
+    @should_delete = BradyW::TempFileNameGenerator.from_existing_file orig_file
     puts "Got filename #{@should_delete}, trying to create to ensure it's a valid filename"
     FileUtils.touch @should_delete
   end
