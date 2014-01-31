@@ -142,7 +142,7 @@ module BradyW
     end
 
     def configuration
-      @build_config || :Release
+      @build_config ? @build_config.to_sym : :Release
     end
 
     def bin_dir
@@ -177,8 +177,12 @@ module BradyW
 
     def wix_constants
       props_array = []
-      props_array << 'Debug' if @build_config == :Debug
+      # This is a default in .wixproj files
+      props_array << 'Debug' if configuration == :Debug
       props_array << properties.map { |k, v| property_kv(k, v) }
+      # Preprocessor variables in projects built using traditional .csproj files need these next 2 and .csproj builds may be triggered by the WIX build
+      props_array << 'DEBUG' if configuration == :Debug
+      props_array << 'TRACE'
       props_flat = props_array.join ';'
       {
           :DefineConstants => props_flat

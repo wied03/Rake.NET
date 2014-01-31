@@ -127,7 +127,7 @@ describe BradyW::WixCoordinator do
                                         :setting2 => 'the set ting 2',
                                         :ProductVersion => '1.0.0.0',
                                         :UpgradeCode => '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7',
-                                        :DefineConstants => 'ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;setting1=the setting;setting2=the set ting 2'}
+                                        :DefineConstants => 'ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;setting1=the setting;setting2=the set ting 2;TRACE'}
   end
 
   it 'should configure the MSBuild task with proper WIX variables when semicolons exist in property values' do
@@ -155,7 +155,7 @@ describe BradyW::WixCoordinator do
                                         :setting2 => 'the set;ting 2',
                                         :ProductVersion => '1.0.0.0',
                                         :UpgradeCode => '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7',
-                                        :DefineConstants => 'ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;setting1=the setting;setting2=the set%3Bting 2'}
+                                        :DefineConstants => 'ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;setting1=the setting;setting2=the set%3Bting 2;TRACE'}
   end
 
   it 'should work properly with properties without spaces' do
@@ -183,7 +183,7 @@ describe BradyW::WixCoordinator do
                                         :setting2 => 'setting2',
                                         :ProductVersion => '1.0.0.0',
                                         :UpgradeCode => '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7',
-                                        :DefineConstants => 'ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;setting1=setting1;setting2=setting2'}
+                                        :DefineConstants => 'ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;setting1=setting1;setting2=setting2;TRACE'}
   end
 
   it 'should configure the MSBuild task' do
@@ -211,7 +211,7 @@ describe BradyW::WixCoordinator do
                                         :setting2 => 'the setting 2',
                                         :ProductVersion => '1.0.0.0',
                                         :UpgradeCode => '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7',
-                                        :DefineConstants => 'ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;setting1=the setting;setting2=the setting 2'}
+                                        :DefineConstants => 'ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;setting1=the setting;setting2=the setting 2;TRACE'}
   end
 
   it 'should configure the Paraffin task' do
@@ -319,7 +319,48 @@ describe BradyW::WixCoordinator do
                                         :setting2 => 'the setting 2',
                                         :ProductVersion => '1.0.0.0',
                                         :UpgradeCode => '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7',
-                                        :DefineConstants => 'Debug;ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;setting1=the setting;setting2=the setting 2'}
+                                        :DefineConstants => 'Debug;ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;setting1=the setting;setting2=the setting 2;DEBUG;TRACE'}
+    # DEBUG is needed for preprocessor variables
+  end
+
+  it 'allows Debug to be specified as a string, not just a symbol' do
+    # arrange
+    ms_build_mock = BradyW::MSBuild.new
+    BradyW::MSBuild.stub(:new) do |&block|
+      block[ms_build_mock]
+      ms_build_mock
+    end
+    dnet_mock = BradyW::DotNetInstaller.new
+    BradyW::DotNetInstaller.stub(:new) do |&block|
+      block[dnet_mock]
+      dnet_mock
+    end
+
+    # act
+    BradyW::WixCoordinator.new do |t|
+      t.product_version = '1.0.0.0'
+      t.wix_project_directory = 'MyWixProject'
+      t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
+      t.properties = {:setting1 => 'the setting', :setting2 => 'the setting 2'}
+      t.build_config = 'Debug'
+    end
+
+    # assert
+    dnet_mock.tokens.should == {:setting1 => 'the setting',
+                                :setting2 => 'the setting 2',
+                                :Configuration => :Debug,
+                                :ProductVersion => '1.0.0.0',
+                                :UpgradeCode => '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7',
+                                :MsiPath => 'MyWixProject/bin/Debug/MyWixProject.msi',
+                                :MsiFileName => 'MyWixProject.msi'}
+    dnet_mock.output.should == 'MyWixProject/bin/Debug/MyWixProject 1.0.0.0.exe'
+    ms_build_mock.build_config.should == :Debug
+    ms_build_mock.properties.should == {:setting1 => 'the setting',
+                                        :setting2 => 'the setting 2',
+                                        :ProductVersion => '1.0.0.0',
+                                        :UpgradeCode => '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7',
+                                        :DefineConstants => 'Debug;ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;setting1=the setting;setting2=the setting 2;DEBUG;TRACE'}
+    # DEBUG is needed for preprocessor variables
   end
 
   it 'should allow MSBuild properties like .NET version, etc. to be passed along' do
@@ -387,7 +428,7 @@ describe BradyW::WixCoordinator do
                                 :MsiFileName => 'MyWixProject.msi'}
     ms_build_mock.properties.should == {:ProductVersion => '1.0.0.0',
                                         :UpgradeCode => '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7',
-                                        :DefineConstants => 'ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'}
+                                        :DefineConstants => 'ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;TRACE'}
   end
 
   it 'executes each dependency it defines' do
@@ -418,7 +459,7 @@ describe BradyW::WixCoordinator do
 
     # assert
     command1.should == '"path/to/paraffin.exe" -update "MyWixProject/paraffin/binaries.wxs" -verbose'
-    command2.should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:setting1="the setting" /property:setting2="the setting 2" /property:DefineConstants="ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;setting1=the setting;setting2=the setting 2" MyWixProject/MyWixProject.wixproj'
+    command2.should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:setting1="the setting" /property:setting2="the setting 2" /property:DefineConstants="ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;setting1=the setting;setting2=the setting 2;TRACE" MyWixProject/MyWixProject.wixproj'
     command3.should include '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"MyWixProject/dnetinstall'
     command3.should include '/o:"MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
   end
@@ -454,7 +495,7 @@ describe BradyW::WixCoordinator do
     # assert
     command1.should == 'dependent_task'
     command2.should == '"path/to/paraffin.exe" -update "MyWixProject/paraffin/binaries.wxs" -verbose'
-    command3.should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:setting1="the setting" /property:setting2="the setting 2" /property:DefineConstants="ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;setting1=the setting;setting2=the setting 2" MyWixProject/MyWixProject.wixproj'
+    command3.should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:setting1="the setting" /property:setting2="the setting 2" /property:DefineConstants="ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;setting1=the setting;setting2=the setting 2;TRACE" MyWixProject/MyWixProject.wixproj'
     command4.should include '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"MyWixProject/dnetinstall'
     command4.should include '/o:"MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
   end
@@ -493,7 +534,7 @@ describe BradyW::WixCoordinator do
     command1.should == 'dependent_task'
     command2.should == 'dependent_task'
     command3.should == '"path/to/paraffin.exe" -update "MyWixProject/paraffin/binaries.wxs" -verbose'
-    command4.should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:setting1="the setting" /property:setting2="the setting 2" /property:DefineConstants="ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;setting1=the setting;setting2=the setting 2" MyWixProject/MyWixProject.wixproj'
+    command4.should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:setting1="the setting" /property:setting2="the setting 2" /property:DefineConstants="ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;setting1=the setting;setting2=the setting 2;TRACE" MyWixProject/MyWixProject.wixproj'
     command5.should include '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"MyWixProject/dnetinstall'
     command5.should include '/o:"MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
   end
@@ -550,7 +591,7 @@ describe BradyW::WixCoordinator do
     commands[0].should == 'dependent_task'
     commands[1].should == 'dependent_task'
     commands[2].should == '"path/to/paraffin.exe" -update "MyWixProject/paraffin/binaries.wxs" -verbose'
-    commands[3].should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:DefineConstants="ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7" MyWixProject/MyWixProject.wixproj'
+    commands[3].should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:DefineConstants="ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;TRACE" MyWixProject/MyWixProject.wixproj'
     commands[4].should == '"windowskit/path/bin/x64/signtool.exe" sign /n "The Subject" /t http://timestamp.verisign.com/scripts/timestamp.dll /d "The description" "MyWixProject/bin/Release/MyWixProject.msi"'
     commands[5].should include '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"MyWixProject/dnetinstall'
     commands[5].should include '/o:"MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
