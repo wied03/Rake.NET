@@ -15,4 +15,14 @@ describe BradyW::TempFileNameGenerator do
     puts "Got filename #{@should_delete}, trying to create to ensure it's a valid filename"
     FileUtils.touch @should_delete
   end
+
+  it 'should work OK with a random filename (not from an existing file)' do
+    # arrange
+
+    # act
+    @should_delete = BradyW::TempFileNameGenerator.random_filename 'theprefix', '.txt'
+
+    # assert
+    /theprefix_\d+\.txt/.should match @should_delete
+  end
 end

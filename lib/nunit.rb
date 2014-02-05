@@ -67,7 +67,7 @@ module BradyW
       if security_mode == :elevated
         @xml_output = :enabled
         @custom_output = @output != nil
-        temp_file = TempFileNameGenerator.random_filename('nunitoutput', 'txt') unless @custom_output
+        temp_file = TempFileNameGenerator.random_filename('nunitoutput', '.txt') unless @custom_output
         @output = temp_file if temp_file
       end
       tparm = testsparam
@@ -80,27 +80,30 @@ module BradyW
                 tparm ? param_fslash_eq('run', tparm) : '']
       params << assemblies
       params.reject! { |p| !p || p.empty? }
-      quoted_path = "\"#{full_path}\""
-      "#{quoted_path} #{params.join(' ')}"
+      "#{quoted(full_path)} #{params.join(' ')}"
     end
 
     def run_standard
       shell get_nunit_console_command_line
     end
 
+    def quote_val_if_necessary(value)
+      value.include?(' ') ? quoted(value) : value
+    end
+
     def environment_variable_lines
-      @elevated_environment_variables.map {|var,val| "set #{var}=#{val}\r\n"}
+      @elevated_environment_variables.map { |var, val| "set #{var}=#{quote_val_if_necessary(val)}\r\n" }
     end
 
     def run_elevated
-      temp_batch_file_name = TempFileNameGenerator.random_filename('run_nunit_elevated', 'bat')
+      temp_batch_file_name = TempFileNameGenerator.random_filename('run_nunit_elevated', '.bat')
       File.open temp_batch_file_name, 'w' do |file|
-        environment_variable_lines.each {|line| file << line} if @elevated_environment_variables
+        environment_variable_lines.each { |line| file << line } if @elevated_environment_variables
         file << get_nunit_console_command_line
       end
       begin
         full_path = File.expand_path temp_batch_file_name
-        shell "#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w \"#{windows_friendly_path(full_path)}\""
+        shell "#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w #{quoted(windows_friendly_path(full_path))}"
       ensure
         # Elevated NUnit runs in a separate window and we won't see its output in the build script
         log get_file_contents(@output)
