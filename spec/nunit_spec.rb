@@ -21,6 +21,7 @@ describe BradyW::Nunit do
     FileUtils.stub(:rm) { |file|
       File.delete file if file != @nunit_batch_file
     }
+    Rake.stub(:original_dir).and_return 'the/rakefile/path'
   end
 
   after(:each) do
@@ -231,8 +232,10 @@ describe BradyW::Nunit do
     windows_friendly = full_path.gsub(/\//, '\\')
     task.executedPop.should == "#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w \"#{windows_friendly}\""
     File.should be_exist(@nunit_batch_file)
-    contents = File.read @nunit_batch_file
-    contents.should == "\"C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe\" /output=generated_output_1.txt /labels /framework=4.5 /timeout=35000 file1.dll file2.dll"
+    lines = File.readlines @nunit_batch_file
+    lines.should have(2).items
+    lines[0].should == "cd the/rakefile/path\r\n"
+    lines[1].should == "\"C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe\" /output=generated_output_1.txt /labels /framework=4.5 /timeout=35000 file1.dll file2.dll"
     expect(console_text).to include('stuff from nunit')
     File.should_not be_exist(@generated_output_file)
   end
@@ -258,8 +261,10 @@ describe BradyW::Nunit do
     windows_friendly = full_path.gsub(/\//, '\\')
     task.executedPop.should == "#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w \"#{windows_friendly}\""
     File.should be_exist(@nunit_batch_file)
-    contents = File.read @nunit_batch_file
-    contents.should == "\"C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe\" /output=something.txt /labels /framework=4.5 /timeout=35000 file1.dll file2.dll"
+    lines = File.readlines @nunit_batch_file
+    lines.should have(2).items
+    lines[0].should == "cd the/rakefile/path\r\n"
+    lines[1].should == "\"C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe\" /output=something.txt /labels /framework=4.5 /timeout=35000 file1.dll file2.dll"
     expect(console_text).to include('stuff from nunit')
     File.should be_exist('something.txt')
   end
@@ -281,10 +286,11 @@ describe BradyW::Nunit do
     # assert
     File.should be_exist(@nunit_batch_file)
     lines = File.readlines @nunit_batch_file
-    lines.should have(3).items
+    lines.should have(4).items
     lines[0].should == "set var1=foo\r\n"
     lines[1].should == "set var2=bar\r\n"
-    lines[2].should == "\"C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe\" /output=generated_output_1.txt /labels /framework=4.5 /timeout=35000 file1.dll file2.dll"
+    lines[2].should == "cd the/rakefile/path\r\n"
+    lines[3].should == "\"C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe\" /output=generated_output_1.txt /labels /framework=4.5 /timeout=35000 file1.dll file2.dll"
   end
 
   it 'should allow environment variables with spaces in the values to work propoerly with NUnit console in elevated mode' do
@@ -304,9 +310,10 @@ describe BradyW::Nunit do
     # assert
     File.should be_exist(@nunit_batch_file)
     lines = File.readlines @nunit_batch_file
-    lines.should have(3).items
+    lines.should have(4).items
     lines[0].should == "set var1=foo\r\n"
     lines[1].should == "set var2=\"bar with spaces\"\r\n"
-    lines[2].should == "\"C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe\" /output=generated_output_1.txt /labels /framework=4.5 /timeout=35000 file1.dll file2.dll"
+    lines[2].should == "cd the/rakefile/path\r\n"
+    lines[3].should == "\"C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe\" /output=generated_output_1.txt /labels /framework=4.5 /timeout=35000 file1.dll file2.dll"
   end
 end

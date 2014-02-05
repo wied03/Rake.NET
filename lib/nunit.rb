@@ -60,9 +60,6 @@ module BradyW
     end
 
     def get_nunit_console_command_line
-      override = ENV['nunit_filelist']
-      file_list = override ? FileList[override] : files
-      assemblies = file_list.uniq.join(' ')
       # Elevated NUnit runs in a separate window and we won't see its output in the build script
       if security_mode == :elevated
         @xml_output = :enabled
@@ -78,7 +75,7 @@ module BradyW
                 param_fslash_eq('framework', framework_version),
                 param_fslash_eq('timeout', timeout),
                 tparm ? param_fslash_eq('run', tparm) : '']
-      params << assemblies
+      params << get_assemblies
       params.reject! { |p| !p || p.empty? }
       "#{quoted(full_path)} #{params.join(' ')}"
     end
@@ -99,6 +96,7 @@ module BradyW
       temp_batch_file_name = TempFileNameGenerator.random_filename('run_nunit_elevated', '.bat')
       File.open temp_batch_file_name, 'w' do |file|
         environment_variable_lines.each { |line| file << line } if @elevated_environment_variables
+        file << "cd #{Rake.original_dir}\r\n"
         file << get_nunit_console_command_line
       end
       begin
@@ -110,6 +108,13 @@ module BradyW
         FileUtils.rm @output unless @custom_output
         FileUtils.rm temp_batch_file_name
       end
+    end
+
+    def get_assemblies
+      override = ENV['nunit_filelist']
+      file_list = override ? FileList[override] : files
+      files_unique = file_list.uniq
+      files_unique.join(' ')
     end
 
     def windows_friendly_path(path)
