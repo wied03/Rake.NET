@@ -84,17 +84,14 @@ module BradyW
       shell get_nunit_console_command_line
     end
 
-    def quote_val_if_necessary(value)
-      value.include?(' ') ? quoted(value) : value
-    end
-
     def environment_variable_lines
-      @elevated_environment_variables.map { |var, val| "set #{var}=#{quote_val_if_necessary(val)}\r\n" }
+      @elevated_environment_variables.map { |var, val| "set #{var}=#{val}\r\n" }
     end
 
     def run_elevated
       temp_batch_file_name = TempFileNameGenerator.random_filename('run_nunit_elevated', '.bat')
-      File.open temp_batch_file_name, 'w' do |file|
+      # Need to use binary mode to avoid CRLF/Windows issues since it's picky about batch files
+      File.open temp_batch_file_name, 'wb' do |file|
         environment_variable_lines.each { |line| file << line } if @elevated_environment_variables
         file << "cd #{Rake.original_dir}\r\n"
         file << get_nunit_console_command_line

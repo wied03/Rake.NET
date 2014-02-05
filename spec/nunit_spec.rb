@@ -293,7 +293,7 @@ describe BradyW::Nunit do
     lines[3].should == "\"C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe\" /output=generated_output_1.txt /labels /framework=4.5 /timeout=35000 file1.dll file2.dll"
   end
 
-  it 'should allow environment variables with spaces in the values to work propoerly with NUnit console in elevated mode' do
+  it 'should allow environment variables with spaces in the values to work properly with NUnit console in elevated mode' do
     # arrange
     task = BradyW::Nunit.new do |test|
       test.files = %w(file1.dll file2.dll)
@@ -312,7 +312,8 @@ describe BradyW::Nunit do
     lines = File.readlines @nunit_batch_file
     lines.should have(4).items
     lines[0].should == "set var1=foo\r\n"
-    lines[1].should == "set var2=\"bar with spaces\"\r\n"
+    # On Windows, we don't escape the spaces
+    lines[1].should == "set var2=bar with spaces\r\n"
     lines[2].should == "cd the/rakefile/path\r\n"
     lines[3].should == "\"C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe\" /output=generated_output_1.txt /labels /framework=4.5 /timeout=35000 file1.dll file2.dll"
   end
