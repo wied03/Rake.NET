@@ -4,6 +4,7 @@
       <w>dnetinstall</w>
       <w>fslash</w>
       <w>msbuild</w>
+      <w>nunit</w>
       <w>regpath</w>
       <w>signmsi</w>
       <w>signtool</w>

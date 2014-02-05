@@ -6,17 +6,27 @@ describe BradyW::Nunit do
     ENV['nunit_filelist'] = nil
     FileUtils.rm 'something.txt' if File.exists?('something.txt')
     File.stub(:exists?).with('C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe').and_return(true)
-    @should_deletes = ['generated_name_1.xml', 'generated_name_2.xml']
-    @file_index = 0
-    BradyW::TempFileNameGenerator.stub(:random_filename) {
-      @file_index += 1
-      "generated_name_#{@file_index}.xml"
+    @generated_output_file = 'generated_output_1.txt'
+    @nunit_batch_file = 'run_nunit_elevated.bat'
+    BradyW::TempFileNameGenerator.stub(:random_filename) { |base, extension|
+      extension == 'bat' ? @nunit_batch_file : @generated_output_file
+    }
+    FileUtils.stub(:rm) { |file|
+      File.delete file if file != @nunit_batch_file
     }
   end
 
   after(:each) do
     begin
-     File.delete 'something.txt'
+      File.delete 'something.txt'
+    rescue
+    end
+    begin
+      File.delete @generated_output_file
+    rescue
+    end
+    begin
+      File.delete @nunit_batch_file
     rescue
     end
   end
@@ -200,7 +210,7 @@ describe BradyW::Nunit do
       test.files = %w(file1.dll file2.dll)
       test.security_mode = :elevated
     end
-    File.open 'generated_name_1.xml', 'w' do |f|
+    File.open @generated_output_file, 'w' do |f|
       f << 'stuff from nunit'
     end
     console_text = []
@@ -210,9 +220,14 @@ describe BradyW::Nunit do
     task.exectaskpublic
 
     # assert
-    task.executedPop.should == "#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w \"C:\\Program Files (x86)\\NUnit 2.6.3\\bin\\nunit-console.exe\" /output=generated_name_1.xml /labels /framework=4.5 /timeout=35000 file1.dll file2.dll"
+    full_path = File.expand_path @nunit_batch_file
+    windows_friendly = full_path.gsub(/\//, '\\')
+    task.executedPop.should == "#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w \"#{windows_friendly}\""
+    File.should be_exist(@nunit_batch_file)
+    contents = File.read @nunit_batch_file
+    contents.should == "\"C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe\" /output=generated_output_1.txt /labels /framework=4.5 /timeout=35000 file1.dll file2.dll"
     expect(console_text).to include('stuff from nunit')
-    File.should_not be_exist(@should_deletes[0])
+    File.should_not be_exist(@generated_output_file)
   end
 
   it 'should allow the output file to be overridden in elevated mode' do
@@ -232,8 +247,36 @@ describe BradyW::Nunit do
     task.exectaskpublic
 
     # assert
-    task.executedPop.should == "#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w \"C:\\Program Files (x86)\\NUnit 2.6.3\\bin\\nunit-console.exe\" /output=something.txt /labels /framework=4.5 /timeout=35000 file1.dll file2.dll"
+    full_path = File.expand_path @nunit_batch_file
+    windows_friendly = full_path.gsub(/\//, '\\')
+    task.executedPop.should == "#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w \"#{windows_friendly}\""
+    File.should be_exist(@nunit_batch_file)
+    contents = File.read @nunit_batch_file
+    contents.should == "\"C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe\" /output=something.txt /labels /framework=4.5 /timeout=35000 file1.dll file2.dll"
     expect(console_text).to include('stuff from nunit')
     File.should be_exist('something.txt')
+  end
+
+  it 'should allow environment variables to be passed on to NUnit Console in elevated mode' do
+    # arrange
+    task = BradyW::Nunit.new do |test|
+      test.files = %w(file1.dll file2.dll)
+      test.security_mode = :elevated
+      test.elevated_environment_variables = {:var1 => 'foo', :var2 => 'bar'}
+    end
+    File.open @generated_output_file, 'w' do |f|
+      f << 'stuff from nunit'
+    end
+
+    # act
+    task.exectaskpublic
+
+    # assert
+    File.should be_exist(@nunit_batch_file)
+    lines = File.readlines @nunit_batch_file
+    lines.should have(3).items
+    lines[0].should == "set var1=foo\r\n"
+    lines[1].should == "set var2=bar\r\n"
+    lines[2].should ==  "\"C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe\" /output=generated_output_1.txt /labels /framework=4.5 /timeout=35000 file1.dll file2.dll"
   end
 end

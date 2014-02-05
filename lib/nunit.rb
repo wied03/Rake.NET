@@ -46,16 +46,28 @@ module BradyW
     # *Optional* :elevated or :normal, :normal by default.  if :elevated, XML output will be enabled
     attr_accessor :security_mode
 
+    # *Optional* If using :elevated security_mode, you can specify which environment variables you want passed on to the NUnit console process here.  If not using elevated mode, this is ignored
+    attr_accessor :elevated_environment_variables
+
     private
 
     def exectask
+      if security_mode == :elevated
+        run_elevated
+      else
+        run_standard
+      end
+    end
+
+    def get_nunit_console_command_line
       override = ENV['nunit_filelist']
       file_list = override ? FileList[override] : files
       assemblies = file_list.uniq.join(' ')
       # Elevated NUnit runs in a separate window and we won't see its output in the build script
       if security_mode == :elevated
         @xml_output = :enabled
-        temp_file = TempFileNameGenerator.random_filename('nunitoutput','txt') unless @output
+        @custom_output = @output != nil
+        temp_file = TempFileNameGenerator.random_filename('nunitoutput', 'txt') unless @custom_output
         @output = temp_file if temp_file
       end
       tparm = testsparam
@@ -68,13 +80,37 @@ module BradyW
                 tparm ? param_fslash_eq('run', tparm) : '']
       params << assemblies
       params.reject! { |p| !p || p.empty? }
-      path_based_on_mode = security_mode == :elevated ? elevate_and_exe_path : "\"#{full_path}\""
-      shell "#{path_based_on_mode} #{params.join(' ')}"
-      # Elevated NUnit runs in a separate window and we won't see its output in the build script
-      if security_mode == :elevated
-        log get_file_contents(@output)
-        FileUtils.rm @output if temp_file
+      quoted_path = "\"#{full_path}\""
+      "#{quoted_path} #{params.join(' ')}"
+    end
+
+    def run_standard
+      shell get_nunit_console_command_line
+    end
+
+    def environment_variable_lines
+      @elevated_environment_variables.map {|var,val| "set #{var}=#{val}\r\n"}
+    end
+
+    def run_elevated
+      temp_batch_file_name = TempFileNameGenerator.random_filename('run_nunit_elevated', 'bat')
+      File.open temp_batch_file_name, 'w' do |file|
+        environment_variable_lines.each {|line| file << line} if @elevated_environment_variables
+        file << get_nunit_console_command_line
       end
+      begin
+        full_path = File.expand_path temp_batch_file_name
+        shell "#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w \"#{windows_friendly_path(full_path)}\""
+      ensure
+        # Elevated NUnit runs in a separate window and we won't see its output in the build script
+        log get_file_contents(@output)
+        FileUtils.rm @output unless @custom_output
+        FileUtils.rm temp_batch_file_name
+      end
+    end
+
+    def windows_friendly_path(path)
+      path.gsub(/\//, '\\')
     end
 
     def get_file_contents(src_file_name)
@@ -93,12 +129,6 @@ module BradyW
 
     def executable
       arch == :any_cpu ? 'nunit-console.exe' : 'nunit-console-x86.exe'
-    end
-
-    def elevate_and_exe_path
-      # Elevate.exe needs windows style backslash path here and needs to wait for elevation to complete
-      exe_path = full_path.gsub(/\//, '\\')
-      "#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w \"#{exe_path}\""
     end
 
     def arch
