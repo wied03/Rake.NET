@@ -5,9 +5,16 @@ describe BradyW::DotNetInstallerExecute do
   before :each do
     @should_deletes = []
     @file_index = 0
-    BradyW::TempFileNameGenerator.stub(:from_existing_file) {
-      @file_index += 1
-      file = "generated_name_#{@file_index}.xml"
+    BradyW::TempFileNameGenerator.stub(:random_filename) { |base, ext|
+      file =
+          case base
+            when 'msi_log'
+              'msi_log.txt'
+            when 'dnet_log'
+              'dnet_log.txt'
+            else
+              raise "Unknown extension #{extension}"
+          end
       @should_deletes << file
       file
     }
@@ -19,11 +26,14 @@ describe BradyW::DotNetInstallerExecute do
     @should_deletes.each { |f| rm f if (f && File.exists?(f)) }
   end
 
-  def mock_output_and_log_message(task, message)
+  def mock_output_and_log_messages(task, dnet_message, msi_message)
     task.stub(:shell) { |*commands, &block|
       # Simulate dotNetInstaller logging to the file
-      File.open @should_deletes.last, 'w' do |writer|
-        writer << message
+      File.open 'dnet_log.txt', 'w' do |writer|
+        writer << dnet_message
+      end
+      File.open 'msi_log.txt', 'w' do |writer|
+        writer << msi_message
       end
       puts commands
       @commands = commands
@@ -37,14 +47,30 @@ describe BradyW::DotNetInstallerExecute do
       t.path = 'stuff/some.exe'
       t.mode = :install
     end
-    mock_output_and_log_message task, '2014-01-15 00:34:27	dotNetInstaller finished, return code: 0 (0x0)'
+    mock_output_and_log_messages task, '2014-01-15 00:34:27	dotNetInstaller finished, return code: 0 (0x0)', 'MSI log messages'
 
     # act
     task.exectaskpublic
-    command = task.executedPop
 
     # assert
-    expect(@commands.first).to eq("#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w \"stuff\\some.exe\" /i /q /Log /LogFile generated_name_1.xml")
+    expect(@commands.first).to eq("#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w \"stuff\\some.exe\" /i /ComponentArgs *:\"/l* msi_log.txt\" /q /Log /LogFile dnet_log.txt")
+  end
+
+  it 'should output MSI and dnet installer log messages to the console' do
+    # arrange
+    task = BradyW::DotNetInstallerExecute.new do |t|
+      t.path = 'stuff/some.exe'
+      t.mode = :install
+    end
+    mock_output_and_log_messages task, '2014-01-15 00:34:27	dotNetInstaller finished, return code: 0 (0x0)', 'MSI log messages'
+    console_text = []
+    task.stub(:log) { |text| console_text << text }
+
+    # act
+    task.exectaskpublic
+
+    # assert
+    expect(console_text).to eq([".NET Installer Log", "2014-01-15 00:34:27\tdotNetInstaller finished, return code: 0 (0x0)", "\nMSI Log:", "MSI log messages"])
   end
 
   it 'should work properly in install mode with a single property' do
@@ -54,14 +80,14 @@ describe BradyW::DotNetInstallerExecute do
       t.mode = :install
       t.properties = {:SOMETHING => 'stuff'}
     end
-    mock_output_and_log_message task, '2014-01-15 00:34:27	dotNetInstaller finished, return code: 0 (0x0)'
+    mock_output_and_log_messages task, '2014-01-15 00:34:27	dotNetInstaller finished, return code: 0 (0x0)', 'MSI log messages'
 
     # act
     task.exectaskpublic
     command = task.executedPop
 
     # assert
-    expect(@commands.first).to eq("#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w \"some.exe\" /i /ComponentArgs *:\"SOMETHING=stuff\" /q /Log /LogFile generated_name_1.xml")
+    expect(@commands.first).to eq("#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w \"some.exe\" /i /ComponentArgs *:\"/l* msi_log.txt SOMETHING=stuff\" /q /Log /LogFile dnet_log.txt")
   end
 
   it 'should work properly in install mode with multiple properties with whitespace and quotes' do
@@ -71,14 +97,14 @@ describe BradyW::DotNetInstallerExecute do
       t.mode = :install
       t.properties = {:SOMETHING => 'stuff', :SPACES => 'hi there', :QUOTES => 'hello "there" joe'}
     end
-    mock_output_and_log_message task, '2014-01-15 00:34:27	dotNetInstaller finished, return code: 0 (0x0)'
+    mock_output_and_log_messages task, '2014-01-15 00:34:27	dotNetInstaller finished, return code: 0 (0x0)', 'MSI log messages'
 
     # act
     task.exectaskpublic
     command = task.executedPop
 
     # assert
-    expect(@commands.first).to eq(BswTech::DnetInstallUtil::ELEVATE_EXE+' -w "some.exe" /i /ComponentArgs *:"SOMETHING=stuff SPACES=""hi there"" QUOTES=""hello """"there"""" joe""" /q /Log /LogFile generated_name_1.xml')
+    expect(@commands.first).to eq(BswTech::DnetInstallUtil::ELEVATE_EXE+' -w "some.exe" /i /ComponentArgs *:"/l* msi_log.txt SOMETHING=stuff SPACES=""hi there"" QUOTES=""hello """"there"""" joe""" /q /Log /LogFile dnet_log.txt')
   end
 
   it 'should work properly with uninstall' do
@@ -87,14 +113,14 @@ describe BradyW::DotNetInstallerExecute do
       t.path = 'some.exe'
       t.mode = :uninstall
     end
-    mock_output_and_log_message task, '2014-01-15 00:34:27	dotNetInstaller finished, return code: 0 (0x0)'
+    mock_output_and_log_messages task, '2014-01-15 00:34:27	dotNetInstaller finished, return code: 0 (0x0)', 'MSI log messages'
 
     # act
     task.exectaskpublic
     command = task.executedPop
 
     # assert
-    expect(@commands.first).to eq("#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w \"some.exe\" /x /q /Log /LogFile generated_name_1.xml")
+    expect(@commands.first).to eq("#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w \"some.exe\" /x /ComponentArgs *:\"/l* msi_log.txt\" /q /Log /LogFile dnet_log.txt")
   end
 
   it 'should require mode and path' do
@@ -122,7 +148,7 @@ describe BradyW::DotNetInstallerExecute do
       t.path = 'some.exe'
       t.mode = :install
     end
-    mock_output_and_log_message task, '2014-01-15 00:34:27	dotNetInstaller finished, return code: 1 (0x1)'
+    mock_output_and_log_messages task, '2014-01-15 00:34:27	dotNetInstaller finished, return code: 1 (0x1)', 'MSI log messages'
 
     # act + assert
     lambda { task.exectaskpublic }.should raise_exception 'Due to failure message in logs, this task has failed'
@@ -134,13 +160,14 @@ describe BradyW::DotNetInstallerExecute do
       t.path = 'some.exe'
       t.mode = :install
     end
-    mock_output_and_log_message task, '2014-01-15 00:34:27	dotNetInstaller finished, return code: 0 (0x0)'
+    mock_output_and_log_messages task, '2014-01-15 00:34:27	dotNetInstaller finished, return code: 0 (0x0)', 'MSI log messages'
 
     # act
     task.exectaskpublic
 
     # assert
     File.should_not be_exist(@should_deletes[0])
+    File.should_not be_exist(@should_deletes[1])
   end
 
   it 'should clean up temporary log files upon failure' do
@@ -149,12 +176,13 @@ describe BradyW::DotNetInstallerExecute do
       t.path = 'some.exe'
       t.mode = :install
     end
-    mock_output_and_log_message task, '2014-01-15 00:34:27	dotNetInstaller finished, return code: 1 (0x1)'
+    mock_output_and_log_messages task, '2014-01-15 00:34:27	dotNetInstaller finished, return code: 1 (0x1)', 'MSI log messages'
 
     # act
     lambda { task.exectaskpublic }.should raise_exception 'Due to failure message in logs, this task has failed'
 
     # assert
     File.should_not be_exist(@should_deletes[0])
+    File.should_not be_exist(@should_deletes[1])
   end
 end

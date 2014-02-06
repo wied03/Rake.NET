@@ -18,20 +18,29 @@ module BradyW
 
     def exectask
       validate
+      msi_log_file = TempFileNameGenerator.random_filename 'msi_log','.txt'
+      @msiexec_arguments = {'l*' => msi_log_file}
       params = ["/#{mode_switch}"]
-      params << param_fslash('ComponentArgs', properties_flat) if @properties && @mode == :install
+      params << param_fslash('ComponentArgs', properties_flat)
       params << '/q'
-      log_file = TempFileNameGenerator.from_existing_file 'log.txt'
-      clean_file = lambda { FileUtils.rm log_file unless ENV['PRESERVE_TEMP'] }
+      dnet_inst_log_file = TempFileNameGenerator.random_filename 'dnet_log','.txt'
+      clean_file = lambda {
+        FileUtils.rm dnet_inst_log_file
+        FileUtils.rm msi_log_file
+      }
       params << '/Log'
-      params << param_fslash('LogFile', log_file)
+      params << param_fslash('LogFile', dnet_inst_log_file)
       params_flat = params.join ' '
       shell "#{elevate_and_exe_path} #{params_flat}" do |ok, status|
-        contents = get_file_contents log_file
-        puts contents
+        dnet_contents = get_file_contents dnet_inst_log_file
+        log ".NET Installer Log"
+        log dnet_contents
+        msi_contents = get_file_contents msi_log_file
+        log "\nMSI Log:"
+        log msi_contents
         puts 'Ignoring return code since these seem to invalid, instead checking log file for success'
-        success = contents.match(/dotNetInstaller finished, return code: 0 \(0x0\)/)
-        clean_file.call
+        success = dnet_contents.match(/dotNetInstaller finished, return code: 0 \(0x0\)/)
+        clean_file.call unless ENV['PRESERVE_TEMP']
         puts 'Successful return code, task finished' if success
         fail 'Due to failure message in logs, this task has failed' unless success
       end
@@ -72,7 +81,8 @@ module BradyW
     end
 
     def properties_flat
-      props_list = properties.map { |k, v| "#{k}=#{escape_prop_value(v)}" }
+      props_list = @msiexec_arguments.map { |k, v| param_fslash(k, escape_prop_value(v)) }
+      props_list << properties.map { |k, v| "#{k}=#{escape_prop_value(v)}" } if @properties
       props_flat = props_list.join ' '
       "*:\"#{props_flat}\""
     end
