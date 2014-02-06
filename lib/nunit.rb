@@ -19,8 +19,8 @@ module BradyW
     # *Optional* What version of the .NET framework to use for the tests?  :v2_0, :v3_5, :v4_0, :v4_5, defaults to :v4_5
     attr_accessor :framework_version
 
-    # *Optional* Full path of nunit-console.exe, defaults to C:\Program Files (x86)\NUnit ${version}\bin\nunit-console.exe
-    attr_accessor :path
+    # *Optional* Path where nunit-console.exe lives, defaults to C:\Program Files (x86)\NUnit ${version}\bin
+    attr_accessor :base_path
 
     # *Optional* Timeout for each test case in milliseconds, by default the timeout is 35 seconds
     attr_accessor :timeout
@@ -178,8 +178,10 @@ module BradyW
     end
 
     def full_path
-      possibleDirectories = ["NUnit #{version}", "NUnit-#{version}"]
-      candidates = @path ? [@path] : possibleDirectories.map { |p| File.join(PROGRAM_FILES_DIR, p, "bin", executable) }
+      dirs_under_program_files = ["NUnit #{version}", "NUnit-#{version}"]
+      full_dirs_under_program_files =  dirs_under_program_files.map {|d| File.join(PROGRAM_FILES_DIR, d, 'bin')}
+      possibleDirectories = @base_path ? [@base_path] : full_dirs_under_program_files
+      candidates = possibleDirectories.map { |p| File.join(p, executable) }
       found = candidates.detect { |c| File.exists? c }
       return found if found
       raise "We checked the following locations and could not find nunit-console.exe #{candidates}"

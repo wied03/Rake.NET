@@ -86,20 +86,31 @@ describe BradyW::Nunit do
   end
 
   it 'uses a configured custom path' do
-    File.stub(:exists?).with("C:\\SomeOtherplace\\nunit-console.exe").and_return(true)
+    File.stub(:exists?).with("C:\\SomeOtherplace/nunit-console.exe").and_return(true)
     task = BradyW::Nunit.new do |test|
       test.files = %w(file1.dll file2.dll)
-      test.path = 'C:\\SomeOtherplace\\nunit-console.exe'
+      test.base_path = 'C:\\SomeOtherplace'
     end
     task.exectaskpublic
-    task.executedPop.should == "\"C:\\SomeOtherplace\\nunit-console.exe\" /labels /noxml /framework=4.5 /timeout=35000 file1.dll file2.dll"
+    task.executedPop.should == "\"C:\\SomeOtherplace/nunit-console.exe\" /labels /noxml /framework=4.5 /timeout=35000 file1.dll file2.dll"
   end
+
+  it 'uses a configured custom path with x86' do
+      File.stub(:exists?).with("C:\\SomeOtherplace/nunit-console-x86.exe").and_return(true)
+      task = BradyW::Nunit.new do |test|
+        test.files = %w(file1.dll file2.dll)
+        test.base_path = 'C:\\SomeOtherplace'
+        test.arch = :x86
+      end
+      task.exectaskpublic
+      task.executedPop.should == "\"C:\\SomeOtherplace/nunit-console-x86.exe\" /labels /noxml /framework=4.5 /timeout=35000 file1.dll file2.dll"
+    end
 
   it 'uses a configured custom path and the console is not found' do
     File.stub(:exists?).with("C:/SomeOtherplace/nunit-console.exe").and_return(false)
     task = BradyW::Nunit.new do |test|
       test.files = %w(file1.dll file2.dll)
-      test.path = 'C:/SomeOtherplace/nunit-console.exe'
+      test.base_path = 'C:/SomeOtherplace'
     end
 
     lambda { task.exectaskpublic }.should raise_exception "We checked the following locations and could not find nunit-console.exe [\"C:/SomeOtherplace/nunit-console.exe\"]"
