@@ -74,8 +74,10 @@ module BradyW
     end
 
     def escape_prop_value value
+      # nil values can be sent to the MSI inside quotes
+      value = '' if !value
       quotes_handled = double_the_quotes value
-      spaces_handled = quotes_handled.include?(' ') ? quoted(quotes_handled) : quotes_handled
+      spaces_handled = quotes_handled.include?(' ') || value == '' ? quoted(quotes_handled) : quotes_handled
       # Need 4x the quotes for property values that contain quotes and 2X the quotes when we surround with a quote due to a space
       double_the_quotes spaces_handled
     end

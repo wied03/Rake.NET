@@ -317,4 +317,29 @@ describe BradyW::Nunit do
     lines[2].should == "cd the/rakefile/path\r\n"
     lines[3].should == "\"C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe\" /output=generated_output_1.txt /labels /framework=4.5 /timeout=35000 file1.dll file2.dll"
   end
+
+  it 'should not freak out with environment variables of nil value' do
+    # arrange
+    task = BradyW::Nunit.new do |test|
+      test.files = %w(file1.dll file2.dll)
+      test.security_mode = :elevated
+      test.elevated_environment_variables = {:var1 => 'foo', :var2 => nil}
+    end
+    File.open @generated_output_file, 'w' do |f|
+      f << 'stuff from nunit'
+    end
+
+    # act
+    task.exectaskpublic
+
+    # assert
+    File.should be_exist(@nunit_batch_file)
+    lines = File.readlines @nunit_batch_file
+    lines.should have(4).items
+    lines[0].should == "set var1=foo\r\n"
+    # On Windows, we don't escape the spaces
+    lines[1].should == "set var2=\r\n"
+    lines[2].should == "cd the/rakefile/path\r\n"
+    lines[3].should == "\"C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe\" /output=generated_output_1.txt /labels /framework=4.5 /timeout=35000 file1.dll file2.dll"
+  end
 end

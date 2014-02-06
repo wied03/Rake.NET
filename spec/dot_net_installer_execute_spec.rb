@@ -84,10 +84,26 @@ describe BradyW::DotNetInstallerExecute do
 
     # act
     task.exectaskpublic
-    command = task.executedPop
 
     # assert
     expect(@commands.first).to eq("#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w \"some.exe\" /i /ComponentArgs *:\"/l* msi_log.txt SOMETHING=stuff\" /q /Log /LogFile dnet_log.txt")
+  end
+
+  it 'should not freak out if a nil value is passed for a property' do
+    # arrange
+    ENV['foobar'] = nil
+    task = BradyW::DotNetInstallerExecute.new do |t|
+      t.path = 'some.exe'
+      t.mode = :install
+      t.properties = {:SOMETHING => nil}
+    end
+    mock_output_and_log_messages task, '2014-01-15 00:34:27	dotNetInstaller finished, return code: 0 (0x0)', 'MSI log messages'
+
+    # act
+    task.exectaskpublic
+
+    # assert
+    expect(@commands.first).to eq(BswTech::DnetInstallUtil::ELEVATE_EXE+' -w "some.exe" /i /ComponentArgs *:"/l* msi_log.txt SOMETHING=""""" /q /Log /LogFile dnet_log.txt')
   end
 
   it 'should work properly in install mode with multiple properties with whitespace and quotes' do
