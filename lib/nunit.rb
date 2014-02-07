@@ -31,6 +31,12 @@ module BradyW
     # *Optional* Should XML be outputted?  By default the answer is no, but set this to :enabled if you want XML output
     attr_accessor :xml_output
 
+    # *Optional* If NUnit should be run as a different user, supply the username here.  You must supply :run_as_password as well
+    attr_accessor :run_as_user
+
+    # *Optional* The password for the user specified under :run_as_user
+    attr_accessor :run_as_password
+
     # *Optional* Should labels be printed in the test output, default is :include_labels, can also say :exclude_labels
     attr_accessor :labels
 
@@ -43,7 +49,7 @@ module BradyW
     # *Optional* Should :x86 or :anycpu archiecture be used?  Default is :anycpu
     attr_accessor :arch
 
-    # *Optional* :elevated or :normal, :normal by default.  if :elevated, XML output will be enabled
+    # *Optional* :elevated, :normal :normal by default.  if :elevated, XML output will be enabled
     attr_accessor :security_mode
 
     # *Optional* If using :elevated security_mode, you can specify which environment variables you want passed on to the NUnit console process here.  If not using elevated mode, this is ignored

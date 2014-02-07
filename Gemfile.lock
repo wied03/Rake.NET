@@ -1,8 +1,8 @@
 GIT
   remote: git://github.com/wied03/Win32TestStub.git
-  revision: 9aa7f0c5e6d36ef376b082df7dd0028d02523826
+  revision: 38ebf782360516ff8762f1bec41d31c26316ad88
   specs:
-    win32stub (1.0.1)
+    win32stub (1.0.2)
 
 GEM
   remote: https://rubygems.org/
@@ -57,4 +57,4 @@ DEPENDENCIES
   geminabox
   rake
   rspec
-  win32stub (= 1.0.1)!
+  win32stub (= 1.0.2)!
