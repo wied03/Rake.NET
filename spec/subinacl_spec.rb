@@ -9,36 +9,46 @@ describe BradyW::Subinacl do
     BradyW::TempFileNameGenerator.stub(:random_filename) { |base, ext|
       file =
           case base
-            when 'run_subinacl_without_output_redirect'
-              'run_subinacl_without_output_redirect.bat'
+            when 'run_subinacl_with_output_redirect'
+              "#{base}#{ext}"
+            when 'subinacl_log'
+              "#{base}#{ext}"
             else
               raise "Unknown extension #{extension}"
           end
       @should_deletes << file
       file
     }
+    # Need to examine the batch file as part of our tests
+    FileUtils.stub(:rm) { |file|
+      File.delete file if file != 'run_subinacl_with_output_redirect.bat'
+    }
     @commands = []
     ENV['PRESERVE_TEMP'] = nil
+    File.stub(:expand_path) {|f| "/some/base/dir/#{f}" }
   end
 
   after :each do
-    @should_deletes.each { |f| rm f if (f && File.exists?(f)) }
+    @should_deletes.each { |f| File.delete f if (f && File.exists?(f)) }
+    File.unstub(:expand_path)
   end
 
 
-  def generate_subinacl_output(error_count)
-    "Done:        0, Modified        0, Failed        0, Syntax errors        #{error_count}"
+  def generate_subinacl_output(opts)
+    "Done:        0, Modified        0, Failed        #{opts[:failure_count_to_indicate]}, Syntax errors        #{opts[:syntax_error_count_to_indicate]}"
   end
 
-  def mock_output_and_log_messages(task, options)
-    task.stub(:shell) { |*commands, &block|
+  def mock_output_and_log_messages(options)
+    task = options.is_a?(Hash) ? options[:task] : options
+    opts = {:syntax_error_count_to_indicate => 0, :failure_count_to_indicate => 0}
+    opts.merge! options if options.is_a?(Hash)
+    task.stub(:shell) { |*commands|
       # Simulate dotNetInstaller logging to the file
-      File.open 'run_subinacl_without_output_redirect.bat', 'w' do |writer|
-        writer << generate_subinacl_output(options[:error_count_to_indicate])
+      File.open 'subinacl_log.txt', 'w' do |writer|
+        writer << generate_subinacl_output(opts)
       end
       puts commands
       @commands = commands
-      block.call
     }
   end
 
@@ -48,14 +58,20 @@ describe BradyW::Subinacl do
       t.service_to_grant_access_to = 'theservice'
       t.user_to_grant_top_access_to = 'theuser'
     end
-    task.should_receive(:subinacl_path).and_return('\path\to\subinacl.exe')
-    mock_output_and_log_messages task, :error_count_to_indicate => 0
+    task.stub(:subinacl_path).and_return('\path\to\subinacl.exe')
+    mock_output_and_log_messages task
 
     # act
     task.exectaskpublic
 
     # assert
-    @commands.should include "#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w \"\\path\\to\\subinacl.exe\" /service theservice /grant=theuser=top"
+    full_path = File.expand_path 'run_subinacl_with_output_redirect.bat'
+    windows_friendly = full_path.gsub(/\//, '\\')
+    @commands.should include "#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w \"#{windows_friendly}\""
+    File.should be_exist('run_subinacl_with_output_redirect.bat')
+    lines = File.readlines 'run_subinacl_with_output_redirect.bat'
+    lines.should have(1).items
+    lines[0].should == '"\path\to\subinacl.exe" /service theservice /grant=theuser=top 1> "\some\base\dir\subinacl_log.txt" 2>&1'
   end
 
   it 'should run Subinacl properly when spaces are in path' do
@@ -64,14 +80,20 @@ describe BradyW::Subinacl do
       t.service_to_grant_access_to = 'theservice'
       t.user_to_grant_top_access_to = 'theuser'
     end
-    task.should_receive(:subinacl_path).and_return('\path\to the\subinacl.exe')
-    mock_output_and_log_messages task, :error_count_to_indicate => 0
+    task.stub(:subinacl_path).and_return('\path\to the\subinacl.exe')
+    mock_output_and_log_messages task
 
     # act
     task.exectaskpublic
 
     # assert
-    @commands.should include "#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w \"\\path\\to the\\subinacl.exe\" /service theservice /grant=theuser=top"
+    full_path = File.expand_path 'run_subinacl_with_output_redirect.bat'
+    windows_friendly = full_path.gsub(/\//, '\\')
+    @commands.should include "#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w \"#{windows_friendly}\""
+    File.should be_exist('run_subinacl_with_output_redirect.bat')
+    lines = File.readlines 'run_subinacl_with_output_redirect.bat'
+    lines.should have(1).items
+    lines[0].should == '"\path\to the\subinacl.exe" /service theservice /grant=theuser=top 1> "\some\base\dir\subinacl_log.txt" 2>&1'
   end
 
   it 'should output log information to the console' do
@@ -80,8 +102,8 @@ describe BradyW::Subinacl do
       t.service_to_grant_access_to = 'theservice'
       t.user_to_grant_top_access_to = 'theuser'
     end
-    task.should_receive(:subinacl_path).and_return('\path\to the\subinacl.exe')
-    mock_output_and_log_messages task, :error_count_to_indicate => 0
+    task.stub(:subinacl_path).and_return('\path\to the\subinacl.exe')
+    mock_output_and_log_messages task
     console_text = []
     task.stub(:log) { |text| console_text << text }
 
@@ -89,20 +111,32 @@ describe BradyW::Subinacl do
     task.exectaskpublic
 
     # assert
-    console_text.should == 'subinacl output'
+    console_text.should include('Done:        0, Modified        0, Failed        0, Syntax errors        0')
   end
 
-  it 'should fail if Subinacl outputs an error count since subinacl doesnt use return codes properly' do
+  it 'should fail if Subinacl outputs a failure count since subinacl doesnt use return codes properly' do
     task = BradyW::Subinacl.new do |t|
       t.service_to_grant_access_to = 'theservice'
       t.user_to_grant_top_access_to = 'theuser'
     end
-    task.should_receive(:subinacl_path).and_return('\path\to\subinacl.exe')
-    mock_output_and_log_messages task, :error_count_to_indicate => 1
+    task.stub(:subinacl_path).and_return('\path\to\subinacl.exe')
+    mock_output_and_log_messages :task => task, :failure_count_to_indicate => 1
 
     # act + assert
-    lambda { task.exectaskpublic }.should raise_exception 'Subinacl failed'
+    lambda { task.exectaskpublic }.should raise_exception 'Subinacl failed due to syntax errors or failures in making the requested change'
   end
+
+  it 'should fail if Subinacl outputs a syntax error since subinacl doesnt use return codes properly' do
+      task = BradyW::Subinacl.new do |t|
+        t.service_to_grant_access_to = 'theservice'
+        t.user_to_grant_top_access_to = 'theuser'
+      end
+      task.stub(:subinacl_path).and_return('\path\to\subinacl.exe')
+      mock_output_and_log_messages :task => task, :syntax_error_count_to_indicate => 1
+
+      # act + assert
+      lambda { task.exectaskpublic }.should raise_exception 'Subinacl failed due to syntax errors or failures in making the requested change'
+    end
 
   it 'should complain if subnacl is not installed' do
     # arrange
@@ -110,10 +144,10 @@ describe BradyW::Subinacl do
       t.service_to_grant_access_to = 'theservice'
       t.user_to_grant_top_access_to = 'theuser'
     end
-    task.should_receive(:subinacl_path).and_return(nil)
+    task.stub(:subinacl_path).and_return(nil)
 
     # act + assert
-    lambda { task.exectaskpublic }.should raise_exception 'Subinacl not found on your system.  Did you install MSI version XXX?'
+    lambda { task.exectaskpublic }.should raise_exception 'Subinacl not found on your system.  Did you install MSI version 5.2.3790 ?'
   end
 
   it 'should delete temporary log file when successful' do
@@ -122,13 +156,14 @@ describe BradyW::Subinacl do
       t.service_to_grant_access_to = 'theservice'
       t.user_to_grant_top_access_to = 'theuser'
     end
-    task.should_receive(:subinacl_path).and_return('\path\to the\subinacl.exe')
-    mock_output_and_log_messages task, :error_count_to_indicate => 0
+    task.stub(:subinacl_path).and_return('\path\to the\subinacl.exe')
+    mock_output_and_log_messages task
 
     # act
     task.exectaskpublic
 
     # assert
+    File.should_not be_exist('subinacl_log.txt')
     File.should_not be_exist('run_subinacl_without_output_redirect.bat')
   end
 
@@ -138,13 +173,14 @@ describe BradyW::Subinacl do
       t.service_to_grant_access_to = 'theservice'
       t.user_to_grant_top_access_to = 'theuser'
     end
-    task.should_receive(:subinacl_path).and_return('\path\to the\subinacl.exe')
-    mock_output_and_log_messages task, :error_count_to_indicate => 1
+    task.stub(:subinacl_path).and_return('\path\to the\subinacl.exe')
+    mock_output_and_log_messages :task => task, :syntax_error_count_to_indicate => 1
 
     # act
-    task.exectaskpublic
+    lambda {task.exectaskpublic}.should raise_exception
 
     # assert
+    File.should_not be_exist('subinacl_log.txt')
     File.should_not be_exist('run_subinacl_without_output_redirect.bat')
   end
 
@@ -155,13 +191,14 @@ describe BradyW::Subinacl do
       t.service_to_grant_access_to = 'theservice'
       t.user_to_grant_top_access_to = 'theuser'
     end
-    task.should_receive(:subinacl_path).and_return('\path\to the\subinacl.exe')
-    mock_output_and_log_messages task, :error_count_to_indicate => 0
+    task.stub(:subinacl_path).and_return('\path\to the\subinacl.exe')
+    mock_output_and_log_messages task
 
     # act
     task.exectaskpublic
 
     # assert
-    File.should be_exist('run_subinacl_without_output_redirect.bat')
+    File.should be_exist('subinacl_log.txt')
+    File.should be_exist('run_subinacl_with_output_redirect.bat')
   end
 end

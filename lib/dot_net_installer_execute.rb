@@ -40,7 +40,7 @@ module BradyW
         log msi_contents
         puts 'Ignoring return code since these seem to invalid, instead checking log file for success'
         success = dnet_contents.match(/dotNetInstaller finished, return code: 0 \(0x0\)/)
-        clean_file.call unless ENV['PRESERVE_TEMP']
+        clean_file.call unless preserve_temp_files
         puts 'Successful return code, task finished' if success
         fail 'Due to failure message in logs, this task has failed' unless success
       end

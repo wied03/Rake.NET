@@ -107,7 +107,7 @@ module BradyW
         shell "#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w #{quoted(windows_friendly_path(full_path))}"
       ensure
         # Elevated NUnit runs in a separate window and we won't see its output in the build script
-        log get_file_contents(@output)
+        send_log_file_contents_to_console @output
         FileUtils.rm @output
         FileUtils.rm temp_batch_file_name
       end
@@ -118,20 +118,6 @@ module BradyW
       file_list = override ? FileList[override] : files
       files_unique = file_list.uniq
       files_unique.join(' ')
-    end
-
-    def windows_friendly_path(path)
-      path.gsub(/\//, '\\')
-    end
-
-    def get_file_contents(src_file_name)
-      text = ''
-      File.open src_file_name, 'r' do |input|
-        input.each do |line|
-          text << line
-        end
-      end
-      text
     end
 
     def security_mode

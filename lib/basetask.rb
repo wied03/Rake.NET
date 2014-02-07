@@ -10,6 +10,10 @@ module BradyW
 
     protected
 
+    def preserve_temp_files
+      ENV['PRESERVE_TEMP'] != nil
+    end
+
     # Validates whether value is in the allowed list and raises an exception, using name
     # as documentation, if it does not
     def self.validate(value, name, allowed)
@@ -35,6 +39,19 @@ module BradyW
       command = cmd.first
       puts "Running #{command} via Rake sh"
       sh command, options, &block
+    end
+
+    def windows_friendly_path(path)
+      path.gsub(/\//, '\\')
+    end
+
+    def send_log_file_contents_to_console(log_file_name)
+      File.open log_file_name, 'r' do |file|
+        file.each do |line|
+          log line
+          yield line if block_given?
+        end
+      end
     end
 
     private
