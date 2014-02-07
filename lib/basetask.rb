@@ -45,8 +45,11 @@ module BradyW
       path.gsub(/\//, '\\')
     end
 
-    def send_log_file_contents_to_console(log_file_name)
-      File.open log_file_name, 'r' do |file|
+    def send_log_file_contents_to_console(options)
+      log_file_name = options.is_a?(Hash) ? options[:log_file_name] : options
+      opts = {:file_read_options => 'r'}
+      opts.merge!(options) if options.is_a?(Hash)
+      File.open log_file_name, opts[:file_read_options] do |file|
         file.each do |line|
           log line
           yield line if block_given?

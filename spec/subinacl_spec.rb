@@ -25,7 +25,7 @@ describe BradyW::Subinacl do
     }
     @commands = []
     ENV['PRESERVE_TEMP'] = nil
-    File.stub(:expand_path) {|f| "/some/base/dir/#{f}" }
+    File.stub(:expand_path) { |f| "/some/base/dir/#{f}" }
   end
 
   after :each do
@@ -40,12 +40,14 @@ describe BradyW::Subinacl do
 
   def mock_output_and_log_messages(options)
     task = options.is_a?(Hash) ? options[:task] : options
-    opts = {:syntax_error_count_to_indicate => 0, :failure_count_to_indicate => 0}
+    opts = {:syntax_error_count_to_indicate => 0, :failure_count_to_indicate => 0, :object_failure => nil}
     opts.merge! options if options.is_a?(Hash)
     task.stub(:shell) { |*commands|
       # Simulate dotNetInstaller logging to the file
-      File.open 'subinacl_log.txt', 'w' do |writer|
+      File.open 'subinacl_log.txt', 'w:UTF-16LE:ascii' do |writer|
         writer << generate_subinacl_output(opts)
+        writer << "\r\n"
+        writer << "Current object #{opts[:object_failure]} will not be processed\r\n" if opts[:object_failure]
       end
       puts commands
       @commands = commands
@@ -111,7 +113,7 @@ describe BradyW::Subinacl do
     task.exectaskpublic
 
     # assert
-    console_text.should include('Done:        0, Modified        0, Failed        0, Syntax errors        0')
+    console_text.should include("Done:        0, Modified        0, Failed        0, Syntax errors        0\r\n")
   end
 
   it 'should fail if Subinacl outputs a failure count since subinacl doesnt use return codes properly' do
@@ -127,16 +129,29 @@ describe BradyW::Subinacl do
   end
 
   it 'should fail if Subinacl outputs a syntax error since subinacl doesnt use return codes properly' do
-      task = BradyW::Subinacl.new do |t|
-        t.service_to_grant_access_to = 'theservice'
-        t.user_to_grant_top_access_to = 'theuser'
-      end
-      task.stub(:subinacl_path).and_return('\path\to\subinacl.exe')
-      mock_output_and_log_messages :task => task, :syntax_error_count_to_indicate => 1
-
-      # act + assert
-      lambda { task.exectaskpublic }.should raise_exception 'Subinacl failed due to syntax errors or failures in making the requested change'
+    task = BradyW::Subinacl.new do |t|
+      t.service_to_grant_access_to = 'theservice'
+      t.user_to_grant_top_access_to = 'theuser'
     end
+    task.stub(:subinacl_path).and_return('\path\to\subinacl.exe')
+    mock_output_and_log_messages :task => task, :syntax_error_count_to_indicate => 1
+
+    # act + assert
+    lambda { task.exectaskpublic }.should raise_exception 'Subinacl failed due to syntax errors or failures in making the requested change'
+  end
+
+  it 'should fail if subinacl fails for another unknown reason' do
+    # arrange
+    task = BradyW::Subinacl.new do |t|
+      t.service_to_grant_access_to = 'theservice'
+      t.user_to_grant_top_access_to = 'theuser'
+    end
+    task.stub(:subinacl_path).and_return('\path\to\subinacl.exe')
+    mock_output_and_log_messages :task => task, :object_failure => 'theservice'
+
+    # act + assert
+    lambda { task.exectaskpublic }.should raise_exception 'Subinacl failed due to syntax errors or failures in making the requested change'
+  end
 
   it 'should complain if subnacl is not installed' do
     # arrange
@@ -177,7 +192,7 @@ describe BradyW::Subinacl do
     mock_output_and_log_messages :task => task, :syntax_error_count_to_indicate => 1
 
     # act
-    lambda {task.exectaskpublic}.should raise_exception
+    lambda { task.exectaskpublic }.should raise_exception
 
     # assert
     File.should_not be_exist('subinacl_log.txt')
