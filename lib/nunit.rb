@@ -108,7 +108,7 @@ module BradyW
       ensure
         # Elevated NUnit runs in a separate window and we won't see its output in the build script
         log get_file_contents(@output)
-        FileUtils.rm @output unless @custom_output
+        FileUtils.rm @output
         FileUtils.rm temp_batch_file_name
       end
     end

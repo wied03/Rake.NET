@@ -277,7 +277,7 @@ describe BradyW::Nunit do
     lines[0].should == "cd the/rakefile/path\r\n"
     lines[1].should == "\"C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe\" /output=something.txt /labels /framework=4.5 /timeout=35000 file1.dll file2.dll"
     expect(console_text).to include('stuff from nunit')
-    File.should be_exist('something.txt')
+    File.should_not be_exist('something.txt')
   end
 
   it 'should allow environment variables to be passed on to NUnit Console in elevated mode' do
@@ -352,5 +352,14 @@ describe BradyW::Nunit do
     lines[1].should == "set var2=\r\n"
     lines[2].should == "cd the/rakefile/path\r\n"
     lines[3].should == "\"C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe\" /output=generated_output_1.txt /labels /framework=4.5 /timeout=35000 file1.dll file2.dll"
+  end
+
+  it 'should preserve the log files if the environment variable is set' do
+    # arrange
+
+    # act
+
+    # assert
+    fail 'Write this test'
   end
 end
