@@ -5,7 +5,12 @@ describe BradyW::Nunit do
   before(:each) do
     ENV['nunit_filelist'] = nil
     FileUtils.rm 'something.txt' if File.exists?('something.txt')
-    File.stub(:exists?).with('C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe').and_return(true)
+    File.stub(:exists?) { |f|
+      ['C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe', ''].include?(f)
+    }
+    Dir.stub(:exists?) { |d|
+      [BswTech::DnetInstallUtil::PSTOOLS_PATH].include?(d)
+    }
     @generated_output_file = 'generated_output_1.txt'
     @nunit_batch_file = 'run_nunit_elevated.bat'
     BradyW::TempFileNameGenerator.stub(:random_filename) { |base, extension|
@@ -290,7 +295,7 @@ describe BradyW::Nunit do
     task = BradyW::Nunit.new do |test|
       test.files = %w(file1.dll file2.dll)
       test.security_mode = :elevated
-      test.elevated_environment_variables = {:var1 => 'foo', :var2 => 'bar'}
+      test.environment_variables = {:var1 => 'foo', :var2 => 'bar'}
     end
     mock_output_and_log_messages :task => task, :messages => 'stuff from nunit'
 
@@ -312,7 +317,7 @@ describe BradyW::Nunit do
     task = BradyW::Nunit.new do |test|
       test.files = %w(file1.dll file2.dll)
       test.security_mode = :elevated
-      test.elevated_environment_variables = {:var1 => 'foo', :var2 => 'bar with spaces'}
+      test.environment_variables = {:var1 => 'foo', :var2 => 'bar with spaces'}
     end
     mock_output_and_log_messages :task => task, :messages => 'stuff from nunit'
 
@@ -335,7 +340,7 @@ describe BradyW::Nunit do
     task = BradyW::Nunit.new do |test|
       test.files = %w(file1.dll file2.dll)
       test.security_mode = :elevated
-      test.elevated_environment_variables = {:var1 => 'foo', :var2 => nil}
+      test.environment_variables = {:var1 => 'foo', :var2 => nil}
     end
     mock_output_and_log_messages :task => task, :messages => 'stuff from nunit'
 
@@ -386,5 +391,58 @@ describe BradyW::Nunit do
     # assert
     File.should be_exist(@generated_output_file)
     File.should be_exist(@nunit_batch_file)
+  end
+
+  it 'should run as a different user OK' do
+    # arrange
+    task = BradyW::Nunit.new do |test|
+      test.files = %w(file1.dll file2.dll)
+      test.run_as_user = 'theuser'
+      test.run_as_password = 'thepassword'
+    end
+    mock_output_and_log_messages :task => task, :messages => 'stuff from nunit'
+    console_text = []
+    task.stub(:log) { |text| console_text << text }
+
+    # act
+    task.exectaskpublic
+
+    # assert
+    full_path = File.expand_path @nunit_batch_file
+    windows_friendly = full_path.gsub(/\//, '\\')
+    psexec_exe = File.join BswTech::DnetInstallUtil.ps_tools_base_path, 'PsExec.exe'
+    @commands.should include "#{psexec_exe} -u theuser -p thepassword -i \"#{windows_friendly}\""
+    File.should be_exist(@nunit_batch_file) # because our test is checking the contents of the batch file
+    lines = File.readlines @nunit_batch_file
+    lines.should have(2).items
+    lines[0].should == "cd the/rakefile/path\r\n"
+    lines[1].should == "\"C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe\" /output=generated_output_1.txt /labels /framework=4.5 /timeout=35000 file1.dll file2.dll"
+    expect(console_text).to include('stuff from nunit')
+  end
+
+  it 'should allow environment variables to be passed when running as a different user' do
+    # arrange
+    task = BradyW::Nunit.new do |test|
+      test.files = %w(file1.dll file2.dll)
+      test.run_as_user = 'theuser'
+      test.run_as_password = 'thepassword'
+      test.environment_variables = {:var1 => 'foo', :var2 => 'bar with spaces'}
+    end
+    mock_output_and_log_messages :task => task, :messages => 'stuff from nunit'
+    console_text = []
+    task.stub(:log) { |text| console_text << text }
+
+    # act
+    task.exectaskpublic
+
+    # assert
+    File.should be_exist(@nunit_batch_file)
+    lines = File.readlines @nunit_batch_file
+    lines.should have(4).items
+    lines[0].should == "set var1=foo\r\n"
+    # On Windows, we don't escape the spaces
+    lines[1].should == "set var2=bar with spaces\r\n"
+    lines[2].should == "cd the/rakefile/path\r\n"
+    lines[3].should == "\"C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe\" /output=generated_output_1.txt /labels /framework=4.5 /timeout=35000 file1.dll file2.dll"
   end
 end

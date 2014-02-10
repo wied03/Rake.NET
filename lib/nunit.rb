@@ -52,14 +52,16 @@ module BradyW
     # *Optional* :elevated, :normal :normal by default.  if :elevated, XML output will be enabled
     attr_accessor :security_mode
 
-    # *Optional* If using :elevated security_mode, you can specify which environment variables you want passed on to the NUnit console process here.  If not using elevated mode, this is ignored
-    attr_accessor :elevated_environment_variables
+    # *Optional* If using :elevated security_mode or :run_as_user, you can specify which environment variables you want passed on to the NUnit console process here.  If not using elevated mode, this is ignored
+    attr_accessor :environment_variables
 
     private
 
     def exectask
       if security_mode == :elevated
         run_elevated
+      elsif @run_as_user
+        run_as_user
       else
         run_standard
       end
@@ -67,7 +69,7 @@ module BradyW
 
     def get_nunit_console_command_line
       # Elevated NUnit runs in a separate window and we won't see its output in the build script
-      if security_mode == :elevated
+      if security_mode == :elevated or @run_as_user
         @xml_output = :enabled
         @custom_output = @output != nil
         temp_file = TempFileNameGenerator.random_filename('nunitoutput', '.txt') unless @custom_output
@@ -91,10 +93,24 @@ module BradyW
     end
 
     def environment_variable_lines
-      @elevated_environment_variables.map { |var, val| "set #{var}=#{val}\r\n" }
+      @environment_variables.map { |var, val| "set #{var}=#{val}\r\n" }
+    end
+
+    def run_as_user
+      ps_tools_path = File.join BswTech::DnetInstallUtil.ps_tools_base_path, 'PsExec.exe'
+      run_using_delegate_process do |batch_file_path|
+        shell "#{ps_tools_path} -u #{@run_as_user} -p #{run_as_password} -i #{batch_file_path}"
+      end
     end
 
     def run_elevated
+      run_using_delegate_process do |batch_file_path|
+        shell "#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w #{batch_file_path}"
+      end
+    end
+
+    # Yields the full quoted path to the batch file that will run NUnit
+    def run_using_delegate_process
       temp_batch_file_name = TempFileNameGenerator.random_filename('run_nunit_elevated', '.bat')
       cleanup = lambda {
         FileUtils.rm @output
@@ -102,19 +118,20 @@ module BradyW
       }
       # Need to use binary mode to avoid CRLF/Windows issues since it's picky about batch files
       File.open temp_batch_file_name, 'wb' do |file|
-        environment_variable_lines.each { |line| file << line } if @elevated_environment_variables
+        environment_variable_lines.each { |line| file << line } if @environment_variables
         file << "cd #{Rake.original_dir}\r\n"
         file << get_nunit_console_command_line
       end
       begin
         full_path = File.expand_path temp_batch_file_name
-        shell "#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w #{quoted(windows_friendly_path(full_path))}"
+        yield quoted(windows_friendly_path(full_path))
       ensure
         # Elevated NUnit runs in a separate window and we won't see its output in the build script
         send_log_file_contents_to_console :log_file_name => @output, :file_read_options => 'r' # NUnit doesn't do funky encoding
         cleanup.call unless ENV['PRESERVE_TEMP']
       end
     end
+
 
     def get_assemblies
       override = ENV['nunit_filelist']

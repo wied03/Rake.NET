@@ -19,5 +19,5 @@ Gem::Specification.new do |s|
   s.author = "Brady Wied"
   s.email = "brady@bswtechconsulting.com"          
   s.add_dependency('windows-pr')  
-  s.add_dependency('bsw_dnet_install_util', '1.1.3')
+  s.add_dependency('bsw_dnet_install_util', '1.1.5')
 end
