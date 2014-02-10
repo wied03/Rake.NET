@@ -26,7 +26,7 @@ module BradyW
       dnet_inst_log_file = TempFileNameGenerator.random_filename 'dnet_log', '.txt'
       clean_file = lambda {
         FileUtils.rm dnet_inst_log_file
-        FileUtils.rm msi_log_file
+        FileUtils.rm msi_log_file if File.exist?(msi_log_file)
       }
       params << '/Log'
       params << param_fslash('LogFile', dnet_inst_log_file)
@@ -35,7 +35,7 @@ module BradyW
         log ".NET Installer Log"
         success = write_dnet_installer_log_to_console dnet_inst_log_file
         log "\nMSI Log:"
-        write_msi_log_to_console msi_log_file
+        write_msi_log_to_console msi_log_file if File.exist?(msi_log_file)
         clean_file.call unless preserve_temp_files
         puts 'Successful return code, task finished' if success
         fail 'Due to lack of success message in logs, this task has failed' unless success
