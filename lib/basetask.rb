@@ -47,10 +47,11 @@ module BradyW
 
     def send_log_file_contents_to_console(options)
       log_file_name = options.is_a?(Hash) ? options[:log_file_name] : options
-      opts = {:file_read_options => 'r'}
+      # When Windows STDOUT redirects are written, they've been in this encoding
+      opts = {:file_read_options => 'r:UTF-16LE:ascii'}
       opts.merge!(options) if options.is_a?(Hash)
       File.open log_file_name, opts[:file_read_options] do |file|
-        file.each do |line|
+        file.each_line do |line|
           log line
           yield line if block_given?
         end

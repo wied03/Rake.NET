@@ -27,18 +27,19 @@ describe BradyW::DotNetInstallerExecute do
   end
 
   def mock_output_and_log_messages(task, dnet_message, msi_message)
-    task.stub(:shell) { |*commands, &block|
-      # Simulate dotNetInstaller logging to the file
-      File.open 'dnet_log.txt', 'w' do |writer|
-        writer << dnet_message
+    # this task is unique in that in writes to 2 log files, so we borrow the block to do that as well
+    dnet_log_written_already = false
+    # Dnet installer always returns a failure code
+    simulate_redirected_log_output(task, :file_name => 'msi_log.txt', :failure_return_code => true) do |writer|
+      if !dnet_log_written_already
+        File.open 'dnet_log.txt', 'w' do |writer|
+          writer << dnet_message
+        end
+        dnet_log_written_already = true
       end
-      File.open 'msi_log.txt', 'w' do |writer|
-        writer << msi_message
-      end
-      puts commands
-      @commands = commands
-      block.call(nil, SimulateProcessFailure.new)
-    }
+
+      writer << msi_message
+    end
   end
 
   it 'should work properly in install mode with no properties' do
@@ -167,7 +168,7 @@ describe BradyW::DotNetInstallerExecute do
     mock_output_and_log_messages task, '2014-01-15 00:34:27	dotNetInstaller finished, return code: 1 (0x1)', 'MSI log messages'
 
     # act + assert
-    lambda { task.exectaskpublic }.should raise_exception 'Due to failure message in logs, this task has failed'
+    lambda { task.exectaskpublic }.should raise_exception 'Due to lack of success message in logs, this task has failed'
   end
 
   it 'should clean up temporary log files upon success' do
@@ -195,7 +196,7 @@ describe BradyW::DotNetInstallerExecute do
     mock_output_and_log_messages task, '2014-01-15 00:34:27	dotNetInstaller finished, return code: 1 (0x1)', 'MSI log messages'
 
     # act
-    lambda { task.exectaskpublic }.should raise_exception 'Due to failure message in logs, this task has failed'
+    lambda { task.exectaskpublic }.should raise_exception
 
     # assert
     File.should_not be_exist(@should_deletes[0])

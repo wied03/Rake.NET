@@ -2,7 +2,6 @@ require 'base'
 require 'subinacl'
 
 describe BradyW::Subinacl do
-
   before(:each) do
     @should_deletes = []
     @file_index = 0
@@ -39,19 +38,13 @@ describe BradyW::Subinacl do
   end
 
   def mock_output_and_log_messages(options)
-    task = options.is_a?(Hash) ? options[:task] : options
-    opts = {:syntax_error_count_to_indicate => 0, :failure_count_to_indicate => 0, :object_failure => nil}
-    opts.merge! options if options.is_a?(Hash)
-    task.stub(:shell) { |*commands|
-      # Simulate dotNetInstaller logging to the file
-      File.open 'subinacl_log.txt', 'w:UTF-16LE:ascii' do |writer|
-        writer << generate_subinacl_output(opts)
-        writer << "\r\n"
-        writer << "Current object #{opts[:object_failure]} will not be processed\r\n" if opts[:object_failure]
-      end
-      puts commands
-      @commands = commands
-    }
+    options = {:syntax_error_count_to_indicate => 0, :failure_count_to_indicate => 0, :object_failure => nil}.merge((options.is_a?(Hash) ? options : {:task => options}))
+    simulate_redirected_log_output(options[:task], :file_name => 'subinacl_log.txt') do |writer|
+      writer << generate_subinacl_output(options)
+      # Tests on Win8 show MAC line endings (CR, not CRLF or LF) and this encoding, so mimic that
+      writer << "\r"
+      writer << "Current object #{options[:object_failure]} will not be processed\r" if options[:object_failure]
+    end
   end
 
   it 'should run Subinacl properly when no spaces are in path' do
@@ -113,7 +106,7 @@ describe BradyW::Subinacl do
     task.exectaskpublic
 
     # assert
-    console_text.should include("Done:        0, Modified        0, Failed        0, Syntax errors        0\r\n")
+    console_text.should include("Done:        0, Modified        0, Failed        0, Syntax errors        0\r")
   end
 
   it 'should fail if Subinacl outputs a failure count since subinacl doesnt use return codes properly' do
@@ -140,7 +133,7 @@ describe BradyW::Subinacl do
     lambda { task.exectaskpublic }.should raise_exception 'Subinacl failed due to syntax errors or failures in making the requested change'
   end
 
-  it 'should fail if subinacl fails for another unknown reason' do
+  it 'should fail if Subinacl fails for another unknown reason' do
     # arrange
     task = BradyW::Subinacl.new do |t|
       t.service_to_grant_access_to = 'theservice'
@@ -153,7 +146,7 @@ describe BradyW::Subinacl do
     lambda { task.exectaskpublic }.should raise_exception 'Subinacl failed due to syntax errors or failures in making the requested change'
   end
 
-  it 'should complain if subnacl is not installed' do
+  it 'should complain if Subinacl is not installed' do
     # arrange
     task = BradyW::Subinacl.new do |t|
       t.service_to_grant_access_to = 'theservice'

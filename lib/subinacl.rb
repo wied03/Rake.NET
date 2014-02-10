@@ -31,7 +31,7 @@ module BradyW
         error_count_regex = /Done:\s+\d+, Modified\s+\d+, Failed\s+(\d+), Syntax errors\s+(\d+)/
         error_object_regex = /Current object \w+ will not be processed/
         failed = false
-        do_log log_file_name do |line_being_logged|
+        write_log_to_console log_file_name do |line_being_logged|
           match = error_count_regex.match(line_being_logged)
           if match
             captures = match.captures
@@ -45,7 +45,7 @@ module BradyW
         raise 'Subinacl failed due to syntax errors or failures in making the requested change' if failed
       ensure
         # Elevated subinacl runs in a separate window and we won't see its output in the build script
-        do_log log_file_name unless log_file_already_written
+        write_log_to_console log_file_name unless log_file_already_written
         FileUtils.rm log_file_name unless preserve_temp_files
         FileUtils.rm temp_batch_file_name unless preserve_temp_files
       end
@@ -53,8 +53,10 @@ module BradyW
 
     private
 
-    def do_log(filename)
-      send_log_file_contents_to_console(:log_file_name => filename, :file_read_options => 'r:UTF-16LE:ascii')
+    def write_log_to_console(filename)
+      send_log_file_contents_to_console(:log_file_name => filename) do |line|
+        yield line
+      end
     end
 
     def exe_path_with_redirection(params,log_file_name)

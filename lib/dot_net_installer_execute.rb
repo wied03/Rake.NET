@@ -18,12 +18,12 @@ module BradyW
 
     def exectask
       validate
-      msi_log_file = TempFileNameGenerator.random_filename 'msi_log','.txt'
+      msi_log_file = TempFileNameGenerator.random_filename 'msi_log', '.txt'
       @msiexec_arguments = {'l*' => msi_log_file}
       params = ["/#{mode_switch}"]
       params << param_fslash('ComponentArgs', properties_flat)
       params << '/q'
-      dnet_inst_log_file = TempFileNameGenerator.random_filename 'dnet_log','.txt'
+      dnet_inst_log_file = TempFileNameGenerator.random_filename 'dnet_log', '.txt'
       clean_file = lambda {
         FileUtils.rm dnet_inst_log_file
         FileUtils.rm msi_log_file
@@ -32,30 +32,32 @@ module BradyW
       params << param_fslash('LogFile', dnet_inst_log_file)
       params_flat = params.join ' '
       shell "#{elevate_and_exe_path} #{params_flat}" do |ok, status|
-        dnet_contents = get_file_contents dnet_inst_log_file
         log ".NET Installer Log"
-        log dnet_contents
-        msi_contents = get_file_contents msi_log_file
+        success = write_dnet_installer_log_to_console dnet_inst_log_file
         log "\nMSI Log:"
-        log msi_contents
-        puts 'Ignoring return code since these seem to invalid, instead checking log file for success'
-        success = dnet_contents.match(/dotNetInstaller finished, return code: 0 \(0x0\)/)
+        write_msi_log_to_console msi_log_file
         clean_file.call unless preserve_temp_files
         puts 'Successful return code, task finished' if success
-        fail 'Due to failure message in logs, this task has failed' unless success
+        fail 'Due to lack of success message in logs, this task has failed' unless success
       end
     end
 
     private
 
-    def get_file_contents(src_file_name)
-      text = ''
-      File.open src_file_name, 'r' do |input|
-        input.each do |line|
-          text << line
+    def write_dnet_installer_log_to_console(filename)
+      regex = /dotNetInstaller finished, return code: 0 \(0x0\)/
+      # the .net installer log is written with 'standard' encoding
+      success = false
+      send_log_file_contents_to_console :log_file_name => filename, :file_read_options => 'r' do |line_being_logged|
+        if regex.match line_being_logged
+          success = true
         end
       end
-      text
+      success
+    end
+
+    def write_msi_log_to_console(filename)
+      send_log_file_contents_to_console(:log_file_name => filename)
     end
 
     def elevate_and_exe_path
