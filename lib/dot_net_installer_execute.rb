@@ -57,7 +57,7 @@ module BradyW
     end
 
     def write_msi_log_to_console(filename)
-      send_log_file_contents_to_console(:log_file_name => filename)
+      send_log_file_contents_to_console(:log_file_name => filename, :file_read_options => 'r:UTF-16LE:UTF-8')
     end
 
     def elevate_and_exe_path

@@ -31,7 +31,7 @@ describe BradyW::DotNetInstallerExecute do
       # this task is unique in that in writes to 2 log files, so we borrow the block to do that as well
       dnet_log_written_already = false
       # Dnet installer always returns a failure code
-      simulate_redirected_log_output(task, :file_name => 'msi_log.txt', :failure_return_code => true) do |writer|
+      simulate_redirected_log_output(task, :file_name => 'msi_log.txt', :failure_return_code => true, :file_write_options => 'w:UTF-16LE:UTF-8') do |writer|
         if !dnet_log_written_already
           File.open 'dnet_log.txt', 'w' do |writer|
             writer << dnet_message
