@@ -96,6 +96,10 @@ module BradyW
 
     def run_elevated
       temp_batch_file_name = TempFileNameGenerator.random_filename('run_nunit_elevated', '.bat')
+      cleanup = lambda {
+        FileUtils.rm @output
+        FileUtils.rm temp_batch_file_name
+      }
       # Need to use binary mode to avoid CRLF/Windows issues since it's picky about batch files
       File.open temp_batch_file_name, 'wb' do |file|
         environment_variable_lines.each { |line| file << line } if @elevated_environment_variables
@@ -107,9 +111,8 @@ module BradyW
         shell "#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w #{quoted(windows_friendly_path(full_path))}"
       ensure
         # Elevated NUnit runs in a separate window and we won't see its output in the build script
-        send_log_file_contents_to_console @output
-        FileUtils.rm @output
-        FileUtils.rm temp_batch_file_name
+        send_log_file_contents_to_console :log_file_name => @output, :file_read_options => 'r' # NUnit doesn't do funky encoding
+        cleanup.call unless ENV['PRESERVE_TEMP']
       end
     end
 
@@ -171,7 +174,7 @@ module BradyW
 
     def full_path
       dirs_under_program_files = ["NUnit #{version}", "NUnit-#{version}"]
-      full_dirs_under_program_files =  dirs_under_program_files.map {|d| File.join(PROGRAM_FILES_DIR, d, 'bin')}
+      full_dirs_under_program_files = dirs_under_program_files.map { |d| File.join(PROGRAM_FILES_DIR, d, 'bin') }
       possibleDirectories = @base_path ? [@base_path] : full_dirs_under_program_files
       candidates = possibleDirectories.map { |p| File.join(p, executable) }
       found = candidates.detect { |c| File.exists? c }

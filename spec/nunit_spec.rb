@@ -22,6 +22,7 @@ describe BradyW::Nunit do
       File.delete file if file != @nunit_batch_file
     }
     Rake.stub(:original_dir).and_return 'the/rakefile/path'
+    ENV['PRESERVE_TEMP'] = nil
   end
 
   after(:each) do
@@ -36,6 +37,15 @@ describe BradyW::Nunit do
     begin
       File.delete @nunit_batch_file
     rescue
+    end
+  end
+
+
+  def mock_output_and_log_messages(options)
+    options = {:file_name => @generated_output_file}.merge(options)
+    # NUnit doesn't do funky encoding
+    simulate_redirected_log_output(options[:task], :file_name => options[:file_name], :file_write_options => 'w') do |writer|
+      writer << options[:messages]
     end
   end
 
@@ -96,15 +106,15 @@ describe BradyW::Nunit do
   end
 
   it 'uses a configured custom path with x86' do
-      File.stub(:exists?).with("C:\\SomeOtherplace/nunit-console-x86.exe").and_return(true)
-      task = BradyW::Nunit.new do |test|
-        test.files = %w(file1.dll file2.dll)
-        test.base_path = 'C:\\SomeOtherplace'
-        test.arch = :x86
-      end
-      task.exectaskpublic
-      task.executedPop.should == "\"C:\\SomeOtherplace/nunit-console-x86.exe\" /labels /noxml /framework=4.5 /timeout=35000 file1.dll file2.dll"
+    File.stub(:exists?).with("C:\\SomeOtherplace/nunit-console-x86.exe").and_return(true)
+    task = BradyW::Nunit.new do |test|
+      test.files = %w(file1.dll file2.dll)
+      test.base_path = 'C:\\SomeOtherplace'
+      test.arch = :x86
     end
+    task.exectaskpublic
+    task.executedPop.should == "\"C:\\SomeOtherplace/nunit-console-x86.exe\" /labels /noxml /framework=4.5 /timeout=35000 file1.dll file2.dll"
+  end
 
   it 'uses a configured custom path and the console is not found' do
     File.stub(:exists?).with("C:/SomeOtherplace/nunit-console.exe").and_return(false)
@@ -229,9 +239,7 @@ describe BradyW::Nunit do
       test.files = %w(file1.dll file2.dll)
       test.security_mode = :elevated
     end
-    File.open @generated_output_file, 'w' do |f|
-      f << 'stuff from nunit'
-    end
+    mock_output_and_log_messages :task => task, :messages => 'stuff from nunit'
     console_text = []
     task.stub(:log) { |text| console_text << text }
 
@@ -241,14 +249,13 @@ describe BradyW::Nunit do
     # assert
     full_path = File.expand_path @nunit_batch_file
     windows_friendly = full_path.gsub(/\//, '\\')
-    task.executedPop.should == "#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w \"#{windows_friendly}\""
-    File.should be_exist(@nunit_batch_file)
+    @commands.should include "#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w \"#{windows_friendly}\""
+    File.should be_exist(@nunit_batch_file) # because our test is checking the contents of the batch file
     lines = File.readlines @nunit_batch_file
     lines.should have(2).items
     lines[0].should == "cd the/rakefile/path\r\n"
     lines[1].should == "\"C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe\" /output=generated_output_1.txt /labels /framework=4.5 /timeout=35000 file1.dll file2.dll"
     expect(console_text).to include('stuff from nunit')
-    File.should_not be_exist(@generated_output_file)
   end
 
   it 'should allow the output file to be overridden in elevated mode' do
@@ -258,9 +265,7 @@ describe BradyW::Nunit do
       test.security_mode = :elevated
       test.output = 'something.txt'
     end
-    File.open 'something.txt', 'w' do |f|
-      f << 'stuff from nunit'
-    end
+    mock_output_and_log_messages :task => task, :messages => 'stuff from nunit', :file_name => 'something.txt'
     console_text = []
     task.stub(:log) { |text| console_text << text }
 
@@ -270,7 +275,7 @@ describe BradyW::Nunit do
     # assert
     full_path = File.expand_path @nunit_batch_file
     windows_friendly = full_path.gsub(/\//, '\\')
-    task.executedPop.should == "#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w \"#{windows_friendly}\""
+    @commands.should include "#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w \"#{windows_friendly}\""
     File.should be_exist(@nunit_batch_file)
     lines = File.readlines @nunit_batch_file
     lines.should have(2).items
@@ -287,9 +292,7 @@ describe BradyW::Nunit do
       test.security_mode = :elevated
       test.elevated_environment_variables = {:var1 => 'foo', :var2 => 'bar'}
     end
-    File.open @generated_output_file, 'w' do |f|
-      f << 'stuff from nunit'
-    end
+    mock_output_and_log_messages :task => task, :messages => 'stuff from nunit'
 
     # act
     task.exectaskpublic
@@ -311,9 +314,7 @@ describe BradyW::Nunit do
       test.security_mode = :elevated
       test.elevated_environment_variables = {:var1 => 'foo', :var2 => 'bar with spaces'}
     end
-    File.open @generated_output_file, 'w' do |f|
-      f << 'stuff from nunit'
-    end
+    mock_output_and_log_messages :task => task, :messages => 'stuff from nunit'
 
     # act
     task.exectaskpublic
@@ -336,9 +337,7 @@ describe BradyW::Nunit do
       test.security_mode = :elevated
       test.elevated_environment_variables = {:var1 => 'foo', :var2 => nil}
     end
-    File.open @generated_output_file, 'w' do |f|
-      f << 'stuff from nunit'
-    end
+    mock_output_and_log_messages :task => task, :messages => 'stuff from nunit'
 
     # act
     task.exectaskpublic
@@ -354,12 +353,38 @@ describe BradyW::Nunit do
     lines[3].should == "\"C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe\" /output=generated_output_1.txt /labels /framework=4.5 /timeout=35000 file1.dll file2.dll"
   end
 
-  it 'should preserve the log files if the environment variable is set' do
+  it 'should cleanup the log files if the environment variable is not set' do
     # arrange
+    FileUtils.unstub(:rm)
+    task = BradyW::Nunit.new do |test|
+      test.files = %w(file1.dll file2.dll)
+      test.security_mode = :elevated
+    end
+    mock_output_and_log_messages :task => task, :messages => 'stuff from nunit'
 
     # act
+    task.exectaskpublic
 
     # assert
-    fail 'Write this test'
+    File.should_not be_exist(@generated_output_file)
+    File.should_not be_exist(@nunit_batch_file)
+  end
+
+  it 'should preserve the log files if the environment variable is set' do
+    # arrange
+    FileUtils.unstub(:rm)
+    ENV['PRESERVE_TEMP'] = 'true'
+    task = BradyW::Nunit.new do |test|
+      test.files = %w(file1.dll file2.dll)
+      test.security_mode = :elevated
+    end
+    mock_output_and_log_messages :task => task, :messages => 'stuff from nunit'
+
+    # act
+    task.exectaskpublic
+
+    # assert
+    File.should be_exist(@generated_output_file)
+    File.should be_exist(@nunit_batch_file)
   end
 end
