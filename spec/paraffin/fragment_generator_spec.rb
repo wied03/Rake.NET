@@ -90,7 +90,7 @@ describe BradyW::Paraffin::FragmentGenerator do
       t.component_group = 'ServiceBinariesGroup'
       t.alias = '$(var.Project.TargetDir)'
       t.output_file = 'something.wxs'
-      t.directory_to_scan = '..\Bin\Release'
+      t.directory_to_scan = '../Bin/Release'
       t.no_root_directory = false
       t.ignore_extensions = ['pdb', 'txt']
       t.exclude_regexp = ['\d+', '\w+']
@@ -235,7 +235,7 @@ describe BradyW::Paraffin::FragmentGenerator do
     @commands = []
     task.stub(:shell) { |*commands, &block|
       puts commands
-      @commands << commands
+      @commands += commands
       raise 'Paraffin failed' if commands[0].include?('Paraffin.exe')
     }
 
@@ -243,8 +243,8 @@ describe BradyW::Paraffin::FragmentGenerator do
     lambda { task.exectaskpublic }.should raise_exception "Paraffin failed"
 
     # assert
-    @commands[0][0].should == 'cmd.exe /c mklink /J ".\paraffin_config_aware_symlink" "..\Bin\Release"'
-    @commands[1][0].should == '"someParaffinPath\Paraffin.exe" -dir ".\paraffin_config_aware_symlink" -dr BinDir -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -verbose'
-    @commands[2][0].should == 'rmdir ".\paraffin_config_aware_symlink"'
+    @commands[0].should == 'cmd.exe /c mklink /J ".\paraffin_config_aware_symlink" "..\Bin\Release"'
+    @commands[1].should == '"someParaffinPath\Paraffin.exe" -dir ".\paraffin_config_aware_symlink" -dr BinDir -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -verbose'
+    @commands[2].should == 'rmdir ".\paraffin_config_aware_symlink"'
   end
 end
