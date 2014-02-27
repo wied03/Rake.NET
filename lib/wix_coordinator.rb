@@ -61,7 +61,7 @@ module BradyW
       # Allow Paraffin to run separately
       if @wix_project_directory || @paraffin_update_fragment then
         desc 'Updates Paraffin fragment on its own (without doing a build first)'
-        paraffin = Paraffin::FragmentUpdater.new "paraffin_#{@name}" do |pf|
+        paraffin = Paraffin::FragmentUpdater.new "paraffin_#{@name}" => [*@dependencies] do |pf|
           pf.fragment_file = paraffin_update_fragment
           pf.output_directory = @installer_referencer_bin
         end
