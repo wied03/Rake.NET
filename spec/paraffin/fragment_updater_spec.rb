@@ -23,7 +23,7 @@ describe BradyW::Paraffin::FragmentUpdater do
     task = BradyW::Paraffin::FragmentUpdater.new
 
     # act + assert
-    lambda { task.exectaskpublic }.should raise_exception ':fragment_file is required for this task'
+    lambda { task.exectaskpublic }.should raise_exception ':fragment_file and :output_directory are required for this task'
   end
 
   it 'should work OK when the WXS value is supplied and replace original is off' do

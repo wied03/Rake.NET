@@ -84,7 +84,7 @@ module BradyW
       end
 
       def validate
-        fail ":fragment_file is required for this task" unless @fragment_file
+        fail ":fragment_file and :output_directory are required for this task" unless (@fragment_file && @output_directory)
       end
 
       def report_if_different
