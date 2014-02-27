@@ -39,7 +39,7 @@ module BradyW
           end
         ensure
           if @replace_original
-            log "Removing generated file #{generated_file} since Paraffin failed"
+            log "Removing generated file #{generated_file}"
             FileUtils.rm generated_file if File.exists? generated_file
           end
           shell sym_link_delete
