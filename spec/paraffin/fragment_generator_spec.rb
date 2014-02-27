@@ -60,7 +60,7 @@ describe BradyW::Paraffin::FragmentGenerator do
     command3.should eq 'rmdir "otherdir\paraffin_config_aware_symlink"'
   end
 
-  it 'should generate a WXS with 1 extension ignored, 1 directory excluded, 1 regex excluded' do
+  it 'should generate a WXS with 1 extension ignored, 1 regex excluded' do
     # arrange
     task = BradyW::Paraffin::FragmentGenerator.new do |t|
       t.component_group = 'ServiceBinariesGroup'
@@ -84,7 +84,7 @@ describe BradyW::Paraffin::FragmentGenerator do
     command3.should eq 'rmdir ".\paraffin_config_aware_symlink"'
   end
 
-  it 'should generate a WXS with 2 extensions ignored, 2 directories excluded, 2 regexes excluded' do
+  it 'should generate a WXS with 2 extensions ignored, 2 regexes excluded' do
     # arrange
     task = BradyW::Paraffin::FragmentGenerator.new do |t|
       t.component_group = 'ServiceBinariesGroup'
@@ -115,7 +115,7 @@ describe BradyW::Paraffin::FragmentGenerator do
       t.alias = '$(var.Project.TargetDir)'
       t.output_file = 'something.wxs'
       t.directory_to_scan = '..\Bin\Release'
-      t.directories_to_exclude = 'C:/somefile'
+      t.directories_to_exclude = '/somefile'
     end
 
     # act
@@ -124,9 +124,7 @@ describe BradyW::Paraffin::FragmentGenerator do
     command = task.executedPop
 
     # assert
-    command.should eq '"someParaffinPath\Paraffin.exe" -dir ".\paraffin_config_aware_symlink" -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -regExExclude "C:\\somefile" -verbose'
-
-    fail 'Write this test'
+    command.should eq '"someParaffinPath\Paraffin.exe" -dir ".\paraffin_config_aware_symlink" -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -regExExclude "\\\\somefile" -verbose'
   end
 
   it 'should generate a WXS with 1 relative directory ignored via regex' do
@@ -145,9 +143,7 @@ describe BradyW::Paraffin::FragmentGenerator do
     command = task.executedPop
 
     # assert
-    command.should eq '"someParaffinPath\Paraffin.exe" -dir ".\paraffin_config_aware_symlink" -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -regExExclude "\.\\paraffin_config_aware_symlink\\somedir" -verbose'
-
-    fail 'Write this test'
+    command.should eq '"someParaffinPath\Paraffin.exe" -dir ".\paraffin_config_aware_symlink" -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -regExExclude "\.\\\\paraffin_config_aware_symlink\\\\somedir" -verbose'
   end
 
   it 'should generate a WXS with 2 absolute directories ignored via regex' do
@@ -157,7 +153,7 @@ describe BradyW::Paraffin::FragmentGenerator do
       t.alias = '$(var.Project.TargetDir)'
       t.output_file = 'something.wxs'
       t.directory_to_scan = '..\Bin\Release'
-      t.directories_to_exclude = 'C:/somefile', 'c:\someotherdir'
+      t.directories_to_exclude = '/somefile', '/someotherdir'
     end
 
     # act
@@ -166,9 +162,7 @@ describe BradyW::Paraffin::FragmentGenerator do
     command = task.executedPop
 
     # assert
-    command.should eq '"someParaffinPath\Paraffin.exe" -dir ".\paraffin_config_aware_symlink" -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -regExExclude "C:\\somefile" -regExExclude "C:\\someotherdir" -verbose'
-
-    fail 'Write this test'
+    command.should eq '"someParaffinPath\Paraffin.exe" -dir ".\paraffin_config_aware_symlink" -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -regExExclude "\\\\somefile" -regExExclude "\\\\someotherdir" -verbose'
   end
 
   it 'should generate a WXS with 2 relative directories ignored via regex' do
@@ -187,9 +181,7 @@ describe BradyW::Paraffin::FragmentGenerator do
     command = task.executedPop
 
     # assert
-    command.should eq '"someParaffinPath\Paraffin.exe" -dir ".\paraffin_config_aware_symlink" -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -regExExclude "\.\\paraffin_config_aware_symlink\\somedir" -regExExclude "\.\\paraffin_config_aware_symlink\\otherdir" -verbose'
-
-    fail 'Write this test'
+    command.should eq '"someParaffinPath\Paraffin.exe" -dir ".\paraffin_config_aware_symlink" -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -regExExclude "\.\\\\paraffin_config_aware_symlink\\\\somedir" -regExExclude "\.\\\\paraffin_config_aware_symlink\\\\otherdir" -verbose'
   end
 
   it 'should generate a WXS with 1 relative and 1 absolute directory ignored via regex' do
@@ -199,7 +191,7 @@ describe BradyW::Paraffin::FragmentGenerator do
       t.alias = '$(var.Project.TargetDir)'
       t.output_file = 'something.wxs'
       t.directory_to_scan = '..\Bin\Release'
-      t.directories_to_exclude = 'somedir', 'c:\someotherdir'
+      t.directories_to_exclude = 'somedir', '/someotherdir'
     end
 
     # act
@@ -208,9 +200,7 @@ describe BradyW::Paraffin::FragmentGenerator do
     command = task.executedPop
 
     # assert
-    command.should eq '"someParaffinPath\Paraffin.exe" -dir ".\paraffin_config_aware_symlink" -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -regExExclude "\.\\paraffin_config_aware_symlink\\somedir" -regExExclude "C:\\someotherdir" -verbose'
-
-    fail 'Write this test'
+    command.should eq '"someParaffinPath\Paraffin.exe" -dir ".\paraffin_config_aware_symlink" -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -regExExclude "\.\\\\paraffin_config_aware_symlink\\\\somedir" -regExExclude "\\\\someotherdir" -verbose'
   end
 
   it 'should generate a WXS with a mixture of directories and expressions via regex' do
@@ -230,9 +220,7 @@ describe BradyW::Paraffin::FragmentGenerator do
     command = task.executedPop
 
     # assert
-    command.should eq '"someParaffinPath\Paraffin.exe" -dir ".\paraffin_config_aware_symlink" -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -regExExclude "\.\\paraffin_config_aware_symlink\\somedir" -regExExclude "\d+" -regExEclude "\w+" -verbose'
-
-    fail 'Write this test'
+    command.should eq '"someParaffinPath\Paraffin.exe" -dir ".\paraffin_config_aware_symlink" -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -regExExclude "\d+" -regExExclude "\w+" -regExExclude "\.\\\\paraffin_config_aware_symlink\\\\somedir" -verbose'
   end
 
   it 'should cleanup symlinks even if Paraffin fails' do
@@ -258,17 +246,5 @@ describe BradyW::Paraffin::FragmentGenerator do
     @commands[0][0].should == 'cmd.exe /c mklink /J ".\paraffin_config_aware_symlink" "..\Bin\Release"'
     @commands[1][0].should == '"someParaffinPath\Paraffin.exe" -dir ".\paraffin_config_aware_symlink" -dr BinDir -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -verbose'
     @commands[2][0].should == 'rmdir ".\paraffin_config_aware_symlink"'
-  end
-
-
-  it 'should properly replace regex directories, etc.' do
-    # arrange
-
-    # TODO: This basic idea works, but need to 1) adapt tests to cmd.exe reality, 2) confirm the rmdir stuff works and 3) Figure out what to do about arguments like the regex ones that include the directory we are scanning
-
-    # act
-
-    # assert
-    fail 'Write this test'
   end
 end

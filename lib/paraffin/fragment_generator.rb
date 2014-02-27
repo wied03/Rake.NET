@@ -58,11 +58,22 @@ module BradyW
         end
       end
 
-      def scanned_directory
-        sym_link_dir
+      private
+
+      def regular_expressions
+        [*@exclude_regexp] + exclude_directory_regexes
       end
 
-      private
+      def exclude_directory_regexes
+        [*@directories_to_exclude].map { |dir| turn_directory_into_regex(dir) }
+      end
+
+      def turn_directory_into_regex(dir)
+        is_absolute = File.absolute_path(dir) == dir
+        prefixed = is_absolute ? dir : File.join(sym_link_dir_not_win_friendly,dir)
+        win_friendly = windows_friendly_path prefixed
+        Regexp.escape win_friendly
+      end
 
       def sym_link_delete
         "rmdir #{sym_link_dir}"
@@ -74,8 +85,12 @@ module BradyW
         "cmd.exe /c mklink /J #{sym_link_dir} #{scan_dir}"
       end
 
+      def sym_link_dir_not_win_friendly
+        File.join(File.dirname(@output_file), TEMP_SYMLINK_DIR)
+      end
+
       def sym_link_dir
-        dir = File.join(File.dirname(@output_file), TEMP_SYMLINK_DIR)
+        dir = sym_link_dir_not_win_friendly
         quoted(windows_friendly_path(dir))
       end
 
@@ -89,7 +104,7 @@ module BradyW
       end
 
       def exclude_regexp
-        [*@exclude_regexp].map { |re| switch_and_param 'regExExclude', re, :quote => true }
+        regular_expressions.map { |re| switch_and_param 'regExExclude', re, :quote => true }
       end
 
       def ignore_extensions
