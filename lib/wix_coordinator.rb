@@ -15,6 +15,9 @@ module BradyW
     # *Required* Upgrade code that is passed on to WIX and dotnetinstaller
     attr_accessor :upgrade_code
 
+    # *Required* The installer referencer directory that Paraffin will scan for files
+    attr_accessor :installer_referencer_bin
+
     # *Optional* Fragment file that will be updated with Paraffin before calling MSBuild.  By default it's @wix_project_directory/paraffin/binaries.wxs
     attr_accessor :paraffin_update_fragment
 
@@ -58,8 +61,9 @@ module BradyW
       # Allow Paraffin to run separately
       if @wix_project_directory || @paraffin_update_fragment then
         desc 'Updates Paraffin fragment on its own (without doing a build first)'
-        paraffin = Paraffin::FragmentUpdater.new "paraffin_#{@name}" do |pf|
+        paraffin = Paraffin::FragmentUpdater.new "paraffin_#{@name}" => [*@dependencies] do |pf|
           pf.fragment_file = paraffin_update_fragment
+          pf.output_directory = @installer_referencer_bin
         end
       end
 
@@ -203,11 +207,11 @@ module BradyW
     end
 
     def validate
-      raise ':product_version, :upgrade_code, :wix_project_directory are all required' unless is_valid
+      raise ':product_version, :upgrade_code, :wix_project_directory, and :installer_referencer_bin are all required' unless is_valid
     end
 
     def is_valid
-      @product_version && @upgrade_code && @wix_project_directory
+      @product_version && @upgrade_code && @wix_project_directory  && @installer_referencer_bin
     end
   end
 end

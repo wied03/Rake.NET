@@ -49,6 +49,7 @@ describe BradyW::WixCoordinator do
       t.product_version = '1.0.0.0'
       t.wix_project_directory = 'MyWixProject'
       t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
+      t.installer_referencer_bin = 'somedir'
     end
 
     # assert
@@ -64,7 +65,7 @@ describe BradyW::WixCoordinator do
     # act + assert
     lambda {
       task.exectaskpublic
-    }.should raise_exception ':product_version, :upgrade_code, :wix_project_directory are all required'
+    }.should raise_exception ':product_version, :upgrade_code, :wix_project_directory, and :installer_referencer_bin are all required'
   end
 
   it 'should work with custom paraffin fragment name, custom output file, and custom dotnet installer xml file' do
@@ -89,6 +90,7 @@ describe BradyW::WixCoordinator do
       t.dnetinstaller_output_exe = 'some.exe'
       t.dnetinstaller_xml_config = 'some.xml'
       t.msi_path = 'path/to/msi'
+      t.installer_referencer_bin = 'somedir'
     end
 
     # assert
@@ -117,6 +119,7 @@ describe BradyW::WixCoordinator do
       t.wix_project_directory = 'MyWixProject'
       t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
       t.properties = {:setting1 => 'the setting', :setting2 => 'the set ting 2'}
+      t.installer_referencer_bin = 'somedir'
     end
 
     # assert
@@ -145,6 +148,7 @@ describe BradyW::WixCoordinator do
       t.wix_project_directory = 'MyWixProject'
       t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
       t.properties = {:setting1 => 'the setting', :setting2 => 'the set;ting 2'}
+      t.installer_referencer_bin = 'somedir'
     end
 
     # assert
@@ -173,6 +177,7 @@ describe BradyW::WixCoordinator do
       t.wix_project_directory = 'MyWixProject'
       t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
       t.properties = {:setting1 => 'setting1', :setting2 => 'setting2'}
+      t.installer_referencer_bin = 'somedir'
     end
 
     # assert
@@ -201,6 +206,7 @@ describe BradyW::WixCoordinator do
       t.wix_project_directory = 'MyWixProject'
       t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
       t.properties = {:setting1 => 'the setting', :setting2 => 'the setting 2'}
+      t.installer_referencer_bin = 'somedir'
     end
 
     # assert
@@ -227,10 +233,12 @@ describe BradyW::WixCoordinator do
       t.product_version = '1.0.0.0'
       t.wix_project_directory = 'MyWixProject'
       t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
+      t.installer_referencer_bin = 'somedir'
     end
 
     # assert
     pf_mock.fragment_file.should == 'MyWixProject/paraffin/binaries.wxs'
+    pf_mock.output_directory = 'somedir'
   end
 
   it 'should configure the DotNetInstaller task' do
@@ -247,6 +255,7 @@ describe BradyW::WixCoordinator do
       t.wix_project_directory = 'src/MyWixProject'
       t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
       t.properties = {:setting1 => 'the setting', :setting2 => 'the setting 2'}
+      t.installer_referencer_bin = 'somedir'
     end
 
     # assert
@@ -275,6 +284,7 @@ describe BradyW::WixCoordinator do
       t.wix_project_directory = 'src/MyWixProject'
       t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
       t.bootstrapper_manifest = 'the/manifest.xml'
+      t.installer_referencer_bin = 'somedir'
     end
 
     # assert
@@ -303,6 +313,7 @@ describe BradyW::WixCoordinator do
       t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
       t.properties = {:setting1 => 'the setting', :setting2 => 'the setting 2'}
       t.build_config = :Debug
+      t.installer_referencer_bin = 'somedir'
     end
 
     # assert
@@ -343,6 +354,7 @@ describe BradyW::WixCoordinator do
       t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
       t.properties = {:setting1 => 'the setting', :setting2 => 'the setting 2'}
       t.build_config = 'Debug'
+      t.installer_referencer_bin = 'somedir'
     end
 
     # assert
@@ -378,6 +390,7 @@ describe BradyW::WixCoordinator do
       t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
       t.properties = {:setting1 => 'the setting', :setting2 => 'the setting 2'}
       t.msbuild_configure = lambda { |m| m.dotnet_bin_version = :v4_0 }
+      t.installer_referencer_bin = 'somedir'
     end
 
     # assert
@@ -394,6 +407,7 @@ describe BradyW::WixCoordinator do
         t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
         t.properties = {:setting1 => 'the setting', :setting2 => 'the setting 2', :Configuration => :Debug}
         t.msbuild_configure = lambda { |m| m.dotnet_bin_version = :v4_0 }
+        t.installer_referencer_bin = 'somedir'
       end
 
       # assert
@@ -418,6 +432,7 @@ describe BradyW::WixCoordinator do
       t.product_version = '1.0.0.0'
       t.wix_project_directory = 'MyWixProject'
       t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
+      t.installer_referencer_bin = 'somedir'
     end
 
     # assert
@@ -445,23 +460,25 @@ describe BradyW::WixCoordinator do
       t.wix_project_directory = 'MyWixProject'
       t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
       t.properties = {:setting1 => 'the setting', :setting2 => 'the setting 2'}
+      t.installer_referencer_bin = 'somedir'
     end
     ms_build_mock.stub(:dotnet).and_return('path/to/')
     FileUtils.touch 'MyWixProject/paraffin/binaries.PARAFFIN'
     FileUtils.touch 'MyWixProject/dnetinstaller.xml'
+    commands = []
 
     # act
 
     Rake::Task[:integration_test].invoke
-    command3 = task.executedPop
-    command2 = task.executedPop
-    command1 = task.executedPop
+    5.times { commands << task.executedPop }
 
     # assert
-    command1.should == '"path/to/paraffin.exe" -update "MyWixProject/paraffin/binaries.wxs" -verbose'
-    command2.should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:setting1="the setting" /property:setting2="the setting 2" /property:DefineConstants="ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;setting1=the setting;setting2=the setting 2;TRACE" MyWixProject/MyWixProject.wixproj'
-    command3.should include '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"MyWixProject/dnetinstall'
-    command3.should include '/o:"MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
+    commands[4].should == "cmd.exe /c mklink /J \"MyWixProject\\paraffin\\paraffin_config_aware_symlink\" \"somedir\""
+    commands[3].should == '"path/to/paraffin.exe" -update "MyWixProject/paraffin/binaries.wxs" -verbose'
+    commands[2].should == "rmdir \"MyWixProject\\paraffin\\paraffin_config_aware_symlink\""
+    commands[1].should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:setting1="the setting" /property:setting2="the setting 2" /property:DefineConstants="ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;setting1=the setting;setting2=the setting 2;TRACE" MyWixProject/MyWixProject.wixproj'
+    commands[0].should include '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"MyWixProject/dnetinstall'
+    commands[0].should include '/o:"MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
   end
 
   it 'should execute dependency (singular) of the overall task before the dependencies it defines' do
@@ -480,24 +497,26 @@ describe BradyW::WixCoordinator do
       t.wix_project_directory = 'MyWixProject'
       t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
       t.properties = {:setting1 => 'the setting', :setting2 => 'the setting 2'}
+      t.installer_referencer_bin = 'somedir'
     end
     ms_build_mock.stub(:dotnet).and_return('path/to/')
     FileUtils.touch 'MyWixProject/paraffin/binaries.PARAFFIN'
     FileUtils.touch 'MyWixProject/dnetinstaller.xml'
+    commands = []
 
     # act
     Rake::Task[:integration_test2].invoke
-    command4 = BradyW::BaseTask.pop_executed_command
-    command3 = BradyW::BaseTask.pop_executed_command
-    command2 = BradyW::BaseTask.pop_executed_command
-    command1 = BradyW::BaseTask.pop_executed_command
+    Rake::Task[:integration_test].invoke
+    6.times { commands << BradyW::BaseTask.pop_executed_command }
 
     # assert
-    command1.should == 'dependent_task'
-    command2.should == '"path/to/paraffin.exe" -update "MyWixProject/paraffin/binaries.wxs" -verbose'
-    command3.should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:setting1="the setting" /property:setting2="the setting 2" /property:DefineConstants="ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;setting1=the setting;setting2=the setting 2;TRACE" MyWixProject/MyWixProject.wixproj'
-    command4.should include '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"MyWixProject/dnetinstall'
-    command4.should include '/o:"MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
+    commands[5].should == 'dependent_task'
+    commands[4].should == "cmd.exe /c mklink /J \"MyWixProject\\paraffin\\paraffin_config_aware_symlink\" \"somedir\""
+    commands[3].should == '"path/to/paraffin.exe" -update "MyWixProject/paraffin/binaries.wxs" -verbose'
+    commands[2].should == "rmdir \"MyWixProject\\paraffin\\paraffin_config_aware_symlink\""
+    commands[1].should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:setting1="the setting" /property:setting2="the setting 2" /property:DefineConstants="ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;setting1=the setting;setting2=the setting 2;TRACE" MyWixProject/MyWixProject.wixproj'
+    commands[0].should include '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"MyWixProject/dnetinstall'
+    commands[0].should include '/o:"MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
   end
 
   it 'should execute dependencies (plural) of the overall task before the dependencies it defines' do
@@ -517,26 +536,26 @@ describe BradyW::WixCoordinator do
       t.wix_project_directory = 'MyWixProject'
       t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
       t.properties = {:setting1 => 'the setting', :setting2 => 'the setting 2'}
+      t.installer_referencer_bin = 'somedir'
     end
     ms_build_mock.stub(:dotnet).and_return('path/to/')
     FileUtils.touch 'MyWixProject/paraffin/binaries.PARAFFIN'
     FileUtils.touch 'MyWixProject/dnetinstaller.xml'
+    commands = []
 
     # act
     Rake::Task[:integration_test3].invoke
-    command5 = BradyW::BaseTask.pop_executed_command
-    command4 = BradyW::BaseTask.pop_executed_command
-    command3 = BradyW::BaseTask.pop_executed_command
-    command2 = BradyW::BaseTask.pop_executed_command
-    command1 = BradyW::BaseTask.pop_executed_command
+    7.times { commands << BradyW::BaseTask.pop_executed_command }
 
     # assert
-    command1.should == 'dependent_task'
-    command2.should == 'dependent_task'
-    command3.should == '"path/to/paraffin.exe" -update "MyWixProject/paraffin/binaries.wxs" -verbose'
-    command4.should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:setting1="the setting" /property:setting2="the setting 2" /property:DefineConstants="ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;setting1=the setting;setting2=the setting 2;TRACE" MyWixProject/MyWixProject.wixproj'
-    command5.should include '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"MyWixProject/dnetinstall'
-    command5.should include '/o:"MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
+    commands[6].should == 'dependent_task'
+    commands[5].should == 'dependent_task'
+    commands[4].should == "cmd.exe /c mklink /J \"MyWixProject\\paraffin\\paraffin_config_aware_symlink\" \"somedir\""
+    commands[3].should == '"path/to/paraffin.exe" -update "MyWixProject/paraffin/binaries.wxs" -verbose'
+    commands[2].should == "rmdir \"MyWixProject\\paraffin\\paraffin_config_aware_symlink\""
+    commands[1].should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:setting1="the setting" /property:setting2="the setting 2" /property:DefineConstants="ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;setting1=the setting;setting2=the setting 2;TRACE" MyWixProject/MyWixProject.wixproj'
+    commands[0].should include '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"MyWixProject/dnetinstall'
+    commands[0].should include '/o:"MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
   end
 
   it "should fail to execute the task when we don't have required parameters" do
@@ -550,7 +569,7 @@ describe BradyW::WixCoordinator do
 
     # act
     puts 'Acting'
-    lambda { Rake::Task[:integration_test4].invoke }.should raise_exception ':product_version, :upgrade_code, :wix_project_directory are all required'
+    lambda { Rake::Task[:integration_test4].invoke }.should raise_exception ':product_version, :upgrade_code, :wix_project_directory, and :installer_referencer_bin are all required'
     command1 = BradyW::BaseTask.pop_executed_command
 
     # assert
@@ -577,6 +596,7 @@ describe BradyW::WixCoordinator do
       t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
       t.certificate_subject = 'The Subject'
       t.description = 'The description'
+      t.installer_referencer_bin = 'somedir'
     end
     ms_build_mock.stub(:dotnet).and_return('path/to/')
     FileUtils.touch 'MyWixProject/paraffin/binaries.PARAFFIN'
@@ -584,18 +604,20 @@ describe BradyW::WixCoordinator do
 
     # act
     Rake::Task[:integration_test5].invoke
-    commands = 7.times.collect { BradyW::BaseTask.pop_executed_command }
+    commands = 9.times.collect { BradyW::BaseTask.pop_executed_command }
     commands = commands.reverse
 
     # assert
     commands[0].should == 'dependent_task'
     commands[1].should == 'dependent_task'
-    commands[2].should == '"path/to/paraffin.exe" -update "MyWixProject/paraffin/binaries.wxs" -verbose'
-    commands[3].should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:DefineConstants="ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;TRACE" MyWixProject/MyWixProject.wixproj'
-    commands[4].should == '"windowskit/path/bin/x64/signtool.exe" sign /n "The Subject" /t http://timestamp.verisign.com/scripts/timestamp.dll /d "The description" "MyWixProject/bin/Release/MyWixProject.msi"'
-    commands[5].should include '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"MyWixProject/dnetinstall'
-    commands[5].should include '/o:"MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
-    commands[6].should == '"windowskit/path/bin/x64/signtool.exe" sign /n "The Subject" /t http://timestamp.verisign.com/scripts/timestamp.dll /d "The description" "MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe"'
+    commands[2].should == "cmd.exe /c mklink /J \"MyWixProject\\paraffin\\paraffin_config_aware_symlink\" \"somedir\""
+    commands[3].should == '"path/to/paraffin.exe" -update "MyWixProject/paraffin/binaries.wxs" -verbose'
+    commands[4].should == "rmdir \"MyWixProject\\paraffin\\paraffin_config_aware_symlink\""
+    commands[5].should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:DefineConstants="ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;TRACE" MyWixProject/MyWixProject.wixproj'
+    commands[6].should == '"windowskit/path/bin/x64/signtool.exe" sign /n "The Subject" /t http://timestamp.verisign.com/scripts/timestamp.dll /d "The description" "MyWixProject/bin/Release/MyWixProject.msi"'
+    commands[7].should include '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"MyWixProject/dnetinstall'
+    commands[7].should include '/o:"MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
+    commands[8].should == '"windowskit/path/bin/x64/signtool.exe" sign /n "The Subject" /t http://timestamp.verisign.com/scripts/timestamp.dll /d "The description" "MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe"'
   end
 
   it 'should allow executing the Paraffin task on its own (without a version number)' do
@@ -604,16 +626,20 @@ describe BradyW::WixCoordinator do
     FileUtils.touch 'MyWixProject/paraffin/binaries.wxs'
     BradyW::WixCoordinator.new :integration_test6 do |t|
       t.wix_project_directory = 'MyWixProject'
+      t.installer_referencer_bin = 'somedir'
     end
     FileUtils.touch 'MyWixProject/paraffin/binaries.PARAFFIN'
     FileUtils.touch 'MyWixProject/dnetinstaller.xml'
 
     # act
     Rake::Task[:paraffin_integration_test6].invoke
-    command = BradyW::BaseTask.pop_executed_command
+    commands = 3.times.collect { BradyW::BaseTask.pop_executed_command }
+    commands = commands.reverse
 
     # assert
-    command.should == '"path/to/paraffin.exe" -update "MyWixProject/paraffin/binaries.wxs" -verbose'
+    commands[0].should == "cmd.exe /c mklink /J \"MyWixProject\\paraffin\\paraffin_config_aware_symlink\" \"somedir\""
+    commands[1].should == '"path/to/paraffin.exe" -update "MyWixProject/paraffin/binaries.wxs" -verbose'
+    commands[2].should == "rmdir \"MyWixProject\\paraffin\\paraffin_config_aware_symlink\""
   end
 
   it 'should allow a custom timestamp URL' do
@@ -637,6 +663,7 @@ describe BradyW::WixCoordinator do
       t.certificate_subject = 'The Subject'
       t.description = 'The description'
       t.code_sign_timestamp_server = 'http://something.else'
+      t.installer_referencer_bin = 'somedir'
     end
     ms_build_mock.stub(:dotnet).and_return('path/to/')
     FileUtils.touch 'MyWixProject/paraffin/binaries.PARAFFIN'
