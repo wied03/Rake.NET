@@ -31,6 +31,11 @@ module BradyW
       # *Optional* Regular expressions that should be ignored. Can be an array or single item
       attr_accessor :exclude_regexp
 
+      # *Optional* Directories that will be excluded.  Any relative path given will be considered relative to :directory_to_scan.  Can either be array or single item
+      attr_accessor :directories_to_exclude
+
+      TEMP_SYMLINK_DIR = 'paraffin_config_aware_symlink'
+
       def exectask
         validate
         params = [directory_to_scan,
@@ -42,12 +47,37 @@ module BradyW
                   exclude_regexp,
                   '-verbose',
                   no_root_directory]
-        params.reject!{|p| !p || p.empty?}
+        params.reject! { |p| !p || p.empty? }
         flat_params = params.join ' '
-        shell "\"#{path}\" #{flat_params}"
+        shell sym_link_create
+        begin
+          shell "\"#{path}\" #{flat_params}"
+        ensure
+          # Need to use Windows directly since this is a "symlink"
+          shell sym_link_delete
+        end
+      end
+
+      def scanned_directory
+        sym_link_dir
       end
 
       private
+
+      def sym_link_delete
+        "rmdir #{sym_link_dir}"
+      end
+
+      def sym_link_create
+        scan_dir = windows_friendly_path(quoted(@directory_to_scan))
+        # Mklink is not an executable, part of the shell
+        "cmd.exe /c mklink /J #{sym_link_dir} #{scan_dir}"
+      end
+
+      def sym_link_dir
+        dir = File.join(File.dirname(@output_file), TEMP_SYMLINK_DIR)
+        quoted(windows_friendly_path(dir))
+      end
 
       def validate
         required = {:component_group => @component_group,
@@ -67,7 +97,7 @@ module BradyW
       end
 
       def no_root_directory
-         '-NoRootDirectory' if @no_root_directory
+        '-NoRootDirectory' if @no_root_directory
       end
 
       def the_alias
@@ -79,7 +109,7 @@ module BradyW
       end
 
       def directory_to_scan
-        switch_and_param 'dir', @directory_to_scan, :quote => true
+        switch_and_param 'dir', sym_link_dir
       end
 
       def directory_reference
