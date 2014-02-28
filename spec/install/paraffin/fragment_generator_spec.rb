@@ -4,6 +4,13 @@ describe BradyW::Paraffin::FragmentGenerator do
   before(:each) do
     @mockBasePath = 'someParaffinPath\Paraffin.exe'
     stub_const 'BswTech::DnetInstallUtil::PARAFFIN_EXE', @mockBasePath
+    File.stub(:absolute_path) do |p|
+      if p[0] == '/'
+        p
+      else
+        File.join '/root/dir/for', p
+      end
+    end
   end
 
   it 'should work properly when specifying dir ref' do
@@ -23,9 +30,9 @@ describe BradyW::Paraffin::FragmentGenerator do
     command1 = task.executedPop
 
     # assert
-    command1.should eq 'cmd.exe /c mklink /J ".\paraffin_config_aware_symlink" "..\Bin\Release"'
+    command1.should eq 'cmd.exe /c mklink /J "\root\dir\for\.\paraffin_config_aware_symlink" "\root\dir\for\..\Bin\Release"'
     command2.should eq '"someParaffinPath\Paraffin.exe" -dir ".\paraffin_config_aware_symlink" -dr BinDir -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -verbose'
-    command3.should eq 'rmdir ".\paraffin_config_aware_symlink"'
+    command3.should eq 'rmdir "\root\dir\for\.\paraffin_config_aware_symlink"'
   end
 
   it 'should require a component group, alias, output file, and directory to scan' do
@@ -53,9 +60,9 @@ describe BradyW::Paraffin::FragmentGenerator do
     command1 = task.executedPop
 
     # assert
-    command1.should eq 'cmd.exe /c mklink /J "otherdir\paraffin_config_aware_symlink" "..\Bin\Release"'
+    command1.should eq 'cmd.exe /c mklink /J "\root\dir\for\otherdir\paraffin_config_aware_symlink" "\root\dir\for\..\Bin\Release"'
     command2.should eq '"someParaffinPath\Paraffin.exe" -dir "otherdir\paraffin_config_aware_symlink" -GroupName ServiceBinariesGroup otherdir/something.wxs -alias $(var.Project.TargetDir) -verbose -NoRootDirectory'
-    command3.should eq 'rmdir "otherdir\paraffin_config_aware_symlink"'
+    command3.should eq 'rmdir "\root\dir\for\otherdir\paraffin_config_aware_symlink"'
   end
 
   it 'should generate a WXS with 1 extension ignored, 1 regex excluded' do
@@ -77,9 +84,9 @@ describe BradyW::Paraffin::FragmentGenerator do
     command1 = task.executedPop
 
     # assert
-    command1.should eq 'cmd.exe /c mklink /J ".\paraffin_config_aware_symlink" "..\Bin\Release"'
+    command1.should eq 'cmd.exe /c mklink /J "\root\dir\for\.\paraffin_config_aware_symlink" "\root\dir\for\..\Bin\Release"'
     command2.should eq '"someParaffinPath\Paraffin.exe" -dir ".\paraffin_config_aware_symlink" -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -ext pdb -regExExclude ".*" -verbose'
-    command3.should eq 'rmdir ".\paraffin_config_aware_symlink"'
+    command3.should eq 'rmdir "\root\dir\for\.\paraffin_config_aware_symlink"'
   end
 
   it 'should generate a WXS with 2 extensions ignored, 2 regexes excluded' do
@@ -101,9 +108,9 @@ describe BradyW::Paraffin::FragmentGenerator do
     command1 = task.executedPop
 
     # assert
-    command1.should eq 'cmd.exe /c mklink /J ".\paraffin_config_aware_symlink" "..\Bin\Release"'
+    command1.should eq 'cmd.exe /c mklink /J "\root\dir\for\.\paraffin_config_aware_symlink" "\root\dir\for\..\Bin\Release"'
     command2.should eq '"someParaffinPath\Paraffin.exe" -dir ".\paraffin_config_aware_symlink" -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -ext pdb -ext txt -regExExclude "\d+" -regExExclude "\w+" -verbose'
-    command3.should eq 'rmdir ".\paraffin_config_aware_symlink"'
+    command3.should eq 'rmdir "\root\dir\for\.\paraffin_config_aware_symlink"'
   end
 
   it 'should generate a WXS with 1 absolute directory ignored via regex' do
@@ -241,8 +248,8 @@ describe BradyW::Paraffin::FragmentGenerator do
     lambda { task.exectaskpublic }.should raise_exception "Paraffin failed"
 
     # assert
-    @commands[0].should == 'cmd.exe /c mklink /J ".\paraffin_config_aware_symlink" "..\Bin\Release"'
+    @commands[0].should == 'cmd.exe /c mklink /J "\root\dir\for\.\paraffin_config_aware_symlink" "\root\dir\for\..\Bin\Release"'
     @commands[1].should == '"someParaffinPath\Paraffin.exe" -dir ".\paraffin_config_aware_symlink" -dr BinDir -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -verbose'
-    @commands[2].should == 'rmdir ".\paraffin_config_aware_symlink"'
+    @commands[2].should == 'rmdir "\root\dir\for\.\paraffin_config_aware_symlink"'
   end
 end

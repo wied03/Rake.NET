@@ -72,19 +72,25 @@ module BradyW
       # Exclude directories is deprecated according to Paraffin documentation
       def turn_directory_into_regex(dir)
         is_absolute = File.absolute_path(dir) == dir
-        prefixed = is_absolute ? dir : File.join(sym_link_dir_not_win_friendly,dir)
+        prefixed = is_absolute ? dir : File.join(sym_link_dir_not_win_friendly, dir)
         win_friendly = windows_friendly_path prefixed
         Regexp.escape win_friendly
       end
 
       def sym_link_delete
-        "rmdir #{sym_link_dir}"
+        "rmdir #{sym_link_dir_absolute}"
       end
 
       def sym_link_create
-        scan_dir = windows_friendly_path(quoted(@directory_to_scan))
+        # Mklink needs an absolute path
+        scan_dir = windows_friendly_path(quoted(File.absolute_path(@directory_to_scan)))
         # Mklink is not an executable, part of the shell
-        "cmd.exe /c mklink /J #{sym_link_dir} #{scan_dir}"
+        "cmd.exe /c mklink /J #{sym_link_dir_absolute} #{scan_dir}"
+      end
+
+      def sym_link_dir_absolute
+        dir = File.absolute_path(sym_link_dir_not_win_friendly)
+        quoted(windows_friendly_path(dir))
       end
 
       def sym_link_dir_not_win_friendly
