@@ -48,6 +48,8 @@ module BradyW
                   no_root_directory]
         params.reject! { |p| !p || p.empty? }
         flat_params = params.join ' '
+        # Reason we create the symlink is so that we can scan "someProj/Debug" but on the fly and later do an update based on the config
+        # we are building with (e.g. Release) and not have Debug hard coded in the Paraffin XML
         shell sym_link_create
         begin
           shell "\"#{path}\" #{flat_params}"
@@ -67,6 +69,7 @@ module BradyW
         [*@directories_to_exclude].map { |dir| turn_directory_into_regex(dir) }
       end
 
+      # Exclude directories is deprecated according to Paraffin documentation
       def turn_directory_into_regex(dir)
         is_absolute = File.absolute_path(dir) == dir
         prefixed = is_absolute ? dir : File.join(sym_link_dir_not_win_friendly,dir)
