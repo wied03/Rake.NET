@@ -1,4 +1,4 @@
-require 'base'
+require 'spec_helper'
 
 class WindowsPathsWrapper
   include BradyW::WindowsPaths

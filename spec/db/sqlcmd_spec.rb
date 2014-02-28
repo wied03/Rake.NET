@@ -1,4 +1,4 @@
-require 'base'
+require 'spec_helper'
 
 def testdata
   FileList["data/sqlcmd/input/**/*"]

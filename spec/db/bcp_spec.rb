@@ -1,4 +1,4 @@
-require 'base'
+require 'spec_helper'
 
 describe BradyW::BCP do
   before(:each) do

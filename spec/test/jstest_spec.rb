@@ -1,4 +1,4 @@
-require 'base'
+require 'spec_helper'
 
 def jspath
   FileList["data/jstest/path/**/*.js"]

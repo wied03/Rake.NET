@@ -1,4 +1,4 @@
-require 'base'
+require 'spec_helper'
 
 class ParaffinReportDifferentError
   def exitstatus

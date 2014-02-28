@@ -1,4 +1,4 @@
-require 'base'
+require 'spec_helper'
 
 describe "Configuration Works Properly" do
   before(:all) do

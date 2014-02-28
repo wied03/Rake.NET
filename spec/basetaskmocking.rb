@@ -1,4 +1,4 @@
-require 'base'
+require 'spec_helper'
 require 'rake'
 require 'rake/tasklib'
 

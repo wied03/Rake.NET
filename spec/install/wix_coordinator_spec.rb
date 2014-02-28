@@ -1,4 +1,4 @@
-require 'base'
+require 'spec_helper'
 
 module BradyW
   class BaseTask < Rake::TaskLib

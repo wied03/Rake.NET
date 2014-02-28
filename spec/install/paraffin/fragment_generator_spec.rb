@@ -1,4 +1,4 @@
-require 'base'
+require 'spec_helper'
 
 describe BradyW::Paraffin::FragmentGenerator do
   before(:each) do
