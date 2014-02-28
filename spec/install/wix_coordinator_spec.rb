@@ -472,9 +472,9 @@ describe BradyW::WixCoordinator do
     5.times { commands << task.executedPop }
 
     # assert
-    commands[4].should == "cmd.exe /c mklink /J \"MyWixProject\\paraffin\\paraffin_config_aware_symlink\" \"somedir\""
+    commands[4].should include 'symlink' # create
     commands[3].should == '"path/to/paraffin.exe" -update "MyWixProject/paraffin/binaries.wxs" -verbose -ReportIfDifferent'
-    commands[2].should == "rmdir \"MyWixProject\\paraffin\\paraffin_config_aware_symlink\""
+    commands[2].should include 'symlink' # delete
     commands[1].should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:setting1="the setting" /property:setting2="the setting 2" /property:DefineConstants="ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;setting1=the setting;setting2=the setting 2;TRACE" MyWixProject/MyWixProject.wixproj'
     commands[0].should include '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"MyWixProject/dnetinstall'
     commands[0].should include '/o:"MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
@@ -510,9 +510,9 @@ describe BradyW::WixCoordinator do
 
     # assert
     commands[5].should == 'dependent_task'
-    commands[4].should == "cmd.exe /c mklink /J \"MyWixProject\\paraffin\\paraffin_config_aware_symlink\" \"somedir\""
+    commands[4].should include 'symlink' # create
     commands[3].should == '"path/to/paraffin.exe" -update "MyWixProject/paraffin/binaries.wxs" -verbose -ReportIfDifferent'
-    commands[2].should == "rmdir \"MyWixProject\\paraffin\\paraffin_config_aware_symlink\""
+    commands[2].should include 'symlink' # delete
     commands[1].should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:setting1="the setting" /property:setting2="the setting 2" /property:DefineConstants="ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;setting1=the setting;setting2=the setting 2;TRACE" MyWixProject/MyWixProject.wixproj'
     commands[0].should include '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"MyWixProject/dnetinstall'
     commands[0].should include '/o:"MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
@@ -549,9 +549,9 @@ describe BradyW::WixCoordinator do
     # assert
     commands[6].should == 'dependent_task'
     commands[5].should == 'dependent_task'
-    commands[4].should == "cmd.exe /c mklink /J \"MyWixProject\\paraffin\\paraffin_config_aware_symlink\" \"somedir\""
+    commands[4].should include 'symlink' # create
     commands[3].should == '"path/to/paraffin.exe" -update "MyWixProject/paraffin/binaries.wxs" -verbose -ReportIfDifferent'
-    commands[2].should == "rmdir \"MyWixProject\\paraffin\\paraffin_config_aware_symlink\""
+    commands[2].should include 'symlink' # delete
     commands[1].should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:setting1="the setting" /property:setting2="the setting 2" /property:DefineConstants="ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;setting1=the setting;setting2=the setting 2;TRACE" MyWixProject/MyWixProject.wixproj'
     commands[0].should include '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"MyWixProject/dnetinstall'
     commands[0].should include '/o:"MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
@@ -609,9 +609,9 @@ describe BradyW::WixCoordinator do
     # assert
     commands[0].should == 'dependent_task'
     commands[1].should == 'dependent_task'
-    commands[2].should == "cmd.exe /c mklink /J \"MyWixProject\\paraffin\\paraffin_config_aware_symlink\" \"somedir\""
+    commands[2].should include 'symlink' # create
     commands[3].should == '"path/to/paraffin.exe" -update "MyWixProject/paraffin/binaries.wxs" -verbose -ReportIfDifferent'
-    commands[4].should == "rmdir \"MyWixProject\\paraffin\\paraffin_config_aware_symlink\""
+    commands[4].should include 'symlink' # delete
     commands[5].should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:DefineConstants="ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;TRACE" MyWixProject/MyWixProject.wixproj'
     commands[6].should == '"windowskit/path/bin/x64/signtool.exe" sign /n "The Subject" /t http://timestamp.verisign.com/scripts/timestamp.dll /d "The description" "MyWixProject/bin/Release/MyWixProject.msi"'
     commands[7].should include '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"MyWixProject/dnetinstall'
@@ -636,9 +636,9 @@ describe BradyW::WixCoordinator do
     commands = commands.reverse
 
     # assert
-    commands[0].should == "cmd.exe /c mklink /J \"MyWixProject\\paraffin\\paraffin_config_aware_symlink\" \"somedir\""
+    commands[0].should include 'symlink' # create
     commands[1].should == '"path/to/paraffin.exe" -update "MyWixProject/paraffin/binaries.wxs" -verbose -ReportIfDifferent'
-    commands[2].should == "rmdir \"MyWixProject\\paraffin\\paraffin_config_aware_symlink\""
+    commands[2].should include 'symlink' # delete
   end
 
   it 'should allow a custom timestamp URL' do
