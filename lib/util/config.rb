@@ -1,5 +1,5 @@
-require "base_config"
-require "singleton"
+require_relative 'base_config'
+require 'singleton'
 
 module BradyW
   # Using the bwbuildconfig GEM, does a singleton fetch of properties from the YAML config files

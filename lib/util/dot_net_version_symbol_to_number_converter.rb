@@ -1,5 +1,5 @@
 module BradyW
-  module Dotframeworksymbolhelp
+  module DotNetVersionSymbolToNumberConverter
     def convertToNumber symbol
       trimmedV = symbol.to_s()[1..-1]
       trimmedV.gsub(/_/, '.')

@@ -1,4 +1,4 @@
-require 'basetask'
+require_relative '../basetask'
 require 'yaml'
 
 module BradyW

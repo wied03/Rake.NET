@@ -1,7 +1,5 @@
-require "base_config"
-
-module TestCase_2
-  class ADefaultConfig < BradyW::BaseConfig
+module TestCase_1
+  class Config < BradyW::BaseConfig
     def setting
       "yep"
     end

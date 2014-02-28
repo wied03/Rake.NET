@@ -1,3 +1,5 @@
+require_relative '../basetask'
+
 module BradyW
   class WixCoordinator < BaseTask
     # *Required* Product version to configure in the WIX/MSBUild + DotNetInstaller

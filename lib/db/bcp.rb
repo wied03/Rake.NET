@@ -1,4 +1,6 @@
 require 'csv'
+require_relative '../basetask'
+require_relative 'database'
 
 module BradyW
 =begin rdoc

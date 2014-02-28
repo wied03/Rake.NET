@@ -1,3 +1,5 @@
+require_relative '../basetask'
+
 module BradyW
   # Runs MSTest tests using Visual Studio's MSTest runner
   class MSTest < BaseTask

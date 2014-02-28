@@ -1,3 +1,7 @@
+require_relative '../basetask'
+require_relative '../util/param_quotes'
+require_relative '../binary_locator/windowspaths'
+
 module BradyW
   class Subinacl < BaseTask
     include WindowsPaths

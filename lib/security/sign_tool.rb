@@ -1,3 +1,6 @@
+require_relative '../basetask'
+require_relative '../util/param_quotes'
+
 module BradyW
   class SignTool < BaseTask
     include ParamQuotes

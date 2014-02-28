@@ -1,6 +1,6 @@
-require 'basetask'
-require 'param_quotes'
-require 'temp_file_name_generator'
+require_relative '../basetask'
+require_relative '../util/param_quotes'
+require_relative '../util/temp_file_name_generator'
 require 'path_fetcher'
 
 module BradyW

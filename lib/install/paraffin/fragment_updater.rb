@@ -1,6 +1,5 @@
-require 'basetask'
-require 'path_fetcher'
-require 'param_quotes'
+require_relative '../../basetask'
+require_relative '../../util/param_quotes'
 
 module BradyW
   module Paraffin

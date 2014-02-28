@@ -1,8 +1,7 @@
-require 'basetask'
-require 'path_fetcher'
+require_relative '../basetask'
+require_relative '../util/param_quotes'
+require_relative '../util/temp_file_name_generator'
 require 'date'
-require 'param_quotes'
-require 'temp_file_name_generator'
 
 module BradyW
   class DotNetInstaller < BaseTask

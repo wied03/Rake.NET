@@ -1,5 +1,6 @@
 require 'socket'
-require 'config'
+require_relative '../basetask'
+require_relative '../util/config'
 
 module BradyW
   # TODO: Merge this in with Base_Config

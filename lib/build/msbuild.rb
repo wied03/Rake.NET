@@ -1,9 +1,14 @@
+require_relative '../basetask'
+require_relative '../binary_locator/windowspaths'
+require_relative '../util/dot_net_version_symbol_to_number_converter'
+require_relative '../util/param_quotes'
+
 module BradyW
 
   # Launches a build using MSBuild
   class MSBuild < BaseTask
     include WindowsPaths
-    include Dotframeworksymbolhelp
+    include DotNetVersionSymbolToNumberConverter
     include ParamQuotes
 
     # *Optional* Targets to build.  Can be a single target or an array of targets

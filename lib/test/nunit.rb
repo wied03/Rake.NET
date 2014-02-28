@@ -1,12 +1,12 @@
-require 'basetask'
-require 'dotframeworksymbolhelp'
-require 'param_quotes'
+require_relative '../basetask'
+require_relative '../util/dot_net_version_symbol_to_number_converter'
+require_relative '../util/param_quotes'
+require_relative '../util/temp_file_name_generator'
 require 'path_fetcher'
-require 'temp_file_name_generator'
 
 module BradyW
   class Nunit < BaseTask
-    include Dotframeworksymbolhelp
+    include DotNetVersionSymbolToNumberConverter
     include ParamQuotes
     PROGRAM_FILES_DIR = "C:/Program Files (x86)"
 

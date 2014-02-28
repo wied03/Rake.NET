@@ -1,3 +1,5 @@
+require_relative '../basetask'
+
 module BradyW
 
   # Runs SQLcmd to run supplied SQL scripts.  This task will roll up all supplied SQL script files

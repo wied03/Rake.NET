@@ -1,15 +1,11 @@
-require "config"
-
-module TestCase_1
-  class Config < BradyW::BaseConfig
+module TestCase_3
+  class ADefaultConfig < BradyW::BaseConfig
     def setting
       "yep"
     end
-
     def setting2
       "nope"
     end
-
     def setting3
       "yep"
     end
