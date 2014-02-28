@@ -1,4 +1,5 @@
-$: << File.expand_path(File.dirname(__FILE__) +"/../lib")
+libs_under_test = File.expand_path('../lib/**/*', File.dirname(__FILE__))
+$LOAD_PATH.unshift *Dir.glob(libs_under_test)
 require 'rspec/expectations'
 # Needed to mock out our config/props
 require 'config'
