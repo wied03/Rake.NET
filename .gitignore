@@ -1,4 +1,4 @@
 *.gem
 .idea/workspace.xml
 ._*
-
+.idea/Rake.Net.iml
