@@ -1,3 +1,5 @@
 *.gem
 .idea/workspace.xml
 ._*
+
+/lib/rakedotnet.rb
