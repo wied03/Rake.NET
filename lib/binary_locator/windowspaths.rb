@@ -28,6 +28,10 @@ module BradyW
       component_locator.get_component_path SUBINACL_PRODUCT_CODE, SUBINACL_EXE_COMPONENT_CODE
     end
 
+    def cmd_exe
+      ENV['ComSpec']
+    end
+
     def reg_value(key, value)
       keyAndVal = "#{key}\\#{value}"
       log "Retrieving registry key #{keyAndVal}"

@@ -1,10 +1,12 @@
 require_relative '../../basetask'
 require_relative '../../util/param_quotes'
+require_relative '../../binary_locator/windowspaths'
 
 module BradyW
   module Paraffin
     class FragmentGenerator < BaseTask
       include ParamQuotes
+      include BradyW::WindowsPaths
 
       # *Optional* Which directory reference (defined somewhere in your wxs files) should be used
       attr_accessor :directory_reference
@@ -85,7 +87,7 @@ module BradyW
         # Mklink needs an absolute path
         scan_dir = windows_friendly_path(quoted(File.absolute_path(@directory_to_scan)))
         # Mklink is not an executable, part of the shell
-        "cmd.exe /c mklink /J #{sym_link_dir_absolute} #{scan_dir}"
+        "#{cmd_exe} /c mklink /J #{sym_link_dir_absolute} #{scan_dir}"
       end
 
       def sym_link_dir_absolute

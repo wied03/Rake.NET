@@ -1,5 +1,15 @@
 require 'spec_helper'
 
+module BradyW
+  module Paraffin
+    class FragmentGenerator
+         def cmd_exe
+           'C:\WinDir\cmd.exe'
+         end
+    end
+  end
+end
+
 describe BradyW::Paraffin::FragmentGenerator do
   before(:each) do
     @mockBasePath = 'someParaffinPath\Paraffin.exe'
@@ -30,7 +40,7 @@ describe BradyW::Paraffin::FragmentGenerator do
     command1 = task.executedPop
 
     # assert
-    command1.should eq 'cmd.exe /c mklink /J "\root\dir\for\.\paraffin_config_aware_symlink" "\root\dir\for\..\Bin\Release"'
+    command1.should eq 'C:\WinDir\cmd.exe /c mklink /J "\root\dir\for\.\paraffin_config_aware_symlink" "\root\dir\for\..\Bin\Release"'
     command2.should eq '"someParaffinPath\Paraffin.exe" -dir ".\paraffin_config_aware_symlink" -dr BinDir -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -verbose'
     command3.should eq 'rmdir "\root\dir\for\.\paraffin_config_aware_symlink"'
   end
@@ -60,7 +70,7 @@ describe BradyW::Paraffin::FragmentGenerator do
     command1 = task.executedPop
 
     # assert
-    command1.should eq 'cmd.exe /c mklink /J "\root\dir\for\otherdir\paraffin_config_aware_symlink" "\root\dir\for\..\Bin\Release"'
+    command1.should eq 'C:\WinDir\cmd.exe /c mklink /J "\root\dir\for\otherdir\paraffin_config_aware_symlink" "\root\dir\for\..\Bin\Release"'
     command2.should eq '"someParaffinPath\Paraffin.exe" -dir "otherdir\paraffin_config_aware_symlink" -GroupName ServiceBinariesGroup otherdir/something.wxs -alias $(var.Project.TargetDir) -verbose -NoRootDirectory'
     command3.should eq 'rmdir "\root\dir\for\otherdir\paraffin_config_aware_symlink"'
   end
@@ -84,7 +94,7 @@ describe BradyW::Paraffin::FragmentGenerator do
     command1 = task.executedPop
 
     # assert
-    command1.should eq 'cmd.exe /c mklink /J "\root\dir\for\.\paraffin_config_aware_symlink" "\root\dir\for\..\Bin\Release"'
+    command1.should eq 'C:\WinDir\cmd.exe /c mklink /J "\root\dir\for\.\paraffin_config_aware_symlink" "\root\dir\for\..\Bin\Release"'
     command2.should eq '"someParaffinPath\Paraffin.exe" -dir ".\paraffin_config_aware_symlink" -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -ext pdb -regExExclude ".*" -verbose'
     command3.should eq 'rmdir "\root\dir\for\.\paraffin_config_aware_symlink"'
   end
@@ -108,7 +118,7 @@ describe BradyW::Paraffin::FragmentGenerator do
     command1 = task.executedPop
 
     # assert
-    command1.should eq 'cmd.exe /c mklink /J "\root\dir\for\.\paraffin_config_aware_symlink" "\root\dir\for\..\Bin\Release"'
+    command1.should eq 'C:\WinDir\cmd.exe /c mklink /J "\root\dir\for\.\paraffin_config_aware_symlink" "\root\dir\for\..\Bin\Release"'
     command2.should eq '"someParaffinPath\Paraffin.exe" -dir ".\paraffin_config_aware_symlink" -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -ext pdb -ext txt -regExExclude "\d+" -regExExclude "\w+" -verbose'
     command3.should eq 'rmdir "\root\dir\for\.\paraffin_config_aware_symlink"'
   end
@@ -248,7 +258,7 @@ describe BradyW::Paraffin::FragmentGenerator do
     lambda { task.exectaskpublic }.should raise_exception "Paraffin failed"
 
     # assert
-    @commands[0].should == 'cmd.exe /c mklink /J "\root\dir\for\.\paraffin_config_aware_symlink" "\root\dir\for\..\Bin\Release"'
+    @commands[0].should == 'C:\WinDir\cmd.exe /c mklink /J "\root\dir\for\.\paraffin_config_aware_symlink" "\root\dir\for\..\Bin\Release"'
     @commands[1].should == '"someParaffinPath\Paraffin.exe" -dir ".\paraffin_config_aware_symlink" -dr BinDir -GroupName ServiceBinariesGroup something.wxs -alias $(var.Project.TargetDir) -verbose'
     @commands[2].should == 'rmdir "\root\dir\for\.\paraffin_config_aware_symlink"'
   end
