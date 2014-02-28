@@ -113,7 +113,7 @@ module BradyW
         file.puts HEADER
         file.puts
 
-        @files.each do |input|
+        @files.sort.each do |input|
           if File.directory? input
             containingdir = Sqlcmd.getdir input
 
