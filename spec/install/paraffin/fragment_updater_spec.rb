@@ -14,6 +14,13 @@ describe BradyW::Paraffin::FragmentUpdater do
     end
     @mockBasePath = 'someParaffinPath\Paraffin.exe'
     stub_const 'BswTech::DnetInstallUtil::PARAFFIN_EXE', @mockBasePath
+    File.stub(:absolute_path) do |p|
+      if p[0] == '/'
+        p
+      else
+        File.join '/root/dir/for', p
+      end
+    end
   end
 
   it 'must supply the WXS value' do
@@ -45,9 +52,9 @@ describe BradyW::Paraffin::FragmentUpdater do
     command1 = task.executedPop
 
     # assert
-    command1.should == 'cmd.exe /c mklink /J ".\paraffin_config_aware_symlink" "..\Bin\Release"'
+    command1.should == 'cmd.exe /c mklink /J "\root\dir\for\.\paraffin_config_aware_symlink" "\root\dir\for\..\Bin\Release"'
     command2.should == '"someParaffinPath\Paraffin.exe" -update "some_file.wxs" -verbose -ReportIfDifferent'
-    command3.should == 'rmdir ".\paraffin_config_aware_symlink"'
+    command3.should == 'rmdir "\root\dir\for\.\paraffin_config_aware_symlink"'
     original_file.should == './some_file.PARAFFIN'
     destination_file.should == 'some_file.wxs'
   end
@@ -99,9 +106,9 @@ describe BradyW::Paraffin::FragmentUpdater do
     command1 = task.executedPop
 
     # assert
-    command1.should == 'cmd.exe /c mklink /J "someDirectory\paraffin_config_aware_symlink" "..\Bin\Release"'
+    command1.should == 'cmd.exe /c mklink /J "\root\dir\for\someDirectory\paraffin_config_aware_symlink" "\root\dir\for\..\Bin\Release"'
     command2.should == '"someParaffinPath\Paraffin.exe" -update "someDirectory/some_file.wxs" -verbose -ReportIfDifferent'
-    command3.should == 'rmdir "someDirectory\paraffin_config_aware_symlink"'
+    command3.should == 'rmdir "\root\dir\for\someDirectory\paraffin_config_aware_symlink"'
     original_file.should == 'someDirectory/some_file.PARAFFIN'
     destination_file.should == 'someDirectory/some_file.wxs'
   end
@@ -144,8 +151,8 @@ describe BradyW::Paraffin::FragmentUpdater do
     lambda { task.exectaskpublic }.should raise_exception "Paraffin failed with status code: 'BW Rake Task Problem'"
 
     # assert
-    @commands[0].should == 'cmd.exe /c mklink /J ".\paraffin_config_aware_symlink" "..\Bin\Release"'
+    @commands[0].should == 'cmd.exe /c mklink /J "\root\dir\for\.\paraffin_config_aware_symlink" "\root\dir\for\..\Bin\Release"'
     @commands[1].should == '"someParaffinPath\Paraffin.exe" -update "some_file.wxs" -verbose -ReportIfDifferent'
-    @commands[2].should == 'rmdir ".\paraffin_config_aware_symlink"'
+    @commands[2].should == 'rmdir "\root\dir\for\.\paraffin_config_aware_symlink"'
   end
 end

@@ -49,17 +49,27 @@ module BradyW
       private
 
       def sym_link_delete
-        "rmdir #{sym_link_dir}"
+        "rmdir #{sym_link_dir_absolute}"
       end
 
       def sym_link_create
-        scan_dir = windows_friendly_path(quoted(output_directory))
+        # Mklink needs an absolute path
+        scan_dir = windows_friendly_path(quoted(File.absolute_path(output_directory)))
         # Mklink is not an executable, part of the shell
-        "cmd.exe /c mklink /J #{sym_link_dir} #{scan_dir}"
+        "cmd.exe /c mklink /J #{sym_link_dir_absolute} #{scan_dir}"
+      end
+
+      def sym_link_dir_absolute
+        dir = File.absolute_path(sym_link_dir_not_win_friendly)
+        quoted(windows_friendly_path(dir))
+      end
+
+      def sym_link_dir_not_win_friendly
+        File.join(File.dirname(fragment_file), TEMP_SYMLINK_DIR)
       end
 
       def sym_link_dir
-        dir = File.join(File.dirname(fragment_file), TEMP_SYMLINK_DIR)
+        dir = sym_link_dir_not_win_friendly
         quoted(windows_friendly_path(dir))
       end
 
