@@ -9,9 +9,6 @@ module BradyW
       # *Required* The path to the WXS file to update
       attr_accessor :fragment_file
 
-      # *Optional* Default is true.  If set to true, the original wxs file will be replaced with Paraffin's file.  If set to false, file will not be replaced and build will fail (using Paraffin's ReportIfDifferent flag) if there is a difference in the files
-      attr_accessor :replace_original
-
       # *Required* The directory that should be used to update files against
       attr_accessor :output_directory
 
@@ -22,24 +19,23 @@ module BradyW
         params = ['-update',
                   quoted(@fragment_file),
                   '-verbose',
-                  report_if_different]
+                  '-ReportIfDifferent']
         params.reject! { |p| !p || p.empty? }
         begin
           shell sym_link_create
           shell "\"#{path}\" #{params.join(' ')}" do |ok, status|
             if !ok
-              fail "#{@fragment_file} has changed and you don't have :replace_original enabled.  Manually update #{@fragment_file} using #{generated_file} or enable :replace_original" unless @replace_original
-              fail "Paraffin failed with status code: '#{status.exitstatus}'"
+              code = status.exitstatus
+              fail "#{@fragment_file} has changed.  Review updates to #{@fragment_file} manually and rebuild" if code == 4
+              fail "Paraffin failed with status code: '#{code}'"
             end
           end
-          if @replace_original
+        ensure
+          if File.exist? generated_file
             log "Replacing #{@fragment_file} with #{generated_file}"
             FileUtils.mv generated_file, @fragment_file
-          end
-        ensure
-          if @replace_original
-            log "Removing generated file #{generated_file}"
-            FileUtils.rm generated_file if File.exists? generated_file
+          else
+            log "Will not replace #{@fragment_file} with #{generated_file} because Paraffin didn't generate it"
           end
           shell sym_link_delete
         end
@@ -47,7 +43,6 @@ module BradyW
 
 
       def initialize(parameters = :task)
-        @replace_original = true
         super parameters
       end
 
@@ -84,10 +79,6 @@ module BradyW
 
       def validate
         fail ":fragment_file and :output_directory are required for this task" unless (@fragment_file && @output_directory)
-      end
-
-      def report_if_different
-        '-ReportIfDifferent' unless @replace_original
       end
 
       def path
