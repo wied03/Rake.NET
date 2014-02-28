@@ -1,7 +1,3 @@
-require 'basetask'
-require 'param_quotes'
-require 'registry_accessor'
-
 module BradyW
   class SignTool < BaseTask
     include ParamQuotes

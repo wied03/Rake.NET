@@ -1,5 +1,4 @@
 require 'base'
-require 'jstest'
 
 def jspath
   FileList["data/jstest/path/**/*.js"]

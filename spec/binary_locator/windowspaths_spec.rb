@@ -1,6 +1,4 @@
 require 'base'
-require 'windowspaths'
-require 'msi_file_searcher'
 
 class WindowsPathsWrapper
   include BradyW::WindowsPaths

@@ -1,6 +1,4 @@
-require "base"
-require "basetask"
-require "basetaskmocking"
+require 'base'
 
 module BradyW
   class BaseTask < Rake::TaskLib

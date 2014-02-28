@@ -1,5 +1,4 @@
 require 'base'
-require 'minifyjs'
 
 describe BradyW::MinifyJs do
 

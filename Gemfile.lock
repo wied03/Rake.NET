@@ -1,8 +1,15 @@
 GIT
   remote: git://github.com/wied03/Win32TestStub.git
-  revision: 38ebf782360516ff8762f1bec41d31c26316ad88
+  revision: 0ccfb49b56dcb6f444b3c64b1368d7a531ff7c94
   specs:
-    win32stub (1.0.2)
+    windows-pr (1.0.2)
+
+PATH
+  remote: .
+  specs:
+    rakedotnet (1.0.0)
+      bsw_dnet_install_util (= 1.1.5)
+      windows-pr
 
 GEM
   remote: https://rubygems.org/
@@ -45,9 +52,9 @@ PLATFORMS
   x86-mingw32
 
 DEPENDENCIES
-  bsw_dnet_install_util (= 1.1.5)
   ci_reporter
   geminabox
   rake
+  rakedotnet!
   rspec
-  win32stub (= 1.0.2)!
+  windows-pr (= 1.0.2)!

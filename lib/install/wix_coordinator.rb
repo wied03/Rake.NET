@@ -1,9 +1,3 @@
-require 'basetask'
-require 'msbuild'
-require 'paraffin/fragment_updater'
-require 'dot_net_installer'
-require 'sign_tool'
-
 module BradyW
   class WixCoordinator < BaseTask
     # *Required* Product version to configure in the WIX/MSBUild + DotNetInstaller

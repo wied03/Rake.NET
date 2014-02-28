@@ -1,5 +1,4 @@
 require 'base'
-require 'iis'
 
 describe BradyW::IIS do
 

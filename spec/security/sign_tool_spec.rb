@@ -1,5 +1,4 @@
 require 'base'
-require 'sign_tool'
 
 describe BradyW::SignTool do
   before :each do

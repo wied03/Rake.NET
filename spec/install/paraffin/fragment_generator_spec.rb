@@ -1,6 +1,4 @@
 require 'base'
-require 'paraffin/fragment_generator'
-require 'basetaskmocking'
 
 describe BradyW::Paraffin::FragmentGenerator do
   before(:each) do

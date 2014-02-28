@@ -1,5 +1,4 @@
 require 'base'
-require 'dot_net_installer_execute'
 
 describe BradyW::DotNetInstallerExecute do
   before :each do

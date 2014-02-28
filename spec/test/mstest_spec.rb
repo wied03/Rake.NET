@@ -1,5 +1,4 @@
 require 'base'
-require 'mstest'
 
 describe BradyW::MSTest do
 

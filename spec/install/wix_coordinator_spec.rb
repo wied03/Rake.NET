@@ -1,5 +1,4 @@
 require 'base'
-require 'wix_coordinator'
 
 module BradyW
   class BaseTask < Rake::TaskLib

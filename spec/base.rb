@@ -1,10 +1,9 @@
-libs_under_test = File.expand_path('../lib/**/*', File.dirname(__FILE__))
-$LOAD_PATH.unshift *Dir.glob(libs_under_test)
+require 'bundler/setup'
+Bundler.setup
 require 'rspec/expectations'
 # Needed to mock out our config/props
-require 'config'
+require 'rakedotnet'
 require 'singleton'
-require 'basetask'
 require 'basetaskmocking'
 
 include FileUtils

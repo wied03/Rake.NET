@@ -1,6 +1,4 @@
 require 'base'
-require 'paraffin/fragment_updater'
-require 'basetaskmocking'
 
 class ParaffinReportDifferentError
   def exitstatus

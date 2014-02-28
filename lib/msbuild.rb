@@ -1,8 +1,3 @@
-require 'basetask'
-require 'windowspaths'
-require 'dotframeworksymbolhelp'
-require 'param_quotes'
-
 module BradyW
 
   # Launches a build using MSBuild

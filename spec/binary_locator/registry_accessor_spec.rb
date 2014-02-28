@@ -1,5 +1,4 @@
 require 'base'
-require 'registry_accessor'
 
 describe BradyW::RegistryAccessor, :if => ENV['windows_test'] do
   it 'should work OK with a 64 bit registry call' do

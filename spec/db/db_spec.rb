@@ -1,5 +1,4 @@
 require 'base'
-require 'database'
 
 describe BradyW::Database do
   before(:each) do

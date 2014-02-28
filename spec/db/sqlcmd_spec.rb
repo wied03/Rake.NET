@@ -1,5 +1,4 @@
 require 'base'
-require 'sqlcmd'
 
 def testdata
   FileList["data/sqlcmd/input/**/*"]

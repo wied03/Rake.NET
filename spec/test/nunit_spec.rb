@@ -1,5 +1,4 @@
 require 'base'
-require 'nunit'
 
 describe BradyW::Nunit do
   before(:each) do

@@ -1,5 +1,4 @@
 require 'base'
-require 'msbuild'
 
 describe BradyW::MSBuild do
   it 'should build OK vanilla (.NET 4.5)' do

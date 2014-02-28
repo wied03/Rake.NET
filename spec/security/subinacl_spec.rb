@@ -1,5 +1,4 @@
 require 'base'
-require 'subinacl'
 
 describe BradyW::Subinacl do
   before(:each) do

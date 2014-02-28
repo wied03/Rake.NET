@@ -1,8 +1,3 @@
-require 'basetask'
-require 'windowspaths'
-require 'database'
-require 'temp_file_name_generator'
-
 module BradyW
 
   # Runs SQLcmd to run supplied SQL scripts.  This task will roll up all supplied SQL script files

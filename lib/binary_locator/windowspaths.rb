@@ -1,6 +1,3 @@
-require 'registry_accessor'
-require 'msi_file_searcher'
-
 module BradyW
   module WindowsPaths
     private

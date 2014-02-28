@@ -1,5 +1,4 @@
 require 'base'
-require 'temp_file_name_generator'
 
 describe BradyW::TempFileNameGenerator do
   after :each do
