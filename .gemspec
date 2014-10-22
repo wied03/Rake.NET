@@ -9,7 +9,8 @@ Gem::Specification.new do |s|
   s.files = FileList["#{src}/**/*.rb",
                      "#{testdir}/**/*.rb"]
   s.test_files = FileList["#{testdir}/**/*.rb"]
-  s.version = ENV['version_number'] || '1.0.0'
+  # String.new works around issue with frozen strings in 1.9.3 rubygems
+  s.version = String.new(ENV['version_number'] || '1.0.0')
   s.summary = "Rake tasks for building .NET projects"
   s.description = "Provides MSBuild, NUnit, BCP, SqlCmd, MsTest, MinifyJS, jstest tasks for Rake build files"
   s.has_rdoc = true
