@@ -613,10 +613,10 @@ describe BradyW::WixCoordinator do
     commands[3].should == '"path/to/paraffin.exe" -update "MyWixProject/paraffin/binaries.wxs" -verbose -ReportIfDifferent'
     commands[4].should include 'symlink' # delete
     commands[5].should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:DefineConstants="ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;TRACE" MyWixProject/MyWixProject.wixproj'
-    commands[6].should == '"windowskit/path/bin/x64/signtool.exe" sign /n "The Subject" /t http://timestamp.verisign.com/scripts/timestamp.dll /d "The description" "MyWixProject/bin/Release/MyWixProject.msi"'
+    commands[6].should == '"windowskit/path/bin/x64/signtool.exe" sign /n "The Subject" /t http://timestamp.verisign.com/scripts/timestamp.dll /d "The description" /a "MyWixProject/bin/Release/MyWixProject.msi"'
     commands[7].should include '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"MyWixProject/dnetinstall'
     commands[7].should include '/o:"MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
-    commands[8].should == '"windowskit/path/bin/x64/signtool.exe" sign /n "The Subject" /t http://timestamp.verisign.com/scripts/timestamp.dll /d "The description" "MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe"'
+    commands[8].should == '"windowskit/path/bin/x64/signtool.exe" sign /n "The Subject" /t http://timestamp.verisign.com/scripts/timestamp.dll /d "The description" /a "MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe"'
   end
 
   it 'should allow executing the Paraffin task on its own (without a version number)' do
@@ -674,7 +674,7 @@ describe BradyW::WixCoordinator do
     commands = commands.reverse
 
     # assert
-    commands[4].should == '"windowskit/path/bin/x64/signtool.exe" sign /n "The Subject" /t http://something.else /d "The description" "MyWixProject/bin/Release/MyWixProject.msi"'
-    commands[6].should == '"windowskit/path/bin/x64/signtool.exe" sign /n "The Subject" /t http://something.else /d "The description" "MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe"'
+    commands[4].should == '"windowskit/path/bin/x64/signtool.exe" sign /n "The Subject" /t http://something.else /d "The description" /a "MyWixProject/bin/Release/MyWixProject.msi"'
+    commands[6].should == '"windowskit/path/bin/x64/signtool.exe" sign /n "The Subject" /t http://something.else /d "The description" /a "MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe"'
   end
 end

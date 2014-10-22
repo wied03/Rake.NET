@@ -34,6 +34,7 @@ module BradyW
                 param_fslash('n', @subject, :quote => true),
                 param_fslash('t', timestamp_url),
                 param_fslash('d', @description, :quote => true),
+				'/a',
                 quoted(@sign_this)]
       shell "#{quoted(path)} #{params.join(' ')}"
     end

@@ -34,7 +34,7 @@ describe BradyW::SignTool do
     command = task.executedPop
 
     # assert
-    command.should == '"path/to/bin/x64/signtool.exe" sign /n "The Subject" /t http://timestamp.verisign.com/scripts/timestamp.dll /d "The description" "something.exe"'
+    command.should == '"path/to/bin/x64/signtool.exe" sign /n "The Subject" /t http://timestamp.verisign.com/scripts/timestamp.dll /d "The description" /a "something.exe"'
   end
 
   it 'should execute properly with a certificate in the certificate store and default timestamp' do
@@ -52,7 +52,7 @@ describe BradyW::SignTool do
     command = task.executedPop
 
     # assert
-    command.should == '"path/to/bin/x64/signtool.exe" sign /n "The Subject" /t http://timestamp.verisign.com/scripts/timestamp.dll /d "The description" "something.exe"'
+    command.should == '"path/to/bin/x64/signtool.exe" sign /n "The Subject" /t http://timestamp.verisign.com/scripts/timestamp.dll /d "The description" /a "something.exe"'
   end
 
   it 'should work properly with a custom timestamp, SDK version, and custom architecture' do
@@ -72,6 +72,6 @@ describe BradyW::SignTool do
     command = task.executedPop
 
     # assert
-    command.should == '"path/to/bin/x86/signtool.exe" sign /n "The Subject" /t http://something/timestamp.dll /d "The description" "something.exe"'
+    command.should == '"path/to/bin/x86/signtool.exe" sign /n "The Subject" /t http://something/timestamp.dll /d "The description" /a "something.exe"'
   end
 end

@@ -64,7 +64,7 @@ describe BradyW::Subinacl do
     @commands.should include "#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w \"#{windows_friendly}\""
     File.should be_exist('run_subinacl_with_output_redirect.bat')
     lines = File.readlines 'run_subinacl_with_output_redirect.bat'
-    lines.should have(1).items
+    lines.length.should == 1
     lines[0].should == '"\path\to\subinacl.exe" /service theservice /grant=theuser=top 1> "\some\base\dir\subinacl_log.txt" 2>&1'
   end
 
@@ -86,7 +86,7 @@ describe BradyW::Subinacl do
     @commands.should include "#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w \"#{windows_friendly}\""
     File.should be_exist('run_subinacl_with_output_redirect.bat')
     lines = File.readlines 'run_subinacl_with_output_redirect.bat'
-    lines.should have(1).items
+    lines.length.should == 1
     lines[0].should == '"\path\to the\subinacl.exe" /service theservice /grant=theuser=top 1> "\some\base\dir\subinacl_log.txt" 2>&1'
   end
 

@@ -1,33 +1,27 @@
 require 'spec_helper'
+require 'rspec/expectations'
 
 def testdata
   FileList["data/sqlcmd/input/**/*"]
 end
 
 describe BradyW::Sqlcmd do
-  RSpec::Matchers.define :have_sql_property do |expected|
+  matcher :have_sql_property do |expected|
     match do |actual|
-      actualProps = parseProps actual
-      actualProps.include? expected
-    end
-
-    def parseProps (actual)
-      actualProps = actual.match(/.*-v (.+) -/)[1].scan(/('.*?'|\S+=".*?"|\S+)/).map do |kv|
+      match = actual.match(/.*-v (.+) -/)
+      group = match[1]
+      actualProps = group.scan(/('.*?'|\S+=".*?"|\S+)/).map do |kv|
         arr = kv[0].split('=')
         {:k => arr[0], :v => arr[1]}
       end
-      actualProps
+      actualProps.include? expected
     end
   end
 
-  RSpec::Matchers.define :have_sql_property_count do |expected|
+  matcher :have_sql_property_count do |expected|
     match do |actual|
-      actualProps = parseProps actual
+      actualProps = actual.match(/.*-v (.+) -/)[1].scan(/('.*?'|\S+=".*?"|\S+)/)
       actualProps.should have(expected).items
-    end
-
-    def parseProps (actual)
-      actual.match(/.*-v (.+) -/)[1].scan(/('.*?'|\S+=".*?"|\S+)/)
     end
   end
 
@@ -109,7 +103,7 @@ describe BradyW::Sqlcmd do
     execed = task.executedPop
     execed.should match(/"z:\\sqlcmd\.exe" -U theuser -P thepassword -S myhostname -e -b -v .* -i tempfile.sql/)
 
-    execed.should have_sql_property ({:k => "dbname", :v => "regulardb"})
+    expect(execed).to have_sql_property ({:k => "dbname", :v => "regulardb"})
     execed.should have_sql_property ({:k => "dbuser", :v => "theuser"})
     execed.should have_sql_property_count 2
 
