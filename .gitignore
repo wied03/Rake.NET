@@ -2,3 +2,5 @@
 .idea/workspace.xml
 ._*
 .idea/Rake.Net.iml
+# this is a library
+Gemfile.lock
