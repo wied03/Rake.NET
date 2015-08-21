@@ -1,5 +1,4 @@
-#source 'https://rubygems.org'
-source 'https://repo.fury.io/wied03/'
+source 'https://rubygems.org'
 
 gem 'rake'
 gem 'rspec'
