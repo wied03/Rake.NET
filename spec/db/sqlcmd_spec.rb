@@ -21,7 +21,7 @@ describe BradyW::Sqlcmd do
   matcher :have_sql_property_count do |expected|
     match do |actual|
       actualProps = actual.match(/.*-v (.+) -/)[1].scan(/('.*?'|\S+=".*?"|\S+)/)
-      actualProps.should have(expected).items
+      actualProps.length == expected
     end
   end
 
