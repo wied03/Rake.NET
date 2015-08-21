@@ -1,6 +1,5 @@
 %w[
   util/config
-  util/tools
 
   build/msbuild
 
