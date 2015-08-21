@@ -28,21 +28,21 @@ module BradyW
 
     def self.pop_executed_command
       return nil unless @@sh
-      @@sh.pop()
+      @@sh.pop
     end
   end
 end
 
 class SimulateProcessFailure
   def exitstatus
-    return "BW Rake Task Problem"
+    'BW Rake Task Problem'
   end
 end
 
 def rm_safe directory
   # Before we delete the files, copy them to a place where we can verify their correctness
   if File.exist? directory
-    FileUtils::cp_r directory, "data/output"
+    FileUtils::cp_r directory, 'data/output'
   end
   FileUtils::rm_rf directory
 end

@@ -8,7 +8,7 @@ module BradyW
   class Nunit < BaseTask
     include DotNetVersionSymbolToNumberConverter
     include ParamQuotes
-    PROGRAM_FILES_DIR = "C:/Program Files (x86)"
+    PROGRAM_FILES_DIR = 'C:/Program Files (x86)'
 
     # *Required* Files/assemblies to test.  You can also override this each time by setting the environment variable 'nunit_filelist' to a glob pattern
     attr_accessor :files

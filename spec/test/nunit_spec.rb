@@ -124,7 +124,7 @@ describe BradyW::Nunit do
   end
 
   it 'uses a configured custom path and the console is not found' do
-    allow(File).to receive(:exists?).with("C:/SomeOtherplace/nunit-console.exe").and_return(false)
+    allow(File).to receive(:exists?).with('C:/SomeOtherplace/nunit-console.exe').and_return(false)
     task = BradyW::Nunit.new do |test|
       test.files = %w(file1.dll file2.dll)
       test.base_path = 'C:/SomeOtherplace'
@@ -202,7 +202,7 @@ describe BradyW::Nunit do
   end
 
   it 'Should work OK with x86 arch' do
-    allow(File).to receive(:exists?).with("C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console-x86.exe").and_return(true)
+    allow(File).to receive(:exists?).with('C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console-x86.exe').and_return(true)
     task = BradyW::Nunit.new do |test|
       test.files = %w(file1.dll file2.dll)
       test.arch = :x86

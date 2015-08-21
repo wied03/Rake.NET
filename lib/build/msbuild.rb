@@ -41,7 +41,7 @@ module BradyW
     private
 
     DOTNET4_REG_PATH = "v4\\Client"
-    DOTNET35_REGPATH = "v3.5"
+    DOTNET35_REGPATH = 'v3.5'
     DOTNET2_HARDCODEDPATH = "C:\\Windows\\Microsoft.NET\\Framework\\v2.0.50727\\"
 
     def exectask

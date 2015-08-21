@@ -32,7 +32,7 @@ module BradyW
       params << param_fslash('LogFile', dnet_inst_log_file)
       params_flat = params.join ' '
       shell "#{elevate_and_exe_path} #{params_flat}" do |ok, status|
-        log ".NET Installer Log"
+        log '.NET Installer Log'
         success = write_dnet_installer_log_to_console dnet_inst_log_file
         log "\nMSI Log:"
         write_msi_log_to_console msi_log_file if File.exist?(msi_log_file)
@@ -77,7 +77,7 @@ module BradyW
 
     def escape_prop_value value
       # nil values can be sent to the MSI inside quotes
-      value = '' if !value
+      value = '' unless value
       quotes_handled = double_the_quotes value
       spaces_handled = quotes_handled.include?(' ') || value == '' ? quoted(quotes_handled) : quotes_handled
       # Need 4x the quotes for property values that contain quotes and 2X the quotes when we surround with a quote due to a space

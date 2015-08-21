@@ -1,13 +1,13 @@
 module TestCase_3
   class ADefaultConfig < BradyW::BaseConfig
     def setting
-      "yep"
+      'yep'
     end
     def setting2
-      "nope"
+      'nope'
     end
     def setting3
-      "yep"
+      'yep'
     end
   end
 end

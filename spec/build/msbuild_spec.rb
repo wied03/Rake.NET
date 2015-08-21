@@ -82,15 +82,15 @@ describe BradyW::MSBuild do
   it 'should build OK with everything customized (.NET 3.5)' do
     # arrange
     task = BradyW::MSBuild.new do |t|
-      t.targets = ['t1', 't2']
+      t.targets = %w(t1 t2)
       t.dotnet_bin_version = :v3_5
-      t.solution = "solutionhere"
+      t.solution = 'solutionhere'
       t.compile_version = :v3_5
       t.properties = {'prop1' => 'prop1val',
                       'prop2' => 'prop2val'}
       t.build_config = :Release
     end
-    expect(task).to receive(:dotnet).with("v3.5").and_return("C:\\yespath2\\")
+    expect(task).to receive(:dotnet).with('v3.5').and_return("C:\\yespath2\\")
 
     # act
     task.exectaskpublic

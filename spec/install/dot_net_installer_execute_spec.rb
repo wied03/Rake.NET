@@ -31,7 +31,7 @@ describe BradyW::DotNetInstallerExecute do
       dnet_log_written_already = false
       # Dnet installer always returns a failure code
       simulate_redirected_log_output(task, :file_name => 'msi_log.txt', :failure_return_code => true, :file_write_options => 'w:UTF-16LE:UTF-8') do |writer|
-        if !dnet_log_written_already
+        unless dnet_log_written_already
           File.open 'dnet_log.txt', 'w' do |writer|
             writer << dnet_message
           end
@@ -77,7 +77,7 @@ describe BradyW::DotNetInstallerExecute do
     task.exectaskpublic
 
     # assert
-    expect(console_text).to eq([".NET Installer Log", "2014-01-15 00:34:27\tdotNetInstaller finished, return code: 0 (0x0)", "\nMSI Log:", "MSI log messages"])
+    expect(console_text).to eq(['.NET Installer Log', "2014-01-15 00:34:27\tdotNetInstaller finished, return code: 0 (0x0)", "\nMSI Log:", 'MSI log messages'])
   end
 
   it 'should work properly in install mode with a single property' do

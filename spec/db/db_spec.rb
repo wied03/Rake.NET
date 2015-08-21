@@ -4,50 +4,50 @@ describe BradyW::Database do
   before(:each) do
     @db = BradyW::Database.new
     def @config.db_name
-          "regulardb"
+      'regulardb'
     end
     def @config.project_prefix
-      "PRE"
+      'PRE'
     end
   end
 
-  it "DB Name Plain" do
-    @db.name.should == "regulardb"
+  it 'DB Name Plain' do
+    @db.name.should == 'regulardb'
   end
 
-  it "DB Name with hostname/prefix" do
+  it 'DB Name with hostname/prefix' do
     def @config.db_name
-      "@prefix@-@thismachinehostname@"
+      '@prefix@-@thismachinehostname@'
     end
-    @db.name.should == "PRE-"+Socket.gethostname
+    @db.name.should == 'PRE-'+Socket.gethostname
   end
 
-  it "User plain" do
+  it 'User plain' do
     def @config.db_general_user
-      "username2"
+      'username2'
     end
 
-    @db.user.should == "username2"
+    @db.user.should == 'username2'
   end
 
-  it "Password" do
+  it 'Password' do
     def @config.db_general_password
-        "thepassword"
+      'thepassword'
     end
 
-    @db.password.should == "thepassword"
+    @db.password.should == 'thepassword'
   end
 
-  it "User hostname/prefix" do
+  it 'User hostname/prefix' do
     def @config.db_general_user
-          "@prefix@-@thismachinehostname@"
+      '@prefix@-@thismachinehostname@'
     end
-    @db.user.should == "PRE-"+Socket.gethostname
+    @db.user.should == 'PRE-'+Socket.gethostname
   end
 
-  it "Connect String for .NET Code/SQL Auth" do
+  it 'Connect String for .NET Code/SQL Auth' do
     def @config.db_hostname
-      "myhostname"
+      'myhostname'
     end
 
     def @config.db_general_authmode
@@ -55,23 +55,23 @@ describe BradyW::Database do
     end
 
     def @config.db_general_user
-      "theuser"
+      'theuser'
     end
 
     def @config.db_general_password
-      "thepassword"
+      'thepassword'
     end
 
     def @config.db_connect_string_sqlauth
-      "user @user@ pass @password@ host @host@ db @initialcatalog@"
+      'user @user@ pass @password@ host @host@ db @initialcatalog@'
     end
 
-    @db.connect_code.should == "user theuser pass thepassword host myhostname db regulardb"
+    @db.connect_code.should == 'user theuser pass thepassword host myhostname db regulardb'
   end
 
-  it "Connect String for .NET Code/Windows Auth" do
+  it 'Connect String for .NET Code/Windows Auth' do
     def @config.db_hostname
-          "myhostname"
+      'myhostname'
     end
 
     def @config.db_general_authmode
@@ -79,9 +79,9 @@ describe BradyW::Database do
     end
 
     def @config.db_connect_string_winauth
-      "host @host@ db @initialcatalog@"
+      'host @host@ db @initialcatalog@'
     end
 
-    @db.connect_code.should == "host myhostname db regulardb"
+    @db.connect_code.should == 'host myhostname db regulardb'
   end
 end

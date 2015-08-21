@@ -18,7 +18,7 @@ module BradyW
     end
 
     def testcontainers
-      specifier = " /testcontainer:"
+      specifier = ' /testcontainer:'
       mainstr = files.join(specifier)
       specifier+mainstr
     end
@@ -28,7 +28,7 @@ module BradyW
     end
 
     def version
-      @version || "10.0"
+      @version || '10.0'
     end
   end
 end

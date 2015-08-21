@@ -28,13 +28,13 @@ module BradyW
               param_fslash_colon('t', bootstrapper_path, :quote => true)]
       params << param_fslash_colon('Manifest', manifest_temp_file, :quote => true) if manifest_temp_file
       clean_file = lambda {
-        if !ENV['PRESERVE_TEMP']
+        unless ENV['PRESERVE_TEMP']
           FileUtils.rm generated_core_xml_file
           FileUtils.rm manifest_temp_file if @manifest
         end
       }
       shell "\"#{linker_path}\" #{params.join(' ')}" do |ok, status|
-        if !ok then
+        unless ok
           clean_file.call
           fail "Problem with dotNetInstaller.  Return code '#{status.exitstatus}'"
         end
@@ -45,7 +45,7 @@ module BradyW
     private
 
     def validate
-      fail ":xml_config and :output are required" if !@xml_config || !@output
+      fail ':xml_config and :output are required' if !@xml_config || !@output
     end
 
     def generate_core_xml_file
@@ -64,7 +64,7 @@ module BradyW
       File.open(generated_file_name, 'w') do |out|
         File.open src_file_name, 'r' do |input|
           input.each do |line|
-            if @tokens then
+            if @tokens
               @tokens.each do |k, v|
                 line.sub! token_replace(k), v.to_s
               end

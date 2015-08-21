@@ -26,7 +26,7 @@ module BradyW
         begin
           shell sym_link_create
           shell "\"#{path}\" #{params.join(' ')}" do |ok, status|
-            if !ok
+            unless ok
               code = status.exitstatus
               fail "#{@fragment_file} has changed.  Review updates to #{@fragment_file} manually and rebuild" if code == 4
               fail "Paraffin failed with status code: '#{code}'"
@@ -90,7 +90,7 @@ module BradyW
       end
 
       def validate
-        fail ":fragment_file and :output_directory are required for this task" unless (@fragment_file && @output_directory)
+        fail ':fragment_file and :output_directory are required for this task' unless (@fragment_file && @output_directory)
       end
 
       def path

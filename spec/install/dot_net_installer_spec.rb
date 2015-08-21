@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe BradyW::DotNetInstaller do
   before :each do
-    @should_deletes = ['generated_name_1.xml', 'generated_name_2.xml']
+    @should_deletes = %w(generated_name_1.xml generated_name_2.xml)
     allow(BswTech::DnetInstallUtil).to receive(:dot_net_installer_base_path).and_return('path/to/dnetinstaller')
     @file_index = 0
     allow(BradyW::TempFileNameGenerator).to receive(:from_existing_file) {

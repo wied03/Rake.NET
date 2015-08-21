@@ -35,9 +35,7 @@ describe BradyW::WixCoordinator do
     end
 
     # assert
-    task.dependencies.should == ["paraffin_#{task.name}",
-                                 "wixmsbld_#{task.name}",
-                                 "dnetinst_#{task.name}"]
+    task.dependencies.should == %W(paraffin_#{task.name} wixmsbld_#{task.name} dnetinst_#{task.name})
   end
 
   it 'should require product_version, upgrade_code, wix_project_directory' do
@@ -393,7 +391,7 @@ describe BradyW::WixCoordinator do
       end
 
       # assert
-    }.should raise_exception "You cannot supply Debug for a :Configuration property.  Use the :build_config property on the WixCoordinator task"
+    }.should raise_exception 'You cannot supply Debug for a :Configuration property.  Use the :build_config property on the WixCoordinator task'
   end
 
   it 'should work properly with no additional properties supplied' do
@@ -542,7 +540,7 @@ describe BradyW::WixCoordinator do
 
   it "should fail to execute the task when we don't have required parameters" do
     # arrange
-    puts "Arranging"
+    puts 'Arranging'
     TestTask.new :test_task_5
     task = BradyW::WixCoordinator.new(:integration_test4 => :test_task_5)
 
@@ -567,7 +565,7 @@ describe BradyW::WixCoordinator do
       block[ms_build_mock]
       ms_build_mock
     end
-    allow(@mock_accessor).to receive(:get_sub_keys).with('SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows').and_return(['v7.1A', 'v8.0A', 'v8.1A', 'v8.1'])
+    allow(@mock_accessor).to receive(:get_sub_keys).with('SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows').and_return(%w(v7.1A v8.0A v8.1A v8.1))
     allow(@mock_accessor).to receive(:get_value).with('SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows\\v8.1', 'InstallationFolder').and_return('windowskit/path')
 
     TestTask.new :test_task_6
@@ -633,7 +631,7 @@ describe BradyW::WixCoordinator do
       block[ms_build_mock]
       ms_build_mock
     end
-    allow(@mock_accessor).to receive(:get_sub_keys).with('SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows').and_return(['v7.1A', 'v8.0A', 'v8.1A', 'v8.1'])
+    allow(@mock_accessor).to receive(:get_sub_keys).with('SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows').and_return(%w(v7.1A v8.0A v8.1A v8.1))
     allow(@mock_accessor).to receive(:get_value).with('SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows\\v8.1', 'InstallationFolder').and_return('windowskit/path')
 
     TestTask.new :test_task_8

@@ -6,7 +6,7 @@ module BradyW
     end
 
     def project_prefix
-      "BSW"
+      'BSW'
     end
 
     def db_hostname
@@ -14,7 +14,7 @@ module BradyW
     end
 
     def db_name
-      "@prefix@-@thismachinehostname@"
+      '@prefix@-@thismachinehostname@'
     end
 
     def db_object_creation_authmode
@@ -22,11 +22,11 @@ module BradyW
     end
 
     def db_object_creation_user
-      "user"
+      'user'
     end
 
     def db_object_creation_password
-      "password"
+      'password'
     end
 
     # winauth or sqlauth
@@ -39,7 +39,7 @@ module BradyW
     end
 
     def db_general_password
-      "password"
+      'password'
     end
 
     def db_system_authmode
@@ -47,23 +47,23 @@ module BradyW
     end
 
     def db_system_user
-      "user"
+      'user'
     end
 
     def db_system_password
-      "password"
+      'password'
     end
 
     def db_system_datadir
-      "D:/sqlserverdata"
+      'D:/sqlserverdata'
     end
 
     def db_connect_string_winauth
-      "Data Source=@host@;Initial Catalog=@initialcatalog@;Persist Security Info=True;Min Pool Size=20;Max Pool Size=500;Connection Timeout=15;Trusted_Connection=Yes"
+      'Data Source=@host@;Initial Catalog=@initialcatalog@;Persist Security Info=True;Min Pool Size=20;Max Pool Size=500;Connection Timeout=15;Trusted_Connection=Yes'
     end
 
     def db_connect_string_sqlauth
-      "Data Source=@host@;Initial Catalog=@initialcatalog@;Persist Security Info=True;User ID=@user@;Password=@password@;Min Pool Size=20;Max Pool Size=500;Connection Timeout=15;"
+      'Data Source=@host@;Initial Catalog=@initialcatalog@;Persist Security Info=True;User ID=@user@;Password=@password@;Min Pool Size=20;Max Pool Size=500;Connection Timeout=15;'
     end
 
     def build_type
@@ -75,8 +75,8 @@ module BradyW
     end
 
     def test_javascript_browsers
-      ["D:/Program Files/Mozilla Firefox/firefox.exe",
-       "C:/Users/brady/AppData/Local/Google/Chrome/Application/chrome.exe"]
+      ['D:/Program Files/Mozilla Firefox/firefox.exe',
+       'C:/Users/brady/AppData/Local/Google/Chrome/Application/chrome.exe']
     end
 
   end

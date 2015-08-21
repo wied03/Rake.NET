@@ -37,6 +37,6 @@ describe BradyW::RegistryAccessor, :if => ENV['windows_test'] do
     keys = accessor.get_sub_keys('SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows')
 
     # assert
-    expect(keys).to eq(['v7.1A', 'v8.0A', 'v8.1A', 'v8.1'])
+    expect(keys).to eq(%w(v7.1A v8.0A v8.1A v8.1))
   end
 end

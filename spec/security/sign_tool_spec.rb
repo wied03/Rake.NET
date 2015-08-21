@@ -22,7 +22,7 @@ describe BradyW::SignTool do
       t.description = 'The description'
       t.sign_this = 'something.exe'
     end
-    allow(@mock_registry).to receive(:get_sub_keys).with('SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows').and_return(['v7.1A', 'v8.0', 'v8.1A'])
+    allow(@mock_registry).to receive(:get_sub_keys).with('SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows').and_return(%w(v7.1A v8.0 v8.1A))
     allow(@mock_registry).to receive(:get_value).with('SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows\\v8.0', 'InstallationFolder').and_return('path/to')
 
     # act
@@ -40,7 +40,7 @@ describe BradyW::SignTool do
       t.description = 'The description'
       t.sign_this = 'something.exe'
     end
-    allow(@mock_registry).to receive(:get_sub_keys).with('SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows').and_return(['v7.1A', 'v8.0A', 'v8.1A', 'v8.1'])
+    allow(@mock_registry).to receive(:get_sub_keys).with('SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows').and_return(%w(v7.1A v8.0A v8.1A v8.1))
     allow(@mock_registry).to receive(:get_value).with('SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows\\v8.1', 'InstallationFolder').and_return('path/to')
 
     # act

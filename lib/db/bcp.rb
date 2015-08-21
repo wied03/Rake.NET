@@ -62,12 +62,12 @@ loading them in with BCP.
         csvtoCustomDelim csv, "#{@tmp}/#{fileName}"
         cd @tmp
         # need to trim off both the extension and the leading 2 numbers/hyphen
-        sequenceAndTable = File.basename(csv, ".csv")
+        sequenceAndTable = File.basename(csv, '.csv')
         tableName = sequenceAndTable.match(/\d+-(.*)/)[1]
         args = "\"#{prefix}#{tableName}\" in #{fileName} #{connect_string} -t \"#{delimiter}\" /c #{identity_inserts}-m 1 -F 2"
 
         shell "\"#{path}bcp.exe\" #{args}" do |ok, status|
-          if !ok
+          unless ok
             cd currentdir
             # We want to clean up our temp files if we fail
             rm_safe @tmp
@@ -81,17 +81,17 @@ loading them in with BCP.
     end
 
     def csvtoCustomDelim(oldfile, newfile)
-      File.open(newfile, "a") do |file|
+      File.open(newfile, 'a') do |file|
         CSV.foreach(oldfile) do |row|
           d = delimiter
           row.each { |f|
             if f.include? d
               puts "Your data contains the crazy delimiter that's currently configured, which is "
               puts "#{d} "
-              puts " (the default one) " unless !d
+              puts ' (the default one) ' if d
               puts "Pass in the 'delimiter' attribute from your rakefile with a different random value."
-              puts "Hopefully then it will not exist in your data and can be used with bcp to import"
-              puts "data into the database."
+              puts 'Hopefully then it will not exist in your data and can be used with bcp to import'
+              puts 'data into the database.'
               fail
             end }
           newRow = row.join(d)
@@ -101,33 +101,33 @@ loading them in with BCP.
     end
 
     def path
-      p = @version || "100"
+      p = @version || '100'
       sql_tool p
     end
 
     def delimiter
-      @delimiter || "|d3l1m1t3r|"
+      @delimiter || '|d3l1m1t3r|'
     end
 
     # BCP doesn't allow initial catalogs for SQL auth, but does for winauth and we need them
     # since winauth users might use several schemas
     def prefix
       if @config.db_general_authmode == :winauth
-        "%s.dbo." % [@dbprops.name]
+        '%s.dbo.' % [@dbprops.name]
       else
-        ""
+        ''
       end
     end
 
     def identity_inserts
-      @identity_inserts ? "-E " : ""
+      @identity_inserts ? '-E ' : ''
     end
 
     def connect_string
       if @config.db_general_authmode == :winauth
-        "-T -S %s" % [@dbprops.host]
+        '-T -S %s' % [@dbprops.host]
       else
-        "-U %s -P %s /S%s" % [@dbprops.user,
+        '-U %s -P %s /S%s' % [@dbprops.user,
                               @dbprops.password,
                               @dbprops.host]
       end

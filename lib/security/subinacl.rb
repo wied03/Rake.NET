@@ -11,7 +11,7 @@ module BradyW
     attr_accessor :user_to_grant_top_access_to
 
     def exectask
-      raise 'Subinacl not found on your system.  Did you install MSI version 5.2.3790 ?' if !subinacl_path
+      raise 'Subinacl not found on your system.  Did you install MSI version 5.2.3790 ?' unless subinacl_path
       params = [param_fslash('service', @service_to_grant_access_to),
                 param_fslash_eq('grant', "#{@user_to_grant_top_access_to}=top")]
       temp_batch_file_name = BradyW::TempFileNameGenerator.random_filename 'run_subinacl_with_output_redirect', '.bat'

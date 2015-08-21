@@ -55,7 +55,7 @@ module BradyW
       parseParams parameters
 
       # Allow Paraffin to run separately
-      if @wix_project_directory || @paraffin_update_fragment then
+      if @wix_project_directory || @paraffin_update_fragment
         desc 'Updates Paraffin fragment on its own (without doing a build first)'
         paraffin = Paraffin::FragmentUpdater.new "paraffin_#{@name}" => [*@dependencies] do |pf|
           pf.fragment_file = paraffin_update_fragment
@@ -63,8 +63,8 @@ module BradyW
         end
       end
 
-      if not is_valid then
-        log "WixCoordinator task is missing required parameters, will raise exception if executed"
+      unless is_valid
+        log 'WixCoordinator task is missing required parameters, will raise exception if executed'
         # This task specifies its own dependencies and in this case, won't specify any since we want an error to be thrown upon execution
         @dependencies = nil
         super(@name)
@@ -89,7 +89,7 @@ module BradyW
         end
       end
 
-      if signing_code? then
+      if signing_code?
         sign_msi_task_name = "signmsi_#{@name}"
         sign_code_task[{sign_msi_task_name => msb.name}, msi_path]
       end
@@ -112,7 +112,7 @@ module BradyW
                                           msb.name,
                                           dnet_inst_task_name]
 
-      if signing_code? then
+      if signing_code?
         sign_exe_task_name = "signexe_#{@name}"
         sign_code_task[{sign_exe_task_name => dnet_inst_task_name}, dnetinstaller_output_exe]
         @dependencies << sign_exe_task_name
@@ -190,7 +190,7 @@ module BradyW
     end
 
     def properties
-      if @properties && @properties.include?(:Configuration) then
+      if @properties && @properties.include?(:Configuration)
         raise "You cannot supply #{@properties[:Configuration]} for a :Configuration property.  Use the :build_config property on the WixCoordinator task"
       end
       standard_props = {:ProductVersion => @product_version,

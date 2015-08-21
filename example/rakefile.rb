@@ -1,18 +1,18 @@
 $: << File.expand_path(File.dirname(__FILE__))
 
-require "bcp"
-require "sqlcmd"
-require "tools"
-require "jstest"
-require "config"
-require "minifyjs"
-require "msbuild"
-require "mstest"
-require "nunit"
-require "iis"
+require 'bcp'
+require 'sqlcmd'
+require 'tools'
+require 'jstest'
+require 'config'
+require 'minifyjs'
+require 'msbuild'
+require 'mstest'
+require 'nunit'
+require 'iis'
 
 @config = BradyW::Config.instance.values
-with("Javascript") do |js|
+with('Javascript') do |js|
 	BradyW::JsTest.new :jstest do |j|
 		j.files = FileList["#{js}/src/**/*.js",
 						   "#{js}/test/**/*.js"]
@@ -29,7 +29,7 @@ end
 
 with('MvcApplication1.sln') do |solution|
 	BradyW::MSBuild.new :clean do |clean|
-		clean.targets = "clean"
+		clean.targets = 'clean'
 		clean.solution = solution
 	end
 
@@ -61,27 +61,27 @@ with('Database') do |d|
     end
 
 	task :db => [:db_schema, :db_objects]
-	
+
 	task :db_schema => [:db_schema_create,
 						:db_schema_grant]
-	
+
     BradyW::Sqlcmd.new :db_schema_create do |db|
       db.credentials = :system
       db.files = FileList["#{d}/schema/create_database.sql"]
     end
-	
+
 	BradyW::Sqlcmd.new :db_schema_grant do |db|
 	  db.credentials = :system
 	  db.files = FileList["#{d}/schema/grant_sqlauth.sql"]
 	end
-	
+
 	task :db_drop => [:db_schema_revoke, :db_schema_drop]
-	
+
 	BradyW::Sqlcmd.new :db_schema_revoke do |db|
 	  db.credentials = :system
 	  db.files = FileList["#{d}/schema/revoke_sqlauth.sql"]
 	end
-	
+
     BradyW::Sqlcmd.new :db_schema_drop do |db|
       db.credentials = :system
       db.files = FileList["#{d}/schema/drop_database.sql"]
@@ -91,7 +91,7 @@ with('Database') do |d|
       db.files = FileList["#{d}/objects/**/*"]
       db.credentials = :objectcreation
     end
-	
+
 	BradyW::Sqlcmd.new :db_replacevars do |db|
 	  db.makedynamic = true
       db.files = FileList["#{d}/objects/**/*"]

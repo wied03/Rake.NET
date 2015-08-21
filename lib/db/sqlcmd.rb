@@ -18,7 +18,7 @@ module BradyW
     #    02-indexes
     attr_accessor :files
 
-    # *Optional* Version of SQL Server's sqlcmd to use.  Defaults to SQL Server 2008.  
+    # *Optional* Version of SQL Server's sqlcmd to use.  Defaults to SQL Server 2008.
     attr_accessor :version
 
     # *Optional* By default, several variables are passed into SQLCMD based on the config file.
@@ -35,14 +35,14 @@ module BradyW
     # variables with sqlcmd style $(variable)s to make scripts more dynamic.  It's useful when
     # taking scripts creating on a single developer machine and prepping them for checkin.
     # Default is false.
-    attr_accessor :makedynamic    
+    attr_accessor :makedynamic
 
     # *Optional* Which set of DB credentials should be used?
     # :system - for creation/deletion of databases
     # :objectcreation - for adding/creating objects within a database
     # :general - DEFAULT - for adding/deleting rows within a database (use this for code)
     def credentials=(value)
-      BaseTask.validate value, "credentials", Database::CREDENTIALS
+      BaseTask.validate value, 'credentials', Database::CREDENTIALS
       @credentials = value
     end
 
@@ -56,9 +56,9 @@ module BradyW
       credentials.to_s
     end
 
-    HEADER = "-- *************************************************************"
-    CONNECT_STRING_WINAUTH = "-E -S %s"
-    CONNECT_STRING_SQLAUTH = "-U %s -P %s -S %s"
+    HEADER = '-- *************************************************************'
+    CONNECT_STRING_WINAUTH = '-E -S %s'
+    CONNECT_STRING_SQLAUTH = '-U %s -P %s -S %s'
 
     def initialize (parameters = :task)
       super parameters
@@ -73,7 +73,7 @@ module BradyW
         processdynamic
         return
       end
-      
+
       createtempfile
       exe = "\"#{path}sqlcmd.exe\""
       args = "#{connect} -e -b#{variables_flat} -i #{@tempfile}"
@@ -95,7 +95,7 @@ module BradyW
            text.gsub!(value,
                       "$(#{setting})")
          end
-         File.open fileName, "w" do |newFile|
+         File.open fileName, 'w' do |newFile|
             newFile.puts text
          end
        end
@@ -107,9 +107,9 @@ module BradyW
     end
 
     def createtempfile
-      File.open(@tempfile, "w") do |file|
+      File.open(@tempfile, 'w') do |file|
         file.puts HEADER
-        file.puts "-- BEGIN BATCH SQL RUN"
+        file.puts '-- BEGIN BATCH SQL RUN'
         file.puts HEADER
         file.puts
 
@@ -135,7 +135,7 @@ module BradyW
         file.puts
         file.puts
         file.puts HEADER
-        file.puts "-- COMPLETED BATCH SQL RUN"
+        file.puts '-- COMPLETED BATCH SQL RUN'
         file.puts HEADER
       end
     end
@@ -149,7 +149,7 @@ module BradyW
     end
 
     def path
-      p = @version || "100"
+      p = @version || '100'
       sql_tool p
     end
 
@@ -164,15 +164,15 @@ module BradyW
                                       @config.send("#{prefix}password"),
                                       @dbprops.host]
       end
-    end   
+    end
 
     def variables_flat
       keyvalue = []
       variables.each do |variable, setting|
         setting = setting.include?(' ') ? "\"#{setting}\"" : setting
-        keyvalue << "#{variable}=#{setting}"  
+        keyvalue << "#{variable}=#{setting}"
       end
-      " -v " + keyvalue.join(" ") unless variables.empty?
+      ' -v ' + keyvalue.join(' ') unless variables.empty?
     end
 
     def variables
@@ -182,7 +182,7 @@ module BradyW
         {'dbname' => @dbprops.name,
          'dbuser' => @dbprops.user}
 
-      if (credentials == :system || makedynamic)
+      if credentials == :system || makedynamic
         default['sqlserverdatadirectory'] = "\"#{@config.db_system_datadir}\""
         default['dbpassword'] = @dbprops.password
       end

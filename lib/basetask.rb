@@ -17,9 +17,9 @@ module BradyW
     # Validates whether value is in the allowed list and raises an exception, using name
     # as documentation, if it does not
     def self.validate(value, name, allowed)
-      if !allowed.include? value
+      unless allowed.include? value
         symbols = allowed.collect { |sym| ":#{sym}" }
-        formatted = symbols.join(", ")
+        formatted = symbols.join(', ')
         raise "Invalid #{name} value!  Allowed values: #{formatted}"
       end
     end

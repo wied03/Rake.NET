@@ -16,26 +16,26 @@ module BradyW
 
     # *Optional* Where is the YUI compressor JAR? (defaults to "lib/")
     attr_accessor :path
-    
+
     private
-    
-    def exectask		
+
+    def exectask
 	  puts "YUI Javscript Minify:  Minifying these files: #{files}"
 	  files.each do |j|
         shell "java -jar #{path}yuicompressor-#{version}.jar --charset #{charset} #{j} -o #{j}"
 	  end
-    end	
-	
+    end
+
 	def charset
-      @charset || "utf-8"
+      @charset || 'utf-8'
 	end
-	
+
 	def version
-      @version || "2.4.2"
+      @version || '2.4.2'
 	end
-	
+
 	def path
-      @path || "lib/"
+      @path || 'lib/'
 	end
   end
 end

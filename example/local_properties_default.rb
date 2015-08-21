@@ -1,6 +1,6 @@
-require "base_config"
+require 'base_config'
 
 module ExampleProj
-	class DefaultConfig < BradyW::BaseConfig	
+	class DefaultConfig < BradyW::BaseConfig
 	end
-end 
+end

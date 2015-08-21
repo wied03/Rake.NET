@@ -27,7 +27,7 @@ describe BradyW::WindowsPaths do
 
   it 'should retrieve SQL Server tools properly' do
     result = @windowPathsWrapper.send(:sql_tool, 'verhere')
-    result.should == "hi"
+    result.should == 'hi'
     @key.should == 'SOFTWARE\\Microsoft\\Microsoft SQL Server\\verhere\\Tools\\ClientSetup'
     @value.should == 'Path'
   end

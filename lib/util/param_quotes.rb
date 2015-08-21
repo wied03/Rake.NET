@@ -1,7 +1,7 @@
 module BradyW
   module ParamQuotes
     def switch_and_param(switch, setting, options={})
-      return String.new if !setting
+      return String.new unless setting
       specifier = options[:specifier] || '-'
       quoted = options[:quote] ? quoted(setting) : setting
       "#{specifier}#{switch} #{quoted}"
@@ -12,13 +12,13 @@ module BradyW
     end
 
     def param_fslash_eq(switch, setting, options={})
-      return String.new if !setting
+      return String.new unless setting
       quoted = options[:quote] ? quoted(setting) : setting
       "/#{switch}=#{quoted}"
     end
 
     def param_fslash_colon(switch, setting, options={})
-      return String.new if !setting
+      return String.new unless setting
       quoted = options[:quote] ? quoted(setting) : setting
       "/#{switch}:#{quoted}"
     end

@@ -8,7 +8,7 @@ module BradyW
 
     # *Required* Which Javascript files should be passed on to JS Test driver?
     attr_accessor :files
-    
+
     # *Required* List of browser paths to run the test on. (surrounded in quotes on Windows)
     attr_accessor :browsers
 
@@ -32,7 +32,7 @@ module BradyW
     # when this task is run.  If you specify another server here, then this task will NOT
     # launch a server and will instead only run the tests.
     attr_accessor :server
-    
+
     private
     def exectask
 		genConfigFile
@@ -42,15 +42,15 @@ module BradyW
           rm_safe configFile
           ok or
           fail "Command failed with status (#{status.exitstatus}):"
-        end		
+        end
     end
-	
+
 	def genConfigFile
         # This will include internal Rake FileList exclusion stuff if we don't do this
         onlyFiles = []
         @files.each { |f| onlyFiles << f}
-		config = {"server" => "http://#{server}:#{port}",
-				  "load" => onlyFiles}
+		config = {'server' => "http://#{server}:#{port}",
+				  'load' => onlyFiles}
 		File.open configFile, 'w' do |file|
 			YAML.dump config, file
 		end
@@ -58,41 +58,41 @@ module BradyW
 
     def testoutput
       if xmloutput
-        " --testOutput " + (@outpath || ".")
+        ' --testOutput ' + (@outpath || '.')
       end
     end
 
     def xmloutput
-      @xmloutput || ENV["CCNetProject"]
+      @xmloutput || ENV['CCNetProject']
     end
-	
+
 	def configFile
-		"jsTestDriver.conf"
+    'jsTestDriver.conf'
 	end
-	
+
 	def browsers
-		" --browser "+@browsers.join(",") unless @server
+		' --browser '+@browsers.join(',') unless @server
 	end
-	
+
 	def version
-      @version || "1.2.1"
+      @version || '1.2.1'
     end
 
     def server
-      @server || "localhost"
+      @server || 'localhost'
     end
-	
+
 	def jarpath
-      @jarpath || "lib/"
+      @jarpath || 'lib/'
 	end
 
 
     def portparam
       " --port #{port}" unless @server
     end
-    
+
 	def port
-      @port || "9876"
+      @port || '9876'
 	end
   end
 end

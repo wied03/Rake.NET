@@ -50,7 +50,7 @@ describe BradyW::Paraffin::FragmentGenerator do
     task = BradyW::Paraffin::FragmentGenerator.new
 
     # act + assert
-    lambda { task.exectaskpublic }.should raise_exception "These required attributes must be set by your task: [:component_group, :alias, :output_file, :directory_to_scan]"
+    lambda { task.exectaskpublic }.should raise_exception 'These required attributes must be set by your task: [:component_group, :alias, :output_file, :directory_to_scan]'
   end
 
   it 'should use -NoRootDirectory' do
@@ -107,8 +107,8 @@ describe BradyW::Paraffin::FragmentGenerator do
       t.output_file = 'something.wxs'
       t.directory_to_scan = '../Bin/Release'
       t.no_root_directory = false
-      t.ignore_extensions = ['pdb', 'txt']
-      t.exclude_regexp = ['\d+', '\w+']
+      t.ignore_extensions = %w(pdb txt)
+      t.exclude_regexp = %w(\d+ \w+)
     end
 
     # act
@@ -226,7 +226,7 @@ describe BradyW::Paraffin::FragmentGenerator do
       t.output_file = 'something.wxs'
       t.directory_to_scan = '..\Bin\Release'
       t.directories_to_exclude = 'somedir'
-      t.exclude_regexp = ['\d+', '\w+']
+      t.exclude_regexp = %w(\d+ \w+)
     end
 
     # act
@@ -255,7 +255,7 @@ describe BradyW::Paraffin::FragmentGenerator do
     }
 
     # act
-    lambda { task.exectaskpublic }.should raise_exception "Paraffin failed"
+    lambda { task.exectaskpublic }.should raise_exception 'Paraffin failed'
 
     # assert
     @commands[0].should == 'C:\WinDir\cmd.exe /c mklink /J "\root\dir\for\.\paraffin_config_aware_symlink" "\root\dir\for\..\Bin\Release"'
