@@ -1,6 +1,5 @@
 *.gem
-.idea/workspace.xml
 ._*
-.idea/Rake.Net.iml
+.idea
 # this is a library
 Gemfile.lock
