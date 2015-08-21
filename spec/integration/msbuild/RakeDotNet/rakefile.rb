@@ -1,6 +1,6 @@
 require 'rakedotnet'
 
-solution = 'MvcApplication1.sln'
+solution = 'RakeDotNet.sln'
 BradyW::MSBuild.new :clean do |clean|
   clean.targets = 'clean'
   clean.solution = solution

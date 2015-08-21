@@ -13,7 +13,7 @@ describe BradyW::MSBuild do
 
   describe 'build' do
     before do
-      Dir.chdir(File.join(File.dirname(__FILE__), 'project')) do
+      Dir.chdir(File.join(File.dirname(__FILE__), 'RakeDotNet')) do
         Bundler.clean_system 'bundle exec rake build'
         @success = $?.success?
       end
