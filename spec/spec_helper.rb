@@ -32,6 +32,12 @@ RSpec.configure do |config|
     BradyW::Config.stub(:instance).and_return(MockConfig.instance)
     MockConfig.instance.values = @config
   end
+
+  def read_file_in_bin_mode(filename)
+    File.open(filename, 'rb') do |file|
+      file.readlines
+    end
+  end
 end
 
 

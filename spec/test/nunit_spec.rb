@@ -255,7 +255,7 @@ describe BradyW::Nunit do
     windows_friendly = full_path.gsub(/\//, '\\')
     @commands.should include "#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w \"#{windows_friendly}\""
     File.should be_exist(@nunit_batch_file) # because our test is checking the contents of the batch file
-    lines = File.readlines @nunit_batch_file
+    lines = read_file_in_bin_mode @nunit_batch_file
     lines.length.should == 2
     lines[0].should == "cd the/rakefile/path\r\n"
     lines[1].should == "\"C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe\" /output=generated_output_1.txt /labels /framework=4.5 /timeout=35000 file1.dll file2.dll"
@@ -281,7 +281,7 @@ describe BradyW::Nunit do
     windows_friendly = full_path.gsub(/\//, '\\')
     @commands.should include "#{BswTech::DnetInstallUtil::ELEVATE_EXE} -w \"#{windows_friendly}\""
     File.should be_exist(@nunit_batch_file)
-    lines = File.readlines @nunit_batch_file
+    lines = read_file_in_bin_mode @nunit_batch_file
     lines.length.should == 2
     lines[0].should == "cd the/rakefile/path\r\n"
     lines[1].should == "\"C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe\" /output=something.txt /labels /framework=4.5 /timeout=35000 file1.dll file2.dll"
@@ -303,7 +303,7 @@ describe BradyW::Nunit do
 
     # assert
     File.should be_exist(@nunit_batch_file)
-    lines = File.readlines @nunit_batch_file
+    lines = read_file_in_bin_mode @nunit_batch_file
     lines.length.should == 4
     lines[0].should == "set var1=foo\r\n"
     lines[1].should == "set var2=bar\r\n"
@@ -325,7 +325,7 @@ describe BradyW::Nunit do
 
     # assert
     File.should be_exist(@nunit_batch_file)
-    lines = File.readlines @nunit_batch_file
+    lines = read_file_in_bin_mode @nunit_batch_file
     lines.length.should == 4
     lines[0].should == "set var1=foo\r\n"
     # On Windows, we don't escape the spaces
@@ -348,7 +348,7 @@ describe BradyW::Nunit do
 
     # assert
     File.should be_exist(@nunit_batch_file)
-    lines = File.readlines @nunit_batch_file
+    lines = read_file_in_bin_mode @nunit_batch_file
     lines.length.should == 4
     lines[0].should == "set var1=foo\r\n"
     # On Windows, we don't escape the spaces
@@ -412,7 +412,7 @@ describe BradyW::Nunit do
     psexec_exe = File.join BswTech::DnetInstallUtil.ps_tools_base_path, 'PsExec.exe'
     @commands.should include "#{psexec_exe} -u theuser -p thepassword -i \"#{windows_friendly}\""
     File.should be_exist(@nunit_batch_file) # because our test is checking the contents of the batch file
-    lines = File.readlines @nunit_batch_file
+    lines = read_file_in_bin_mode @nunit_batch_file
     lines.length.should == 2
     lines[0].should == "cd the/rakefile/path\r\n"
     lines[1].should == "\"C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe\" /output=generated_output_1.txt /labels /framework=4.5 /timeout=35000 file1.dll file2.dll"
@@ -436,7 +436,7 @@ describe BradyW::Nunit do
 
     # assert
     File.should be_exist(@nunit_batch_file)
-    lines = File.readlines @nunit_batch_file
+    lines = read_file_in_bin_mode @nunit_batch_file
     lines.length.should == 4
     lines[0].should == "set var1=foo\r\n"
     # On Windows, we don't escape the spaces
