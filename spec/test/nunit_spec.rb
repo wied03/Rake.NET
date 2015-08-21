@@ -1,31 +1,34 @@
 require 'spec_helper'
 
 describe BradyW::Nunit do
+  let(:stub_rm) { true }
   before(:each) do
     ENV['nunit_filelist'] = nil
     FileUtils.rm 'something.txt' if File.exists?('something.txt')
-    File.stub(:exists?) { |f|
-      ['C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe', ''].include?(f)
-    }
-    Dir.stub(:exists?) { |d|
-      [BswTech::DnetInstallUtil::PSTOOLS_PATH].include?(d)
-    }
+    allow(File).to receive(:exists?) { |f|
+                     ['C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe', ''].include?(f)
+                   }
+    allow(Dir).to receive(:exists?) { |d|
+                    [BswTech::DnetInstallUtil::PSTOOLS_PATH].include?(d)
+                  }
     @generated_output_file = 'generated_output_1.txt'
     @nunit_batch_file = 'run_nunit_elevated.bat'
-    BradyW::TempFileNameGenerator.stub(:random_filename) { |base, extension|
-      case extension
-        when '.bat'
-          @nunit_batch_file
-        when '.txt'
-          @generated_output_file
-        else
-          raise "Unknown extension #{extension}"
-      end
-    }
-    FileUtils.stub(:rm) { |file|
-      File.delete file if file != @nunit_batch_file
-    }
-    Rake.stub(:original_dir).and_return 'the/rakefile/path'
+    allow(BradyW::TempFileNameGenerator).to receive(:random_filename) { |base, extension|
+                                              case extension
+                                                when '.bat'
+                                                  @nunit_batch_file
+                                                when '.txt'
+                                                  @generated_output_file
+                                                else
+                                                  raise "Unknown extension #{extension}"
+                                              end
+                                            }
+    if stub_rm
+      allow(FileUtils).to receive(:rm) { |file|
+                            File.delete file if file != @nunit_batch_file
+                          }
+    end
+    allow(Rake).to receive(:original_dir).and_return 'the/rakefile/path'
     ENV['PRESERVE_TEMP'] = nil
   end
 
@@ -54,8 +57,8 @@ describe BradyW::Nunit do
   end
 
   it 'throws error when NUnit could not be found' do
-    File.stub(:exists?).with('C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe').and_return(false)
-    File.stub(:exists?).with('C:/Program Files (x86)/NUnit-2.6.3/bin/nunit-console.exe').and_return(false)
+    allow(File).to receive(:exists?).with('C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe').and_return(false)
+    allow(File).to receive(:exists?).with('C:/Program Files (x86)/NUnit-2.6.3/bin/nunit-console.exe').and_return(false)
 
     task = BradyW::Nunit.new do |test|
       test.files = %w(file1.dll file2.dll)
@@ -64,8 +67,8 @@ describe BradyW::Nunit do
   end
 
   it 'works when a ZIP file, not an MSI is installed, which has a different path' do
-    File.stub(:exists?).with('C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe').and_return(false)
-    File.stub(:exists?).with('C:/Program Files (x86)/NUnit-2.6.3/bin/nunit-console.exe').and_return(true)
+    allow(File).to receive(:exists?).with('C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe').and_return(false)
+    allow(File).to receive(:exists?).with('C:/Program Files (x86)/NUnit-2.6.3/bin/nunit-console.exe').and_return(true)
     task = BradyW::Nunit.new do |test|
       test.files = %w(file1.dll file2.dll)
     end
@@ -90,7 +93,7 @@ describe BradyW::Nunit do
   end
 
   it 'uses NUnit 2.6.1' do
-    File.stub(:exists?).with('C:/Program Files (x86)/NUnit 2.6.1/bin/nunit-console.exe').and_return(true)
+    allow(File).to receive(:exists?).with('C:/Program Files (x86)/NUnit 2.6.1/bin/nunit-console.exe').and_return(true)
     task = BradyW::Nunit.new do |test|
       test.files = %w(file1.dll file2.dll)
       test.version = '2.6.1'
@@ -100,7 +103,7 @@ describe BradyW::Nunit do
   end
 
   it 'uses a configured custom path' do
-    File.stub(:exists?).with("C:\\SomeOtherplace/nunit-console.exe").and_return(true)
+    allow(File).to receive(:exists?).with("C:\\SomeOtherplace/nunit-console.exe").and_return(true)
     task = BradyW::Nunit.new do |test|
       test.files = %w(file1.dll file2.dll)
       test.base_path = 'C:\\SomeOtherplace'
@@ -110,7 +113,7 @@ describe BradyW::Nunit do
   end
 
   it 'uses a configured custom path with x86' do
-    File.stub(:exists?).with("C:\\SomeOtherplace/nunit-console-x86.exe").and_return(true)
+    allow(File).to receive(:exists?).with("C:\\SomeOtherplace/nunit-console-x86.exe").and_return(true)
     task = BradyW::Nunit.new do |test|
       test.files = %w(file1.dll file2.dll)
       test.base_path = 'C:\\SomeOtherplace'
@@ -121,7 +124,7 @@ describe BradyW::Nunit do
   end
 
   it 'uses a configured custom path and the console is not found' do
-    File.stub(:exists?).with("C:/SomeOtherplace/nunit-console.exe").and_return(false)
+    allow(File).to receive(:exists?).with("C:/SomeOtherplace/nunit-console.exe").and_return(false)
     task = BradyW::Nunit.new do |test|
       test.files = %w(file1.dll file2.dll)
       test.base_path = 'C:/SomeOtherplace'
@@ -199,7 +202,7 @@ describe BradyW::Nunit do
   end
 
   it 'Should work OK with x86 arch' do
-    File.stub(:exists?).with("C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console-x86.exe").and_return(true)
+    allow(File).to receive(:exists?).with("C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console-x86.exe").and_return(true)
     task = BradyW::Nunit.new do |test|
       test.files = %w(file1.dll file2.dll)
       test.arch = :x86
@@ -245,7 +248,7 @@ describe BradyW::Nunit do
     end
     mock_output_and_log_messages :task => task, :messages => 'stuff from nunit'
     console_text = []
-    task.stub(:log) { |text| console_text << text }
+    allow(task).to receive(:log) { |text| console_text << text }
 
     # act
     task.exectaskpublic
@@ -271,7 +274,7 @@ describe BradyW::Nunit do
     end
     mock_output_and_log_messages :task => task, :messages => 'stuff from nunit', :file_name => 'something.txt'
     console_text = []
-    task.stub(:log) { |text| console_text << text }
+    allow(task).to receive(:log) { |text| console_text << text }
 
     # act
     task.exectaskpublic
@@ -357,39 +360,41 @@ describe BradyW::Nunit do
     lines[3].should == "\"C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe\" /output=generated_output_1.txt /labels /framework=4.5 /timeout=35000 file1.dll file2.dll"
   end
 
-  it 'should cleanup the log files if the environment variable is not set' do
-    # arrange
-    FileUtils.unstub(:rm)
-    task = BradyW::Nunit.new do |test|
-      test.files = %w(file1.dll file2.dll)
-      test.security_mode = :elevated
+  context 'stub rm off' do
+    let(:stub_rm) { false }
+
+    it 'should cleanup the log files if the environment variable is not set' do
+      # arrange
+      task = BradyW::Nunit.new do |test|
+        test.files = %w(file1.dll file2.dll)
+        test.security_mode = :elevated
+      end
+      mock_output_and_log_messages :task => task, :messages => 'stuff from nunit'
+
+      # act
+      task.exectaskpublic
+
+      # assert
+      File.should_not be_exist(@generated_output_file)
+      File.should_not be_exist(@nunit_batch_file)
     end
-    mock_output_and_log_messages :task => task, :messages => 'stuff from nunit'
 
-    # act
-    task.exectaskpublic
+    it 'should preserve the log files if the environment variable is set' do
+      # arrange
+      ENV['PRESERVE_TEMP'] = 'true'
+      task = BradyW::Nunit.new do |test|
+        test.files = %w(file1.dll file2.dll)
+        test.security_mode = :elevated
+      end
+      mock_output_and_log_messages :task => task, :messages => 'stuff from nunit'
 
-    # assert
-    File.should_not be_exist(@generated_output_file)
-    File.should_not be_exist(@nunit_batch_file)
-  end
+      # act
+      task.exectaskpublic
 
-  it 'should preserve the log files if the environment variable is set' do
-    # arrange
-    FileUtils.unstub(:rm)
-    ENV['PRESERVE_TEMP'] = 'true'
-    task = BradyW::Nunit.new do |test|
-      test.files = %w(file1.dll file2.dll)
-      test.security_mode = :elevated
+      # assert
+      File.should be_exist(@generated_output_file)
+      File.should be_exist(@nunit_batch_file)
     end
-    mock_output_and_log_messages :task => task, :messages => 'stuff from nunit'
-
-    # act
-    task.exectaskpublic
-
-    # assert
-    File.should be_exist(@generated_output_file)
-    File.should be_exist(@nunit_batch_file)
   end
 
   it 'should run as a different user OK' do
@@ -401,7 +406,7 @@ describe BradyW::Nunit do
     end
     mock_output_and_log_messages :task => task, :messages => 'stuff from nunit'
     console_text = []
-    task.stub(:log) { |text| console_text << text }
+    allow(task).to receive(:log) { |text| console_text << text }
 
     # act
     task.exectaskpublic
@@ -429,7 +434,7 @@ describe BradyW::Nunit do
     end
     mock_output_and_log_messages :task => task, :messages => 'stuff from nunit'
     console_text = []
-    task.stub(:log) { |text| console_text << text }
+    allow(task).to receive(:log) { |text| console_text << text }
 
     # act
     task.exectaskpublic

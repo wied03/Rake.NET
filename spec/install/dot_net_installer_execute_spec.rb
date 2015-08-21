@@ -4,7 +4,7 @@ describe BradyW::DotNetInstallerExecute do
   before :each do
     @should_deletes = []
     @file_index = 0
-    BradyW::TempFileNameGenerator.stub(:random_filename) { |base, ext|
+    allow(BradyW::TempFileNameGenerator).to receive(:random_filename) { |base, ext|
       file =
           case base
             when 'msi_log'
@@ -71,7 +71,7 @@ describe BradyW::DotNetInstallerExecute do
     end
     mock_output_and_log_messages task, '2014-01-15 00:34:27	dotNetInstaller finished, return code: 0 (0x0)', 'MSI log messages'
     console_text = []
-    task.stub(:log) { |text| console_text << text }
+    allow(task).to receive(:log) { |text| console_text << text }
 
     # act
     task.exectaskpublic

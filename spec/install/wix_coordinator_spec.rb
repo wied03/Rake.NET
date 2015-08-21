@@ -15,30 +15,13 @@ end
 describe BradyW::WixCoordinator do
   before :each do
     stub_const 'BswTech::DnetInstallUtil::PARAFFIN_EXE', 'path/to/paraffin.exe'
-    BswTech::DnetInstallUtil.stub(:dot_net_installer_base_path).and_return('path/to/dnetinstaller')
+    allow(BswTech::DnetInstallUtil).to receive(:dot_net_installer_base_path).and_return('path/to/dnetinstaller')
     @mock_accessor = BradyW::RegistryAccessor.new
     # No dependency injection framework required :)
-    BradyW::RegistryAccessor.stub(:new).and_return(@mock_accessor)
+    allow(BradyW::RegistryAccessor).to receive(:new).and_return(@mock_accessor)
   end
 
   after :each do
-    begin
-      BradyW::MSBuild.unstub(:new)
-    rescue RSpec::Mocks::MockExpectationError
-    end
-    begin
-      BradyW::Paraffin::FragmentUpdater.unstub(:new)
-    rescue RSpec::Mocks::MockExpectationError
-    end
-    begin
-      BradyW::DotNetInstaller.unstub(:new)
-    rescue RSpec::Mocks::MockExpectationError
-    end
-    begin
-      BradyW::SignTool.unstub(:new)
-    rescue RSpec::Mocks::MockExpectationError
-    end
-
     FileUtils.rm_rf 'MyWixProject'
   end
 
@@ -70,12 +53,12 @@ describe BradyW::WixCoordinator do
   it 'should work with custom paraffin fragment name, custom output file, and custom dotnet installer xml file' do
     # arrange
     pf_mock = BradyW::Paraffin::FragmentUpdater.new
-    BradyW::Paraffin::FragmentUpdater.stub(:new) do |&block|
+    allow(BradyW::Paraffin::FragmentUpdater).to receive(:new) do |&block|
       block[pf_mock]
       pf_mock
     end
     dnet_mock = BradyW::DotNetInstaller.new
-    BradyW::DotNetInstaller.stub(:new) do |&block|
+    allow(BradyW::DotNetInstaller).to receive(:new) do |&block|
       block[dnet_mock]
       dnet_mock
     end
@@ -107,7 +90,7 @@ describe BradyW::WixCoordinator do
     # arrange
     # allow us to create an instance, then mock future creations of that instance while preserving the block
     ms_build_mock = BradyW::MSBuild.new
-    BradyW::MSBuild.stub(:new) do |&block|
+    allow(BradyW::MSBuild).to receive(:new) do |&block|
       block[ms_build_mock]
       ms_build_mock
     end
@@ -136,7 +119,7 @@ describe BradyW::WixCoordinator do
     # arrange
     # allow us to create an instance, then mock future creations of that instance while preserving the block
     ms_build_mock = BradyW::MSBuild.new
-    BradyW::MSBuild.stub(:new) do |&block|
+    allow(BradyW::MSBuild).to receive(:new) do |&block|
       block[ms_build_mock]
       ms_build_mock
     end
@@ -165,7 +148,7 @@ describe BradyW::WixCoordinator do
     # arrange
     # allow us to create an instance, then mock future creations of that instance while preserving the block
     ms_build_mock = BradyW::MSBuild.new
-    BradyW::MSBuild.stub(:new) do |&block|
+    allow(BradyW::MSBuild).to receive(:new) do |&block|
       block[ms_build_mock]
       ms_build_mock
     end
@@ -194,7 +177,7 @@ describe BradyW::WixCoordinator do
     # arrange
     # allow us to create an instance, then mock future creations of that instance while preserving the block
     ms_build_mock = BradyW::MSBuild.new
-    BradyW::MSBuild.stub(:new) do |&block|
+    allow(BradyW::MSBuild).to receive(:new) do |&block|
       block[ms_build_mock]
       ms_build_mock
     end
@@ -222,7 +205,7 @@ describe BradyW::WixCoordinator do
   it 'should configure the Paraffin task' do
     # arrange
     pf_mock = BradyW::Paraffin::FragmentUpdater.new
-    BradyW::Paraffin::FragmentUpdater.stub(:new) do |&block|
+    allow(BradyW::Paraffin::FragmentUpdater).to receive(:new) do |&block|
       block[pf_mock]
       pf_mock
     end
@@ -243,7 +226,7 @@ describe BradyW::WixCoordinator do
   it 'should configure the DotNetInstaller task' do
     # arrange
     dnet_mock = BradyW::DotNetInstaller.new
-    BradyW::DotNetInstaller.stub(:new) do |&block|
+    allow(BradyW::DotNetInstaller).to receive(:new) do |&block|
       block[dnet_mock]
       dnet_mock
     end
@@ -272,7 +255,7 @@ describe BradyW::WixCoordinator do
   it 'should configure the DotNetInstaller task with a manifest if specified' do
     # arrange
     dnet_mock = BradyW::DotNetInstaller.new
-    BradyW::DotNetInstaller.stub(:new) do |&block|
+    allow(BradyW::DotNetInstaller).to receive(:new) do |&block|
       block[dnet_mock]
       dnet_mock
     end
@@ -295,12 +278,12 @@ describe BradyW::WixCoordinator do
   it 'should allow Debug to be specified as the config' do
     # arrange
     ms_build_mock = BradyW::MSBuild.new
-    BradyW::MSBuild.stub(:new) do |&block|
+    allow(BradyW::MSBuild).to receive(:new) do |&block|
       block[ms_build_mock]
       ms_build_mock
     end
     dnet_mock = BradyW::DotNetInstaller.new
-    BradyW::DotNetInstaller.stub(:new) do |&block|
+    allow(BradyW::DotNetInstaller).to receive(:new) do |&block|
       block[dnet_mock]
       dnet_mock
     end
@@ -336,12 +319,12 @@ describe BradyW::WixCoordinator do
   it 'allows Debug to be specified as a string, not just a symbol' do
     # arrange
     ms_build_mock = BradyW::MSBuild.new
-    BradyW::MSBuild.stub(:new) do |&block|
+    allow(BradyW::MSBuild).to receive(:new) do |&block|
       block[ms_build_mock]
       ms_build_mock
     end
     dnet_mock = BradyW::DotNetInstaller.new
-    BradyW::DotNetInstaller.stub(:new) do |&block|
+    allow(BradyW::DotNetInstaller).to receive(:new) do |&block|
       block[dnet_mock]
       dnet_mock
     end
@@ -377,7 +360,7 @@ describe BradyW::WixCoordinator do
   it 'should allow MSBuild properties like .NET version, etc. to be passed along' do
     # arrange
     ms_build_mock = BradyW::MSBuild.new
-    BradyW::MSBuild.stub(:new) do |&block|
+    allow(BradyW::MSBuild).to receive(:new) do |&block|
       block[ms_build_mock]
       ms_build_mock
     end
@@ -416,12 +399,12 @@ describe BradyW::WixCoordinator do
   it 'should work properly with no additional properties supplied' do
     # arrange
     ms_build_mock = BradyW::MSBuild.new
-    BradyW::MSBuild.stub(:new) do |&block|
+    allow(BradyW::MSBuild).to receive(:new) do |&block|
       block[ms_build_mock]
       ms_build_mock
     end
     dnet_mock = BradyW::DotNetInstaller.new
-    BradyW::DotNetInstaller.stub(:new) do |&block|
+    allow(BradyW::DotNetInstaller).to receive(:new) do |&block|
       block[dnet_mock]
       dnet_mock
     end
@@ -450,7 +433,7 @@ describe BradyW::WixCoordinator do
     FileUtils.mkdir_p 'MyWixProject/paraffin'
     FileUtils.touch 'MyWixProject/paraffin/binaries.wxs'
     ms_build_mock = BradyW::MSBuild.new :msbuild_task
-    BradyW::MSBuild.stub(:new) do |&block|
+    allow(BradyW::MSBuild).to receive(:new) do |&block|
       block[ms_build_mock]
       ms_build_mock
     end
@@ -461,7 +444,7 @@ describe BradyW::WixCoordinator do
       t.properties = {:setting1 => 'the setting', :setting2 => 'the setting 2'}
       t.installer_referencer_bin = 'somedir'
     end
-    ms_build_mock.stub(:dotnet).and_return('path/to/')
+    allow(ms_build_mock).to receive(:dotnet).and_return('path/to/')
     FileUtils.touch 'MyWixProject/paraffin/binaries.PARAFFIN'
     FileUtils.touch 'MyWixProject/dnetinstaller.xml'
     commands = []
@@ -485,7 +468,7 @@ describe BradyW::WixCoordinator do
     FileUtils.mkdir_p 'MyWixProject/paraffin'
     FileUtils.touch 'MyWixProject/paraffin/binaries.wxs'
     ms_build_mock = BradyW::MSBuild.new :msbuild_task_2
-    BradyW::MSBuild.stub(:new) do |&block|
+    allow(BradyW::MSBuild).to receive(:new) do |&block|
       block[ms_build_mock]
       ms_build_mock
     end
@@ -498,7 +481,7 @@ describe BradyW::WixCoordinator do
       t.properties = {:setting1 => 'the setting', :setting2 => 'the setting 2'}
       t.installer_referencer_bin = 'somedir'
     end
-    ms_build_mock.stub(:dotnet).and_return('path/to/')
+    allow(ms_build_mock).to receive(:dotnet).and_return('path/to/')
     FileUtils.touch 'MyWixProject/paraffin/binaries.PARAFFIN'
     FileUtils.touch 'MyWixProject/dnetinstaller.xml'
     commands = []
@@ -523,7 +506,7 @@ describe BradyW::WixCoordinator do
     FileUtils.mkdir_p 'MyWixProject/paraffin'
     FileUtils.touch 'MyWixProject/paraffin/binaries.wxs'
     ms_build_mock = BradyW::MSBuild.new :msbuild_task_3
-    BradyW::MSBuild.stub(:new) do |&block|
+    allow(BradyW::MSBuild).to receive(:new) do |&block|
       block[ms_build_mock]
       ms_build_mock
     end
@@ -537,7 +520,7 @@ describe BradyW::WixCoordinator do
       t.properties = {:setting1 => 'the setting', :setting2 => 'the setting 2'}
       t.installer_referencer_bin = 'somedir'
     end
-    ms_build_mock.stub(:dotnet).and_return('path/to/')
+    allow(ms_build_mock).to receive(:dotnet).and_return('path/to/')
     FileUtils.touch 'MyWixProject/paraffin/binaries.PARAFFIN'
     FileUtils.touch 'MyWixProject/dnetinstaller.xml'
     commands = []
@@ -580,12 +563,12 @@ describe BradyW::WixCoordinator do
     FileUtils.mkdir_p 'MyWixProject/paraffin'
     FileUtils.touch 'MyWixProject/paraffin/binaries.wxs'
     ms_build_mock = BradyW::MSBuild.new :msbuild_task_4
-    BradyW::MSBuild.stub(:new) do |&block|
+    allow(BradyW::MSBuild).to receive(:new) do |&block|
       block[ms_build_mock]
       ms_build_mock
     end
-    @mock_accessor.stub(:get_sub_keys).with('SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows').and_return(['v7.1A', 'v8.0A', 'v8.1A', 'v8.1'])
-    @mock_accessor.stub(:get_value).with('SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows\\v8.1', 'InstallationFolder').and_return('windowskit/path')
+    allow(@mock_accessor).to receive(:get_sub_keys).with('SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows').and_return(['v7.1A', 'v8.0A', 'v8.1A', 'v8.1'])
+    allow(@mock_accessor).to receive(:get_value).with('SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows\\v8.1', 'InstallationFolder').and_return('windowskit/path')
 
     TestTask.new :test_task_6
     TestTask.new :test_task_7
@@ -597,7 +580,7 @@ describe BradyW::WixCoordinator do
       t.description = 'The description'
       t.installer_referencer_bin = 'somedir'
     end
-    ms_build_mock.stub(:dotnet).and_return('path/to/')
+    allow(ms_build_mock).to receive(:dotnet).and_return('path/to/')
     FileUtils.touch 'MyWixProject/paraffin/binaries.PARAFFIN'
     FileUtils.touch 'MyWixProject/dnetinstaller.xml'
 
@@ -646,12 +629,12 @@ describe BradyW::WixCoordinator do
     FileUtils.mkdir_p 'MyWixProject/paraffin'
     FileUtils.touch 'MyWixProject/paraffin/binaries.wxs'
     ms_build_mock = BradyW::MSBuild.new :msbuild_task_5
-    BradyW::MSBuild.stub(:new) do |&block|
+    allow(BradyW::MSBuild).to receive(:new) do |&block|
       block[ms_build_mock]
       ms_build_mock
     end
-    @mock_accessor.stub(:get_sub_keys).with('SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows').and_return(['v7.1A', 'v8.0A', 'v8.1A', 'v8.1'])
-    @mock_accessor.stub(:get_value).with('SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows\\v8.1', 'InstallationFolder').and_return('windowskit/path')
+    allow(@mock_accessor).to receive(:get_sub_keys).with('SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows').and_return(['v7.1A', 'v8.0A', 'v8.1A', 'v8.1'])
+    allow(@mock_accessor).to receive(:get_value).with('SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows\\v8.1', 'InstallationFolder').and_return('windowskit/path')
 
     TestTask.new :test_task_8
     TestTask.new :test_task_9
@@ -664,7 +647,7 @@ describe BradyW::WixCoordinator do
       t.code_sign_timestamp_server = 'http://something.else'
       t.installer_referencer_bin = 'somedir'
     end
-    ms_build_mock.stub(:dotnet).and_return('path/to/')
+    allow(ms_build_mock).to receive(:dotnet).and_return('path/to/')
     FileUtils.touch 'MyWixProject/paraffin/binaries.PARAFFIN'
     FileUtils.touch 'MyWixProject/dnetinstaller.xml'
 

@@ -22,7 +22,7 @@ describe BradyW::IIS do
       task.service = "SVC"
     end
 
-    task.stub(:shell).and_yield(nil, SimulateProcessFailure.new)
+    allow(task).to receive(:shell).and_yield(nil, SimulateProcessFailure.new)
     task.exectaskpublic
   end
 
@@ -31,7 +31,7 @@ describe BradyW::IIS do
       task.command = :start
     end
 
-    task.stub(:shell).and_yield(nil, SimulateProcessFailure.new)
+    allow(task).to receive(:shell).and_yield(nil, SimulateProcessFailure.new)
     lambda {task.exectaskpublic}.should raise_exception(RuntimeError,
                                                          "Command failed with status (BW Rake Task Problem):")
   end

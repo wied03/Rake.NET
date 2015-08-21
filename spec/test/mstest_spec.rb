@@ -6,7 +6,7 @@ describe BradyW::MSTest do
     task = BradyW::MSTest.new do |test|
       test.files = ["file1.dll", "file2.dll"]
     end
-    task.should_receive(:visual_studio).with("10.0").and_return("C:\\yespath\\")
+    expect(task).to receive(:visual_studio).with("10.0").and_return("C:\\yespath\\")
     task.exectaskpublic
     task.executedPop.should == "\"C:\\yespath\\MSTest.exe\" /testcontainer:file1.dll /testcontainer:file2.dll"
   end
@@ -16,7 +16,7 @@ describe BradyW::MSTest do
       test.files = ["file1.dll"]
       test.version = "8.0"
     end
-    task.should_receive(:visual_studio).with("8.0").and_return("C:\\yespath2\\")
+    expect(task).to receive(:visual_studio).with("8.0").and_return("C:\\yespath2\\")
     task.exectaskpublic
     task.executedPop.should == "\"C:\\yespath2\\MSTest.exe\" /testcontainer:file1.dll"
   end

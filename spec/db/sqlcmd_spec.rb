@@ -6,10 +6,9 @@ def testdata
 end
 
 describe BradyW::Sqlcmd do
-  matcher :have_sql_property do |expected|
+  RSpec::Matchers.define :have_sql_property do |expected|
     match do |actual|
-      match = actual.match(/.*-v (.+) -/)
-      group = match[1]
+      group = Regexp.new('.*-v (.+) -').match(actual).captures[0]
       actualProps = group.scan(/('.*?'|\S+=".*?"|\S+)/).map do |kv|
         arr = kv[0].split('=')
         {:k => arr[0], :v => arr[1]}
@@ -18,16 +17,16 @@ describe BradyW::Sqlcmd do
     end
   end
 
-  matcher :have_sql_property_count do |expected|
+  RSpec::Matchers.define :have_sql_property_count do |expected|
     match do |actual|
-      actualProps = actual.match(/.*-v (.+) -/)[1].scan(/('.*?'|\S+=".*?"|\S+)/)
+      actualProps = Regexp.new('.*-v (.+) -').match(actual).captures[0].scan(/('.*?'|\S+=".*?"|\S+)/)
       actualProps.length == expected
     end
   end
 
   before(:each) do
     # It uses the current date, which is harder to test
-    BradyW::Sqlcmd.stub(:generatetempfilename).and_return "tempfile.sql"
+    allow(BradyW::Sqlcmd).to receive(:generatetempfilename).and_return "tempfile.sql"
   end
 
   before(:each) do
@@ -97,7 +96,7 @@ describe BradyW::Sqlcmd do
       sql.files = testdata
     end
 
-    task.should_receive(:sql_tool).with("100").and_return("z:\\")
+    expect(task).to receive(:sql_tool).with("100").and_return("z:\\")
 
     task.exectaskpublic
     execed = task.executedPop
@@ -123,7 +122,7 @@ describe BradyW::Sqlcmd do
       sql.version = "902"
     end
 
-    task.should_receive(:sql_tool).with("902").and_return("z:\\")
+    expect(task).to receive(:sql_tool).with("902").and_return("z:\\")
 
     task.exectaskpublic
 
@@ -146,7 +145,7 @@ describe BradyW::Sqlcmd do
       sql.credentials = :system
     end
 
-    task.should_receive(:sql_tool).with("100").and_return("z:\\")
+    expect(task).to receive(:sql_tool).with("100").and_return("z:\\")
 
     task.exectaskpublic
     execed = task.executedPop
@@ -176,7 +175,7 @@ describe BradyW::Sqlcmd do
       sql.credentials = :objectcreation
     end
 
-    task.should_receive(:sql_tool).with("100").and_return("z:\\")
+    expect(task).to receive(:sql_tool).with("100").and_return("z:\\")
 
     task.exectaskpublic
 
@@ -203,7 +202,7 @@ describe BradyW::Sqlcmd do
       sql.credentials = :system
     end
 
-    task.should_receive(:sql_tool).with("100").and_return("z:\\")
+    expect(task).to receive(:sql_tool).with("100").and_return("z:\\")
 
     task.exectaskpublic
     execed = task.executedPop
@@ -230,7 +229,7 @@ describe BradyW::Sqlcmd do
                        "spacevar" => "deals with space right"}
     end
 
-    task.should_receive(:sql_tool).with("100").and_return("z:\\")
+    expect(task).to receive(:sql_tool).with("100").and_return("z:\\")
 
     task.exectaskpublic
     execed = task.executedPop
@@ -259,7 +258,7 @@ describe BradyW::Sqlcmd do
                        "spacevar" => "deals with space right"}
     end
 
-    task.should_receive(:sql_tool).with("100").and_return("z:\\")
+    expect(task).to receive(:sql_tool).with("100").and_return("z:\\")
 
     task.exectaskpublic
     execed = task.executedPop
@@ -284,8 +283,8 @@ describe BradyW::Sqlcmd do
       sql.files = testdata
     end
 
-    task.should_receive(:sql_tool).with("100").and_return("z:\\")
-    task.stub(:shell).and_yield(nil, SimulateProcessFailure.new)
+    expect(task).to receive(:sql_tool).with("100").and_return("z:\\")
+    allow(task).to receive(:shell).and_yield(nil, SimulateProcessFailure.new)
 
     lambda { task.exectaskpublic }.should raise_exception("Command failed with status (BW Rake Task Problem):")
 

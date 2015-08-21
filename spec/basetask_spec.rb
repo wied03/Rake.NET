@@ -13,21 +13,21 @@ describe BradyW::BaseTask do
 
   it "Task with no dependencies/default name" do
     task = BradyW::BaseTask.new
-    task.should_receive(:log).with("Running task: task")
-    task.name.should == :task
+    expect(task).to receive(:log).with("Running task: task")
+    expect(task).to receive(:exectask)
+    expect(task.name).to eq :task
     task.dependencies.should == nil
     task.unless.should == nil
-    task.should_receive(:exectask)
     Rake::Task[:task].invoke
   end
 
   it "Task with no dependencies/custom name" do
     task = BradyW::BaseTask.new "mytask"
-    task.should_receive(:log).with("Running task: mytask")
+    expect(task).to receive(:log).with("Running task: mytask")
+    expect(task).to receive(:exectask)
     task.name.should == "mytask"
     task.dependencies.should == nil
     task.unless.should == nil
-    task.should_receive(:exectask)
     Rake::Task[:mytask].invoke
   end
 
@@ -38,11 +38,11 @@ describe BradyW::BaseTask do
     task.unless.should == nil
 
     dtask = BradyW::BaseTask.new "dependenttask"
-    task.should_receive(:exectask)
-    dtask.should_receive(:exectask)
+    expect(task).to receive(:exectask)
+    expect(dtask).to receive(:exectask)
 
-    task.should_receive(:log).with("Running task: mytask")
-    dtask.should_receive(:log).with("Running task: dependenttask")
+    expect(task).to receive(:log).with("Running task: mytask")
+    expect(dtask).to receive(:log).with("Running task: dependenttask")
     Rake::Task[:mytask].invoke
   end
 
@@ -55,10 +55,10 @@ describe BradyW::BaseTask do
     task.unless.should == "yes"
 
     dtask = BradyW::BaseTask.new "dependenttask"
-    task.should_not_receive(:exectask)
-    dtask.should_not_receive(:exectask)
+    expect(task).to_not receive(:exectask)
+    expect(dtask).to_not receive(:exectask)
 
-    task.should_receive(:log).with("Skipping task: mytask due to unless condition specified in rakefile")
+    expect(task).to receive(:log).with("Skipping task: mytask due to unless condition specified in rakefile")
     Rake::Task[:mytask].invoke
   end
 end

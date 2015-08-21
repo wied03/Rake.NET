@@ -14,7 +14,7 @@ describe BradyW::Paraffin::FragmentGenerator do
   before(:each) do
     @mockBasePath = 'someParaffinPath\Paraffin.exe'
     stub_const 'BswTech::DnetInstallUtil::PARAFFIN_EXE', @mockBasePath
-    File.stub(:absolute_path) do |p|
+    allow(File).to receive(:absolute_path) do |p|
       if p[0] == '/'
         p
       else
@@ -248,7 +248,7 @@ describe BradyW::Paraffin::FragmentGenerator do
       t.directory_to_scan = '..\Bin\Release'
     end
     @commands = []
-    task.stub(:shell) { |*commands, &block|
+    allow(task).to receive(:shell) { |*commands, &block|
       puts commands
       @commands += commands
       raise 'Paraffin failed' if commands[0].include?('Paraffin.exe')

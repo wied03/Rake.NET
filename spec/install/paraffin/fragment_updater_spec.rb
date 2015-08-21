@@ -9,22 +9,18 @@ end
 module BradyW
   module Paraffin
     class FragmentUpdater
-         def cmd_exe
-           'C:\WinDir\cmd.exe'
-         end
+      def cmd_exe
+        'C:\WinDir\cmd.exe'
+      end
     end
   end
 end
 
 describe BradyW::Paraffin::FragmentUpdater do
   before(:each) do
-    begin
-      File.unstub(:exists?)
-    rescue RSpec::Mocks::MockExpectationError
-    end
     @mockBasePath = 'someParaffinPath\Paraffin.exe'
     stub_const 'BswTech::DnetInstallUtil::PARAFFIN_EXE', @mockBasePath
-    File.stub(:absolute_path) do |p|
+    allow(File).to receive(:absolute_path) do |p|
       if p[0] == '/'
         p
       else
@@ -49,11 +45,11 @@ describe BradyW::Paraffin::FragmentUpdater do
     end
     original_file = nil
     destination_file = nil
-    FileUtils.stub(:mv) do |orig, dest|
+    allow(FileUtils).to receive(:mv) do |orig, dest|
       original_file = orig
       destination_file = dest
     end
-    File.stub(:exist?).and_return(true)
+    allow(File).to receive(:exist?).and_return(true)
 
     # act
     task.exectaskpublic
@@ -76,18 +72,18 @@ describe BradyW::Paraffin::FragmentUpdater do
       t.output_directory = '..\Bin\Release'
     end
     @commands = []
-    task.stub(:shell) { |*commands, &block|
+    allow(task).to receive(:shell) { |*commands, &block|
       puts commands
       @commands += commands
       block[nil, ParaffinReportDifferentError.new] if commands[0].include?('Paraffin.exe')
     }
     original_file = nil
     destination_file = nil
-    FileUtils.stub(:mv) do |orig, dest|
+    allow(FileUtils).to receive(:mv) do |orig, dest|
       original_file = orig
       destination_file = dest
     end
-    File.stub(:exist?).and_return(true)
+    allow(File).to receive(:exist?).and_return(true)
 
     # act + assert
     lambda { task.exectaskpublic }.should raise_exception 'some_file.wxs has changed.  Review updates to some_file.wxs manually and rebuild'
@@ -103,11 +99,11 @@ describe BradyW::Paraffin::FragmentUpdater do
     end
     original_file = nil
     destination_file = nil
-    FileUtils.stub(:mv) do |orig, dest|
+    allow(FileUtils).to receive(:mv) do |orig, dest|
       original_file = orig
       destination_file = dest
     end
-    File.stub(:exist?).and_return(true)
+    allow(File).to receive(:exist?).and_return(true)
 
     # act
     task.exectaskpublic
@@ -130,13 +126,13 @@ describe BradyW::Paraffin::FragmentUpdater do
       t.output_directory = '..\Bin\Release'
     end
     @commands = []
-    task.stub(:shell) { |*commands, &block|
+    allow(task).to receive(:shell) { |*commands, &block|
       puts commands
       @commands += commands
       block[nil, SimulateProcessFailure.new] if commands[0].include?('Paraffin.exe')
     }
-    File.stub(:exists?).and_return(false)
-    FileUtils.stub(:mv) do |orig, dest|
+    allow(File).to receive(:exist?).and_return(false)
+    allow(FileUtils).to receive(:mv) do |orig, dest|
       raise 'No such file or directory test!'
     end
 
@@ -151,7 +147,7 @@ describe BradyW::Paraffin::FragmentUpdater do
       t.output_directory = '..\Bin\Release'
     end
     @commands = []
-    task.stub(:shell) { |*commands, &block|
+    allow(task).to receive(:shell) { |*commands, &block|
       puts commands
       @commands += commands
       block[nil, SimulateProcessFailure.new] if commands[0].include?('Paraffin.exe')

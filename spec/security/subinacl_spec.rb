@@ -4,7 +4,7 @@ describe BradyW::Subinacl do
   before(:each) do
     @should_deletes = []
     @file_index = 0
-    BradyW::TempFileNameGenerator.stub(:random_filename) { |base, ext|
+    allow(BradyW::TempFileNameGenerator).to receive(:random_filename) { |base, ext|
       file =
           case base
             when 'run_subinacl_with_output_redirect'
@@ -18,17 +18,16 @@ describe BradyW::Subinacl do
       file
     }
     # Need to examine the batch file as part of our tests
-    FileUtils.stub(:rm) { |file|
+    allow(FileUtils).to receive(:rm) { |file|
       File.delete file if file != 'run_subinacl_with_output_redirect.bat'
     }
     @commands = []
     ENV['PRESERVE_TEMP'] = nil
-    File.stub(:expand_path) { |f| "/some/base/dir/#{f}" }
+    allow(File).to receive(:expand_path) { |f| "/some/base/dir/#{f}" }
   end
 
   after :each do
     @should_deletes.each { |f| File.delete f if (f && File.exists?(f)) }
-    File.unstub(:expand_path)
   end
 
 
@@ -52,7 +51,7 @@ describe BradyW::Subinacl do
       t.service_to_grant_access_to = 'theservice'
       t.user_to_grant_top_access_to = 'theuser'
     end
-    task.stub(:subinacl_path).and_return('\path\to\subinacl.exe')
+    allow(task).to receive(:subinacl_path).and_return('\path\to\subinacl.exe')
     mock_output_and_log_messages task
 
     # act
@@ -74,7 +73,7 @@ describe BradyW::Subinacl do
       t.service_to_grant_access_to = 'theservice'
       t.user_to_grant_top_access_to = 'theuser'
     end
-    task.stub(:subinacl_path).and_return('\path\to the\subinacl.exe')
+    allow(task).to receive(:subinacl_path).and_return('\path\to the\subinacl.exe')
     mock_output_and_log_messages task
 
     # act
@@ -96,16 +95,16 @@ describe BradyW::Subinacl do
       t.service_to_grant_access_to = 'theservice'
       t.user_to_grant_top_access_to = 'theuser'
     end
-    task.stub(:subinacl_path).and_return('\path\to the\subinacl.exe')
+    allow(task).to receive(:subinacl_path).and_return('\path\to the\subinacl.exe')
     mock_output_and_log_messages task
-    console_text = []
-    task.stub(:log) { |text| console_text << text }
+    console_text = StringIO.new
+    allow(task).to receive(:log) { |text| console_text.puts text }
 
     # act
     task.exectaskpublic
 
     # assert
-    console_text.should include("Done:        0, Modified        0, Failed        0, Syntax errors        0\r")
+    console_text.string.should include("Done:        0, Modified        0, Failed        0, Syntax errors        0\n")
   end
 
   it 'should fail if Subinacl outputs a failure count since subinacl doesnt use return codes properly' do
@@ -113,7 +112,7 @@ describe BradyW::Subinacl do
       t.service_to_grant_access_to = 'theservice'
       t.user_to_grant_top_access_to = 'theuser'
     end
-    task.stub(:subinacl_path).and_return('\path\to\subinacl.exe')
+    allow(task).to receive(:subinacl_path).and_return('\path\to\subinacl.exe')
     mock_output_and_log_messages :task => task, :failure_count_to_indicate => 1
 
     # act + assert
@@ -125,7 +124,7 @@ describe BradyW::Subinacl do
       t.service_to_grant_access_to = 'theservice'
       t.user_to_grant_top_access_to = 'theuser'
     end
-    task.stub(:subinacl_path).and_return('\path\to\subinacl.exe')
+    allow(task).to receive(:subinacl_path).and_return('\path\to\subinacl.exe')
     mock_output_and_log_messages :task => task, :syntax_error_count_to_indicate => 1
 
     # act + assert
@@ -138,7 +137,7 @@ describe BradyW::Subinacl do
       t.service_to_grant_access_to = 'theservice'
       t.user_to_grant_top_access_to = 'theuser'
     end
-    task.stub(:subinacl_path).and_return('\path\to\subinacl.exe')
+    allow(task).to receive(:subinacl_path).and_return('\path\to\subinacl.exe')
     mock_output_and_log_messages :task => task, :object_failure => 'theservice'
 
     # act + assert
@@ -151,7 +150,7 @@ describe BradyW::Subinacl do
       t.service_to_grant_access_to = 'theservice'
       t.user_to_grant_top_access_to = 'theuser'
     end
-    task.stub(:subinacl_path).and_return(nil)
+    allow(task).to receive(:subinacl_path).and_return(nil)
 
     # act + assert
     lambda { task.exectaskpublic }.should raise_exception 'Subinacl not found on your system.  Did you install MSI version 5.2.3790 ?'
@@ -163,7 +162,7 @@ describe BradyW::Subinacl do
       t.service_to_grant_access_to = 'theservice'
       t.user_to_grant_top_access_to = 'theuser'
     end
-    task.stub(:subinacl_path).and_return('\path\to the\subinacl.exe')
+    allow(task).to receive(:subinacl_path).and_return('\path\to the\subinacl.exe')
     mock_output_and_log_messages task
 
     # act
@@ -180,7 +179,7 @@ describe BradyW::Subinacl do
       t.service_to_grant_access_to = 'theservice'
       t.user_to_grant_top_access_to = 'theuser'
     end
-    task.stub(:subinacl_path).and_return('\path\to the\subinacl.exe')
+    allow(task).to receive(:subinacl_path).and_return('\path\to the\subinacl.exe')
     mock_output_and_log_messages :task => task, :syntax_error_count_to_indicate => 1
 
     # act
@@ -198,7 +197,7 @@ describe BradyW::Subinacl do
       t.service_to_grant_access_to = 'theservice'
       t.user_to_grant_top_access_to = 'theuser'
     end
-    task.stub(:subinacl_path).and_return('\path\to the\subinacl.exe')
+    allow(task).to receive(:subinacl_path).and_return('\path\to the\subinacl.exe')
     mock_output_and_log_messages task
 
     # act

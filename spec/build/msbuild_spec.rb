@@ -4,7 +4,7 @@ describe BradyW::MSBuild do
   it 'should build OK vanilla (.NET 4.5)' do
     # arrange
     task = BradyW::MSBuild.new
-    task.should_receive(:dotnet).with("v4\\Client").and_return("C:\\yespath\\")
+    expect(task).to receive(:dotnet).with("v4\\Client").and_return("C:\\yespath\\")
 
     # act
     task.exectaskpublic
@@ -20,7 +20,7 @@ describe BradyW::MSBuild do
       m.properties = {:prop1 => 'the value'}
       m.solution = 'stuff.sln'
     end
-    task.should_receive(:dotnet).with("v4\\Client").and_return("C:\\yespath\\")
+    expect(task).to receive(:dotnet).with("v4\\Client").and_return("C:\\yespath\\")
 
     # act
     task.exectaskpublic
@@ -36,7 +36,7 @@ describe BradyW::MSBuild do
       m.properties = {:prop1 => 'the;value'}
       m.solution = 'stuff.sln'
     end
-    task.should_receive(:dotnet).with("v4\\Client").and_return("C:\\yespath\\")
+    expect(task).to receive(:dotnet).with("v4\\Client").and_return("C:\\yespath\\")
 
     # act
     task.exectaskpublic
@@ -51,7 +51,7 @@ describe BradyW::MSBuild do
       t.dotnet_bin_version = :v4_0
       t.compile_version = :v4_0
     end
-    task.should_receive(:dotnet).with("v4\\Client").and_return("C:\\yespath\\")
+    expect(task).to receive(:dotnet).with("v4\\Client").and_return("C:\\yespath\\")
     task.exectaskpublic
     execed = task.executedPop
     execed.should == 'C:\\yespath\\msbuild.exe /property:Configuration=Debug /property:TargetFrameworkVersion=v4.0'
@@ -69,7 +69,7 @@ describe BradyW::MSBuild do
     task = BradyW::MSBuild.new do |t|
       t.targets = 't1'
     end
-    task.should_receive(:dotnet).with("v4\\Client").and_return("C:\\yespath\\")
+    expect(task).to receive(:dotnet).with("v4\\Client").and_return("C:\\yespath\\")
 
     # act
     task.exectaskpublic
@@ -90,7 +90,7 @@ describe BradyW::MSBuild do
                       'prop2' => 'prop2val'}
       t.build_config = :Release
     end
-    task.should_receive(:dotnet).with("v3.5").and_return("C:\\yespath2\\")
+    expect(task).to receive(:dotnet).with("v3.5").and_return("C:\\yespath2\\")
 
     # act
     task.exectaskpublic
@@ -107,7 +107,7 @@ describe BradyW::MSBuild do
                       :prop2 => 'prop2val'}
       t.build_config = :Release
     end
-    task.should_receive(:dotnet).with("v4\\Client").and_return("C:\\yespath2\\")
+    expect(task).to receive(:dotnet).with("v4\\Client").and_return("C:\\yespath2\\")
 
     # act
     task.exectaskpublic
@@ -122,7 +122,7 @@ describe BradyW::MSBuild do
     task = BradyW::MSBuild.new do |t|
       t.build_config = :Debug
     end
-    task.should_receive(:dotnet).with("v4\\Client").and_return("C:\\yespath2\\")
+    expect(task).to receive(:dotnet).with("v4\\Client").and_return("C:\\yespath2\\")
 
     # act
     task.exectaskpublic

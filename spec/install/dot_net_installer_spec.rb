@@ -3,9 +3,9 @@ require 'spec_helper'
 describe BradyW::DotNetInstaller do
   before :each do
     @should_deletes = ['generated_name_1.xml', 'generated_name_2.xml']
-    BswTech::DnetInstallUtil.stub(:dot_net_installer_base_path).and_return('path/to/dnetinstaller')
+    allow(BswTech::DnetInstallUtil).to receive(:dot_net_installer_base_path).and_return('path/to/dnetinstaller')
     @file_index = 0
-    BradyW::TempFileNameGenerator.stub(:from_existing_file) {
+    allow(BradyW::TempFileNameGenerator).to receive(:from_existing_file) {
       @file_index += 1
       "generated_name_#{@file_index}.xml"
     }
@@ -64,7 +64,7 @@ describe BradyW::DotNetInstaller do
                   :token2 => :some_value}
     end
     # Leave the temp file so we can compare it
-    FileUtils.stub(:rm) do |f|
+    allow(FileUtils).to receive(:rm) do |f|
       @should_delete = f
     end
 
@@ -173,7 +173,7 @@ describe BradyW::DotNetInstaller do
       t.output = 'somedir/Our.File.Exe'
       t.manifest = 'data/dot_net_installer/input_manifest.xml'
     end
-    task.stub(:shell).and_yield(nil, SimulateProcessFailure.new)
+    allow(task).to receive(:shell).and_yield(nil, SimulateProcessFailure.new)
 
     # act + assert
     lambda { task.exectaskpublic }.should raise_exception "Problem with dotNetInstaller.  Return code 'BW Rake Task Problem'"

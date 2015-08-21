@@ -4,11 +4,7 @@ describe BradyW::SignTool do
   before :each do
     @mock_registry = BradyW::RegistryAccessor.new
     # No dependency injection framework required :)
-    BradyW::RegistryAccessor.stub(:new).and_return(@mock_registry)
-  end
-
-  after(:each) do
-    BradyW::RegistryAccessor.unstub(:new)
+    allow(BradyW::RegistryAccessor).to receive(:new).and_return(@mock_registry)
   end
 
   it 'should require subject, description, and sign_this' do
@@ -26,8 +22,8 @@ describe BradyW::SignTool do
       t.description = 'The description'
       t.sign_this = 'something.exe'
     end
-    @mock_registry.stub(:get_sub_keys).with('SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows').and_return(['v7.1A', 'v8.0', 'v8.1A'])
-    @mock_registry.stub(:get_value).with('SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows\\v8.0', 'InstallationFolder').and_return('path/to')
+    allow(@mock_registry).to receive(:get_sub_keys).with('SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows').and_return(['v7.1A', 'v8.0', 'v8.1A'])
+    allow(@mock_registry).to receive(:get_value).with('SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows\\v8.0', 'InstallationFolder').and_return('path/to')
 
     # act
     task.exectaskpublic
@@ -44,8 +40,8 @@ describe BradyW::SignTool do
       t.description = 'The description'
       t.sign_this = 'something.exe'
     end
-    @mock_registry.stub(:get_sub_keys).with('SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows').and_return(['v7.1A', 'v8.0A', 'v8.1A', 'v8.1'])
-    @mock_registry.stub(:get_value).with('SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows\\v8.1', 'InstallationFolder').and_return('path/to')
+    allow(@mock_registry).to receive(:get_sub_keys).with('SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows').and_return(['v7.1A', 'v8.0A', 'v8.1A', 'v8.1'])
+    allow(@mock_registry).to receive(:get_value).with('SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows\\v8.1', 'InstallationFolder').and_return('path/to')
 
     # act
     task.exectaskpublic
@@ -65,7 +61,7 @@ describe BradyW::SignTool do
       t.sdk_version = '8.2A'
       t.architecture = :x86
     end
-    @mock_registry.stub(:get_value).with('SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows\\v8.2A', 'InstallationFolder').and_return('path/to')
+    allow(@mock_registry).to receive(:get_value).with('SOFTWARE\\Microsoft\\Microsoft SDKs\\Windows\\v8.2A', 'InstallationFolder').and_return('path/to')
 
     # act
     task.exectaskpublic

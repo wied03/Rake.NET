@@ -1,7 +1,7 @@
 require 'spec_helper'
 
 def jspath
-  FileList["data/jstest/path/**/*.js"]
+  FileList['data/jstest/path/**/*.js']
 end
 
 RSpec::Matchers.define :have_same_config_as do |e|
@@ -15,7 +15,7 @@ RSpec::Matchers.define :have_same_config_as do |e|
       actLoad.each { |file| expLoad.include? file }
     end
 
-    failure_message_for_should do |a|
+    failure_message do |a|
       actual = YAML::load(File.read(a))
       expSvr = expected['server']
       actSvr = actual['server']
@@ -27,7 +27,7 @@ end
 
 describe BradyW::JsTest do
   before(:each) do
-    ENV["CCNetProject"] = nil
+    ENV['CCNetProject'] = nil
   end
 
   after(:each) do
@@ -99,14 +99,14 @@ describe BradyW::JsTest do
       js.files = jspath
     end
 
-    task.stub(:shell).and_yield(nil, SimulateProcessFailure.new)
+    allow(task).to receive(:shell).and_yield(nil, SimulateProcessFailure.new)
 
     lambda {task.exectaskpublic}.should raise_exception("Command failed with status (BW Rake Task Problem):")
 
     # This means our temporary file was correctly cleaned up
     File.exist?("jsTestDriver.conf").should_not == true
     # Our test code should have done this
-    File.exist?("data/output/jsTestDriver.conf").should == true    
+    File.exist?("data/output/jsTestDriver.conf").should == true
   end
 
 end

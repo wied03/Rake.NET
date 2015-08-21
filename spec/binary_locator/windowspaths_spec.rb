@@ -9,25 +9,20 @@ class WindowsPathsWrapper
 end
 
 describe BradyW::WindowsPaths do
-  after(:each) do
-    BradyW::RegistryAccessor.unstub(:new)
-    BradyW::MsiFileSearcher.unstub(:new)
-  end
-
   before(:each) do
     @key = nil
     @value = nil
     @windowPathsWrapper = WindowsPathsWrapper.new
     mock_accessor = BradyW::RegistryAccessor.new
     # No dependency injection framework required :)
-    BradyW::RegistryAccessor.stub(:new).and_return(mock_accessor)
-    mock_accessor.stub(:get_value) do |key, value|
+    allow(BradyW::RegistryAccessor).to receive(:new).and_return(mock_accessor)
+    allow(mock_accessor).to receive(:get_value) do |key, value|
       @key = key
       @value = value
       'hi'
     end
     @mock_msi_searcher = BradyW::MsiFileSearcher.new
-    BradyW::MsiFileSearcher.stub(:new).and_return(@mock_msi_searcher)
+    allow(BradyW::MsiFileSearcher).to receive(:new).and_return(@mock_msi_searcher)
   end
 
   it 'should retrieve SQL Server tools properly' do
@@ -53,7 +48,7 @@ describe BradyW::WindowsPaths do
 
   it 'should retrieve the path of subinacl' do
     # arrange
-    @mock_msi_searcher.stub(:get_component_path).with('{D3EE034D-5B92-4A55-AA02-2E6D0A6A96EE}','{C2BC2826-FDDC-4A61-AA17-B3928B0EDA38}').and_return('path\to\subinacl.exe')
+    allow(@mock_msi_searcher).to receive(:get_component_path).with('{D3EE034D-5B92-4A55-AA02-2E6D0A6A96EE}','{C2BC2826-FDDC-4A61-AA17-B3928B0EDA38}').and_return('path\to\subinacl.exe')
 
     # act
     result = @windowPathsWrapper.send(:subinacl_path)
