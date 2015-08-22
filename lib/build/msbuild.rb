@@ -88,21 +88,23 @@ module BradyW
 
     def get_path
       all_versions = get_msbuild_versions.sort.reverse
-      version_to_use = if @path
-                         number = @path.to_f
-                         if number != 0.0
-                           raise "You requested version #{number} but that version is not installed. Installed versions are #{all_versions}" unless all_versions.include?(number)
-                           number
-                         else
-                           raise "You requested to use #{@path} but that file does not exist!" unless File.exist?(@path)
-                           @path
-                         end
+      version_to_use = if @path and (path_as_number = @path.to_f) and path_as_number != 0.0
+                         raise "You requested version #{path_as_number} but that version is not installed. Installed versions are #{all_versions}" unless all_versions.include?(path_as_number)
+                         path_as_number
+                       elsif @path
+                         raise "You requested to use #{@path} but that file does not exist!" unless File.exist?(@path)
+                         @path
                        else
                          all_versions.first
                        end
-      return quoted_for_spaces(version_to_use) if version_to_use.is_a? String
-      containing_dir = get_msbuild_path version_to_use
-      quoted_for_spaces(File.join(containing_dir, 'MSBuild.exe'))
+
+      resolved = if version_to_use.is_a?(String)
+                   version_to_use
+                 else
+                   containing_dir = get_msbuild_path version_to_use
+                   File.join(containing_dir, 'MSBuild.exe')
+                 end
+      quoted_for_spaces resolved
     end
   end
 end
