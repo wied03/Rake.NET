@@ -163,8 +163,20 @@ describe BradyW::MSBuild do
     pending 'write this'
   end
 
-  context 'target' do
-    pending 'write this'
+  context 'target(s)' do
+    let(:task_block) { lambda { |t| t.targets = build_targets } }
+
+    context 'single' do
+      let(:build_targets) { 't1' }
+
+      it { is_expected.to execute_commands eq '"C:\\Program Files (x86)\\MSBuild\\14.0\\bin\\MSBuild.exe" /target:t1 /property:Configuration=Debug /property:TargetFrameworkVersion=v4.5' }
+    end
+
+    context 'multiple' do
+      let(:build_targets) { %w{t1 t2} }
+
+      it { is_expected.to execute_commands eq '"C:\\Program Files (x86)\\MSBuild\\14.0\\bin\\MSBuild.exe" /target:t1 /target:t2 /property:Configuration=Debug /property:TargetFrameworkVersion=v4.5' }
+    end
   end
 
   context 'build config' do
@@ -192,41 +204,5 @@ describe BradyW::MSBuild do
     task.exectaskpublic
     execed = task.executedPop
     execed.should == 'C:\\yespath\\msbuild.exe /property:Configuration=Debug /property:TargetFrameworkVersion=v4.0'
-  end
-
-  xit 'should build OK with a single target' do
-    # arrange
-    task = BradyW::MSBuild.new do |t|
-      t.targets = 't1'
-    end
-    expect(task).to receive(:dotnet).with("v4\\Client").and_return("C:\\yespath\\")
-
-    # act
-    task.exectaskpublic
-    execed = task.executedPop
-
-    # assert
-    execed.should == 'C:\\yespath\\msbuild.exe /target:t1 /property:Configuration=Debug /property:TargetFrameworkVersion=v4.5'
-  end
-
-  xit 'should build OK with everything customized (.NET 3.5)' do
-    # arrange
-    task = BradyW::MSBuild.new do |t|
-      t.targets = %w(t1 t2)
-      t.dotnet_bin_version = :v3_5
-      t.solution = 'solutionhere'
-      t.compile_version = :v3_5
-      t.properties = {'prop1' => 'prop1val',
-                      'prop2' => 'prop2val'}
-      t.build_config = :Release
-    end
-    expect(task).to receive(:dotnet).with('v3.5').and_return("C:\\yespath2\\")
-
-    # act
-    task.exectaskpublic
-    execed = task.executedPop
-
-    # assert
-    execed.should == 'C:\\yespath2\\msbuild.exe /target:t1 /target:t2 /property:Configuration=Release /property:TargetFrameworkVersion=v3.5 /property:prop1=prop1val /property:prop2=prop2val solutionhere'
   end
 end
