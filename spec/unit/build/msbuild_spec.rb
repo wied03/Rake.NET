@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe BradyW::MSBuild do
   let(:task_block) { lambda { |t|} }
-  subject { BradyW::MSBuild.new(&task_block) }
+  subject(:task) { BradyW::MSBuild.new(&task_block) }
   let(:msb_paths) do
     {
         '12.0' => 'C:\\Program Files (x86)\\MSBuild\\12.0\\bin\\',
@@ -64,7 +64,7 @@ describe BradyW::MSBuild do
     context 'float' do
       context 'no spaces in path' do
         let(:task_block) { lambda { |t| t.path = 3.5 } }
-        
+
         it { is_expected.to execute_commands eq 'C:\\Windows\\Microsoft.NET\\Framework\\v3.5\\MSBuild.exe /property:Configuration=Debug /property:TargetFrameworkVersion=v4.5' }
       end
 
@@ -75,9 +75,12 @@ describe BradyW::MSBuild do
       end
 
       context 'version not installed' do
-        pending 'write this'
-      end
+        let(:task_block) { lambda { |t| t.path = 22.2 } }
 
+        subject { lambda { task } }
+
+        it { is_expected.to raise_exception 'You requested version 22.2 but that version is not installed. Installed versions are [14.0, 12.0, 4.0, 3.5, 2.0]' }
+      end
     end
 
     context 'integer' do

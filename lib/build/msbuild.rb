@@ -37,6 +37,7 @@ module BradyW
       super parameters
       @build_config ||= :Debug
       @registry_accessor = BradyW::RegistryAccessor.new
+      @resolved_path = path
     end
 
     private
@@ -45,7 +46,7 @@ module BradyW
       params = targets
       params << merged_properties.map { |key, val| param_fslash_colon('property', property_kv(key, val)) }
       params_flat = params.join ' '
-      command = quoted_for_spaces File.join(path, 'MSBuild.exe')
+      command = quoted_for_spaces File.join(@resolved_path, 'MSBuild.exe')
       shell "#{command} #{params_flat}#{solution}"
     end
 
@@ -87,11 +88,12 @@ module BradyW
     end
 
     def path
-      all_versions = get_msbuild_versions
+      all_versions = get_msbuild_versions.sort.reverse
       version_to_use = if @path
+                         raise "You requested version #{@path} but that version is not installed. Installed versions are #{all_versions}" unless all_versions.include?(@path)
                          @path
                        else
-                         all_versions.sort.reverse.first
+                         all_versions.first
                        end
       get_msbuild_path version_to_use
     end
