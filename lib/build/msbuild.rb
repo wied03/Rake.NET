@@ -82,8 +82,18 @@ module BradyW
       @registry_accessor.get_value "SOFTWARE\\Microsoft\\MSBuild\\ToolsVersions\\#{version}", 'MsBuildToolsPath'
     end
 
+    def get_msbuild_versions
+      @registry_accessor.get_sub_keys('SOFTWARE\\Microsoft\\MSBuild\\ToolsVersions').map { |v| v.to_f }
+    end
+
     def path
-      get_msbuild_path '14.0'
+      all_versions = get_msbuild_versions
+      version_to_use = if @path
+                         @path
+                       else
+                         all_versions.sort.reverse.first
+                       end
+      get_msbuild_path version_to_use
     end
   end
 end

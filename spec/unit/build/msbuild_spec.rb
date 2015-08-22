@@ -3,7 +3,15 @@ require 'spec_helper'
 describe BradyW::MSBuild do
   let(:task_block) { lambda { |t|} }
   subject { BradyW::MSBuild.new(&task_block) }
-  let(:msb_paths) { {} }
+  let(:msb_paths) do
+    {
+        '12.0' => 'C:\\Program Files (x86)\\MSBuild\\12.0\\bin\\',
+        '14.0' => 'C:\\Program Files (x86)\\MSBuild\\14.0\\bin\\',
+        '2.0' => 'C:\\Windows\\Microsoft.NET\\Framework\\v2.0.50727\\',
+        '3.5' => 'C:\\Windows\\Microsoft.NET\\Framework\\v3.5\\',
+        '4.0' => 'C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\'
+    }
+  end
 
   before do
     @mock_accessor = instance_double BradyW::RegistryAccessor
@@ -39,7 +47,7 @@ describe BradyW::MSBuild do
     context 'multiple MSB versions' do
       let(:msb_paths) do
         {
-            '12.0' => 'C:\\Program Files (x86)\\MSBuild\\14.0\\bin\\',
+            '12.0' => 'C:\\Program Files (x86)\\MSBuild\\12.0\\bin\\',
             '14.0' => 'C:\\Program Files (x86)\\MSBuild\\14.0\\bin\\',
             '2.0' => 'C:\\Windows\\Microsoft.NET\\Framework\\v2.0.50727\\',
             '3.5' => 'C:\\Windows\\Microsoft.NET\\Framework\\v3.5\\',
@@ -59,10 +67,12 @@ describe BradyW::MSBuild do
       end
 
       context 'valid' do
-        pending 'write this'
+        let(:task_block) { lambda { |t| t.path = 12.0 } }
+
+        it { is_expected.to execute_commands eq '"C:\\Program Files (x86)\\MSBuild\\12.0\\bin\\MSBuild.exe" /property:Configuration=Debug /property:TargetFrameworkVersion=v4.5' }
       end
 
-      context 'invalid' do
+      context 'version not installed' do
         pending 'write this'
       end
 
