@@ -84,16 +84,36 @@ describe BradyW::MSBuild do
     end
 
     context 'integer' do
-      pending 'write this'
+      let(:task_block) { lambda { |t| t.path = 12 } }
+
+      it { is_expected.to execute_commands eq '"C:\\Program Files (x86)\\MSBuild\\12.0\\bin\\MSBuild.exe" /property:Configuration=Debug /property:TargetFrameworkVersion=v4.5' }
     end
 
     context 'string' do
-      context 'valid' do
-        pending 'write this'
+      context 'file path' do
+        context 'valid' do
+          pending 'write this'
+        end
+
+        context 'invalid' do
+          pending 'write this'
+        end
       end
 
-      context 'invalid' do
-        pending 'write this'
+      context 'number as string' do
+        context 'valid' do
+          let(:task_block) { lambda { |t| t.path = '12.0' } }
+
+          it { is_expected.to execute_commands eq '"C:\\Program Files (x86)\\MSBuild\\12.0\\bin\\MSBuild.exe" /property:Configuration=Debug /property:TargetFrameworkVersion=v4.5' }
+        end
+
+        context 'invalid' do
+          let(:task_block) { lambda { |t| t.path = '22.2' } }
+
+          subject { lambda { task } }
+
+          it { is_expected.to raise_exception 'You requested version 22.2 but that version is not installed. Installed versions are [14.0, 12.0, 4.0, 3.5, 2.0]' }
+        end
       end
     end
   end

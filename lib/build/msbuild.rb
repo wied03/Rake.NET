@@ -90,8 +90,11 @@ module BradyW
     def path
       all_versions = get_msbuild_versions.sort.reverse
       version_to_use = if @path
-                         raise "You requested version #{@path} but that version is not installed. Installed versions are #{all_versions}" unless all_versions.include?(@path)
-                         @path
+                         number = @path.to_f
+                         if number
+                           raise "You requested version #{number} but that version is not installed. Installed versions are #{all_versions}" unless all_versions.include?(number)
+                           number
+                         end
                        else
                          all_versions.first
                        end
