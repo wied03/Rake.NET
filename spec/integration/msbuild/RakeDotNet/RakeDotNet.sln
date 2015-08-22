@@ -10,7 +10,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		global.json = global.json
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lib1", "Lib1\Lib1.csproj", "{C48515E3-342A-4F83-9276-9A348B3D36CA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClassLibrary1", "ClassLibrary1\ClassLibrary1.csproj", "{B2477287-13B9-478D-A56E-4303D30AE0F4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,15 +18,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C48515E3-342A-4F83-9276-9A348B3D36CA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C48515E3-342A-4F83-9276-9A348B3D36CA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C48515E3-342A-4F83-9276-9A348B3D36CA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C48515E3-342A-4F83-9276-9A348B3D36CA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B2477287-13B9-478D-A56E-4303D30AE0F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B2477287-13B9-478D-A56E-4303D30AE0F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B2477287-13B9-478D-A56E-4303D30AE0F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B2477287-13B9-478D-A56E-4303D30AE0F4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{C48515E3-342A-4F83-9276-9A348B3D36CA} = {64E1CFF9-C7B5-429B-8A44-D954AFADF1DA}
+		{B2477287-13B9-478D-A56E-4303D30AE0F4} = {64E1CFF9-C7B5-429B-8A44-D954AFADF1DA}
 	EndGlobalSection
 EndGlobal

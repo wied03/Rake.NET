@@ -107,14 +107,13 @@ describe BradyW::MSBuild do
     let(:rake_targets) { :build }
 
     it { is_expected.to run_successfully }
-    it { is_expected.to have_dll_files include /RakeDotNet.dll/ }
+    it { is_expected.to have_dll_files include /ClassLibrary1.dll/ }
   end
 
   describe 'clean' do
-    let(:test_filename) { File.join(project_dir, 'artifacts/bin/RakeDotNet/Debug/dotnet/RakeDotNet.dll') }
+    let(:test_filename) { File.join(project_dir, 'ClassLibrary1/bin/Debug/ClassLibrary1.dll') }
 
     before do
-      skip 'Even MSBuild is not cleaning right now'
       FileUtils.touch test_filename
     end
 
@@ -125,6 +124,6 @@ describe BradyW::MSBuild do
     let(:rake_targets) { :clean }
 
     it { is_expected.to run_successfully }
-    it { is_expected.to_not have_dll_files include /RakeDotNet.dll/ }
+    it { is_expected.to_not have_dll_files include /ClassLibrary1.dll/ }
   end
 end
