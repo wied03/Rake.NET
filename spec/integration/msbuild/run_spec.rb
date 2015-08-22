@@ -1,13 +1,52 @@
 require 'spec_helper'
 
 describe BradyW::MSBuild do
-  RSpec::Matchers.define :run_successfully do
+  let(:execute_fails) { [] }
+  let(:execute_succeeds) { [] }
+
+  def run_command(command)
+    if Bundler.clean_system command
+      execute_succeeds << command
+    else
+      execute_fails << command
+    end
+  end
+
+  def run_rake_targets(*targets)
+    run_command "bundle exec rake #{[targets].join ' '}"
+  end
+
+  RSpec::Matchers.define :run_successfully do |matcher|
     match do
-      @success
+      if matcher
+        matcher.matches? execute_fails
+      else
+        execute_fails.empty?
+      end
     end
 
-    failure_message do
-      'Expected task to succeed but it did not'
+    failure_message do |matcher|
+      if matcher
+        matcher.failure_message
+      else
+        "Expected tasks to complete successfully but the following failed: #{execute_fails}"
+      end
+    end
+
+    match_when_negated do
+      if matcher
+        matcher.does_not_match? execute_succeeds
+      else
+        execute_succeeds.any?
+      end
+    end
+
+    failure_message_when_negated do |matcher|
+      if matcher
+        matcher.failure_message
+      else
+        "Expected tasks to NOT complete successfully but the following succeeded: #{execute_succeeds}"
+      end
     end
   end
 
@@ -21,7 +60,7 @@ describe BradyW::MSBuild do
     end
 
     failure_message do
-      matcher.failure_message
+      matcher.failure_message + ", files in project dir: #{Dir.glob(File.join(project_dir, '**/*'))}"
     end
   end
 
@@ -29,6 +68,7 @@ describe BradyW::MSBuild do
   let(:project_gemfile) { File.join(project_dir, 'Gemfile') }
 
   class_variable_set :@@bundle_installed, []
+
   def self.bundle_install_complete_for(path)
     # initializer above does not set an array first
     class_variable_get(:@@bundle_installed) << path
@@ -39,20 +79,24 @@ describe BradyW::MSBuild do
   end
 
   before do
-    Dir.chdir(project_dir) do
-      # lock file is not versioned
-      if self.class.bundle_installed?(project_gemfile)
-        puts "\nSkipping bundle install for #{project_gemfile} because it has been done already\n"
-      else
-        FileUtils.rm_rf 'Gemfile.lock'
-        Bundler.clean_system 'bundle install'
-        @success = $?.success?
-        raise 'Bundle install error' unless @success
-        self.class.bundle_install_complete_for project_gemfile
-      end
-      Bundler.clean_system "bundle exec rake #{[*rake_targets].join ' '}"
-      @success = $?.success?
+    # lock file is not versioned
+    if self.class.bundle_installed?(project_gemfile)
+      puts "\nSkipping bundle install for #{project_gemfile} because it has been done already\n"
+    else
+      FileUtils.rm_rf 'Gemfile.lock'
+      run_command 'bundle install'
+      self.class.bundle_install_complete_for project_gemfile
     end
+  end
+
+  around do |example|
+    Dir.chdir project_dir do
+      example.run
+    end
+  end
+
+  subject do
+    run_rake_targets *rake_targets
   end
 
   describe 'build' do
@@ -67,7 +111,7 @@ describe BradyW::MSBuild do
   end
 
   describe 'clean' do
-    let(:test_filename) { File.join(project_dir, 'RakeDotNet.dll') }
+    let(:test_filename) { File.join(project_dir, 'artifacts/bin/RakeDotNet/Debug/dotnet/RakeDotNet.dll') }
 
     before do
       FileUtils.touch test_filename
