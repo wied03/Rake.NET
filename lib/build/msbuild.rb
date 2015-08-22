@@ -14,9 +14,9 @@ module BradyW
     # *Optional* Targets to build.  Can be a single target or an array of targets
     attr_accessor :targets
 
-    # *Optional* Version of the MSBuild binary to use. Defaults to :v4_5
-    # Other options are :v2_0, :v3_5, :v4_0
-    attr_accessor :dotnet_bin_version
+    # *Optional* Which MSBuild version to use. By default, will use latest version installed (typically in C:\Program Files (x86)\MSBuild\14.0\Bin)
+    # If you supply a Float (e.g. 14.0, 13.0), then that MSBuild version will be used. If you supply a string, then that absolute path will be used
+    attr_accessor :path
 
     # *Optional* Solution file to build
     attr_accessor :solution
@@ -36,19 +36,16 @@ module BradyW
     def initialize (parameters = :task)
       super parameters
       @build_config ||= :Debug
+      @registry_accessor = BradyW::RegistryAccessor.new
     end
 
     private
-
-    DOTNET4_REG_PATH = "v4\\Client"
-    DOTNET35_REGPATH = 'v3.5'
-    DOTNET2_HARDCODEDPATH = "C:\\Windows\\Microsoft.NET\\Framework\\v2.0.50727\\"
 
     def exectask
       params = targets
       params << merged_properties.map { |key, val| param_fslash_colon('property', property_kv(key, val)) }
       params_flat = params.join ' '
-      shell "#{path}msbuild.exe #{params_flat}#{solution}"
+      shell "#{path}MSBuild.exe #{params_flat}#{solution}"
     end
 
     def compile_version
@@ -80,20 +77,12 @@ module BradyW
       default.merge (@properties || {})
     end
 
+    def get_msbuild_path(version)
+      @registry_accessor.get_value "SOFTWARE\\Microsoft\\MSBuild\\ToolsVersions\\#{version}", 'MsBuildToolsPath'
+    end
+
     def path
-      symbol = @dotnet_bin_version || :v4_5
-      case symbol
-        when :v4_0
-          dotnet DOTNET4_REG_PATH
-        when :v4_5
-          dotnet DOTNET4_REG_PATH
-        when :v3_5
-          dotnet DOTNET35_REGPATH
-        when :v2_0
-          DOTNET2_HARDCODEDPATH
-        else
-          fail 'You supplied a .NET MSBuild binary version that\'s not supported.  Please use :v4_0, :v3_5, or :v2_0'
-      end
+      get_msbuild_path '14.0'
     end
   end
 end
