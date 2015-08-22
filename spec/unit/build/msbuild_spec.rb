@@ -10,6 +10,7 @@ describe BradyW::MSBuild do
       let(:msb_paths) { {'14.0' => 'C:\\Program Files (x86)\\MSBuild\\14.0\\bin\\'} }
 
       it { is_expected.to execute_bin eq '"C:\\Program Files (x86)\\MSBuild\\14.0\\bin\\MSBuild.exe"' }
+      it { is_expected.to execute_with_params eq '/property:Configuration=Debug /property:TargetFrameworkVersion=v4.5' }
     end
 
     context 'multiple MSB versions' do
@@ -24,8 +25,8 @@ describe BradyW::MSBuild do
       end
 
       it { is_expected.to execute_bin eq '"C:\\Program Files (x86)\\MSBuild\\14.0\\bin\\MSBuild.exe"' }
+      it { is_expected.to execute_with_params eq '/property:Configuration=Debug /property:TargetFrameworkVersion=v4.5' }
     end
-
   end
 
   context 'specific MSB version' do
