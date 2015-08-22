@@ -26,5 +26,9 @@ module BradyW
     def quoted(setting)
       "\"#{setting}\""
     end
+
+    def quoted_for_spaces(value)
+      value.include?(' ') ? quoted(value) : value
+    end
   end
 end

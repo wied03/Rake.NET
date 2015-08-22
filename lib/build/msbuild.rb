@@ -45,7 +45,8 @@ module BradyW
       params = targets
       params << merged_properties.map { |key, val| param_fslash_colon('property', property_kv(key, val)) }
       params_flat = params.join ' '
-      shell "#{path}MSBuild.exe #{params_flat}#{solution}"
+      command = quoted_for_spaces File.join(path, 'MSBuild.exe')
+      shell "#{command} #{params_flat}#{solution}"
     end
 
     def compile_version

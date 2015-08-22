@@ -33,17 +33,31 @@ describe BradyW::MSBuild do
     context 'latest MSB version is only version' do
       let(:msb_paths) { {'14.0' => 'C:\\Program Files (x86)\\MSBuild\\14.0\\bin\\'} }
 
-      it { is_expected.to execute_commands eq 'C:\\Program Files (x86)\\MSBuild\\14.0\\bin\\MSBuild.exe /property:Configuration=Debug /property:TargetFrameworkVersion=v4.5' }
+      it { is_expected.to execute_commands eq '"C:\\Program Files (x86)\\MSBuild\\14.0\\bin\\MSBuild.exe" /property:Configuration=Debug /property:TargetFrameworkVersion=v4.5' }
     end
 
     context 'multiple MSB versions' do
-      pending 'write this'
+      let(:msb_paths) do
+        {
+            '12.0' => 'C:\\Program Files (x86)\\MSBuild\\14.0\\bin\\',
+            '14.0' => 'C:\\Program Files (x86)\\MSBuild\\14.0\\bin\\',
+            '2.0' => 'C:\\Windows\\Microsoft.NET\\Framework\\v2.0.50727\\',
+            '3.5' => 'C:\\Windows\\Microsoft.NET\\Framework\\v3.5\\',
+            '4.0' => 'C:\\Windows\\Microsoft.NET\\Framework\\v4.0.30319\\'
+        }
+      end
+
+      it { is_expected.to execute_commands eq '"C:\\Program Files (x86)\\MSBuild\\14.0\\bin\\MSBuild.exe" /property:Configuration=Debug /property:TargetFrameworkVersion=v4.5' }
     end
 
   end
 
   context 'specific MSB version' do
     context 'float' do
+      context 'no spaces in path' do
+        pending 'write this'
+      end
+
       context 'valid' do
         pending 'write this'
       end
