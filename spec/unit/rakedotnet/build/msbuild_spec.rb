@@ -10,7 +10,7 @@ describe BradyW::MSBuild do
       let(:msb_paths) { {'14.0' => 'C:\\Program Files (x86)\\MSBuild\\14.0\\bin\\'} }
 
       it { is_expected.to execute_bin eq '"C:\\Program Files (x86)\\MSBuild\\14.0\\bin\\MSBuild.exe"' }
-      it { is_expected.to execute_with_params eq '/property:Configuration=Debug /property:TargetFrameworkVersion=v4.5' }
+      it { is_expected.to execute_with_params eq '/property:Configuration=Debug' }
     end
 
     context 'multiple MSB versions' do
@@ -25,7 +25,7 @@ describe BradyW::MSBuild do
       end
 
       it { is_expected.to execute_bin eq '"C:\\Program Files (x86)\\MSBuild\\14.0\\bin\\MSBuild.exe"' }
-      it { is_expected.to execute_with_params eq '/property:Configuration=Debug /property:TargetFrameworkVersion=v4.5' }
+      it { is_expected.to execute_with_params eq '/property:Configuration=Debug' }
     end
   end
 
@@ -107,13 +107,13 @@ describe BradyW::MSBuild do
     context 'value includes spaces' do
       let(:build_props) { {:prop1 => 'the value'} }
 
-      it { is_expected.to execute_with_params eq '/property:Configuration=Debug /property:TargetFrameworkVersion=v4.5 /property:prop1="the value"' }
+      it { is_expected.to execute_with_params eq '/property:Configuration=Debug /property:prop1="the value"' }
     end
 
     context 'value includes semicolons' do
       let(:build_props) { {:prop1 => 'the;value'} }
 
-      it { is_expected.to execute_with_params eq '/property:Configuration=Debug /property:TargetFrameworkVersion=v4.5 /property:prop1="the;value"' }
+      it { is_expected.to execute_with_params eq '/property:Configuration=Debug /property:prop1="the;value"' }
     end
 
     context 'custom properties that are also defaults' do
@@ -124,12 +124,14 @@ describe BradyW::MSBuild do
         }
       }
 
-      it { is_expected.to execute_with_params eq '/property:Configuration=myconfig /property:TargetFrameworkVersion=v4.5 /property:prop2=prop2val' }
+      it { is_expected.to execute_with_params eq '/property:Configuration=myconfig /property:prop2=prop2val' }
     end
   end
 
   context 'explicit solution' do
-    pending 'write this'
+    let(:task_block) { lambda { |t| t.solution = 'junk.sln' } }
+
+    it { is_expected.to execute_with_params eq '/property:Configuration=Debug junk.sln' }
   end
 
   context 'target(s)' do
@@ -138,13 +140,13 @@ describe BradyW::MSBuild do
     context 'single' do
       let(:build_targets) { 't1' }
 
-      it { is_expected.to execute_with_params eq '/target:t1 /property:Configuration=Debug /property:TargetFrameworkVersion=v4.5' }
+      it { is_expected.to execute_with_params eq '/target:t1 /property:Configuration=Debug' }
     end
 
     context 'multiple' do
       let(:build_targets) { %w{t1 t2} }
 
-      it { is_expected.to execute_with_params eq '/target:t1 /target:t2 /property:Configuration=Debug /property:TargetFrameworkVersion=v4.5' }
+      it { is_expected.to execute_with_params eq '/target:t1 /target:t2 /property:Configuration=Debug' }
     end
   end
 
@@ -154,24 +156,45 @@ describe BradyW::MSBuild do
     context 'explicit debug' do
       let(:build_config) { :Debug }
 
-      it { is_expected.to execute_with_params eq '/property:Configuration=Debug /property:TargetFrameworkVersion=v4.5' }
+      it { is_expected.to execute_with_params eq '/property:Configuration=Debug' }
     end
 
     context 'release' do
       let(:build_config) { :Release }
 
-      it { is_expected.to execute_with_params eq '/property:Configuration=Release /property:TargetFrameworkVersion=v4.5' }
+      it { is_expected.to execute_with_params eq '/property:Configuration=Release' }
     end
   end
 
-  xit 'should build OK (.NET 4.0)' do
-    task = BradyW::MSBuild.new do |t|
-      t.dotnet_bin_version = :v4_0
-      t.compile_version = :v4_0
+  context 'explicit compile version' do
+    let(:task_block) { lambda { |t| t.compile_version = compile_version } }
+
+    context 'integer' do
+      let(:compile_version) { 4 }
+
+      it { is_expected.to execute_with_params eq '/property:Configuration=Debug /property:TargetFrameworkVersion=v4.0' }
     end
-    expect(task).to receive(:dotnet).with("v4\\Client").and_return("C:\\yespath\\")
-    task.exectaskpublic
-    execed = task.executedPop
-    execed.should == 'C:\\yespath\\msbuild.exe /property:Configuration=Debug /property:TargetFrameworkVersion=v4.0'
+
+    context 'float' do
+      let(:compile_version) { 4.0 }
+
+      it { is_expected.to execute_with_params eq '/property:Configuration=Debug /property:TargetFrameworkVersion=v4.0' }
+    end
+
+    context 'string' do
+      context 'valid' do
+        let(:compile_version) { '4.0' }
+
+        it { is_expected.to execute_with_params eq '/property:Configuration=Debug /property:TargetFrameworkVersion=v4.0' }
+      end
+
+      context 'invalid' do
+        let(:compile_version) { 'foobar' }
+
+        subject { lambda { task } }
+
+        it { is_expected.to raise_exception "Compile version needs to be convertible to float and 'foobar' is not" }
+      end
+    end
   end
 end

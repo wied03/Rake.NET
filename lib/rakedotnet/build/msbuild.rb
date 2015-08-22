@@ -22,7 +22,7 @@ module BradyW
     attr_accessor :solution
 
     # *Optional* .NET compilation version (what should MSBuild compile code to, NOT what version
-    # of MSBuild to use).  Defaults to :v4_5).  Other options are :v2_0, :v3_5, :v4_0
+    # of MSBuild to use).  Default is to let MSBuild handle it. If you supply a value, needs to be a Float
     attr_accessor :compile_version
 
     # *Optional* Properties to pass along to MSBuild.  By default 'Configuration' and
@@ -38,6 +38,7 @@ module BradyW
       @build_config ||= :Debug
       @registry_accessor = BradyW::RegistryAccessor.new
       @resolved_path = get_path
+      @resolved_compile = get_compile_version
     end
 
     private
@@ -73,8 +74,8 @@ module BradyW
     end
 
     def merged_properties
-      default = {:Configuration => build_config,
-                 :TargetFrameworkVersion => compile_version}
+      default = {Configuration: build_config}
+      default[:TargetFrameworkVersion] = @resolved_compile if @resolved_compile
       default.merge (@properties || {})
     end
 
@@ -105,6 +106,16 @@ module BradyW
                    File.join(containing_dir, 'MSBuild.exe')
                  end
       quoted_for_spaces resolved
+    end
+
+    def get_compile_version
+      if @compile_version and (as_number = @compile_version.to_f) and as_number != 0.0
+        "v#{as_number}"
+      elsif @compile_version
+        raise "Compile version needs to be convertible to float and '#{@compile_version}' is not"
+      else
+        nil
+      end
     end
   end
 end
