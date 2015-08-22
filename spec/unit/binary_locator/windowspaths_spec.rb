@@ -1,59 +1,52 @@
 require 'spec_helper'
 
-class WindowsPathsWrapper
-  include BradyW::WindowsPaths
-
-  def log text
-    puts text
-  end
-end
-
 describe BradyW::WindowsPaths do
-  before(:each) do
-    @key = nil
-    @value = nil
-    @windowPathsWrapper = WindowsPathsWrapper.new
-    mock_accessor = BradyW::RegistryAccessor.new
-    # No dependency injection framework required :)
-    allow(BradyW::RegistryAccessor).to receive(:new).and_return(mock_accessor)
-    allow(mock_accessor).to receive(:get_value) do |key, value|
-      @key = key
-      @value = value
-      'hi'
+  before do
+    @mock_accessor = instance_double BradyW::RegistryAccessor
+    allow(BradyW::RegistryAccessor).to receive(:new).and_return(@mock_accessor)
+  end
+
+  let(:wrapper_class) do
+    Class.new do
+      include BradyW::WindowsPaths
+
+      public :sql_tool, :visual_studio, :dotnet
+
+      def log text
+        puts text
+      end
     end
-    @mock_msi_searcher = BradyW::MsiFileSearcher.new
-    allow(BradyW::MsiFileSearcher).to receive(:new).and_return(@mock_msi_searcher)
   end
 
-  it 'should retrieve SQL Server tools properly' do
-    result = @windowPathsWrapper.send(:sql_tool, 'verhere')
-    result.should == 'hi'
-    @key.should == 'SOFTWARE\\Microsoft\\Microsoft SQL Server\\verhere\\Tools\\ClientSetup'
-    @value.should == 'Path'
+  subject(:wrapper) { wrapper_class.new }
+
+  describe '#sql_tool' do
+    before do
+      allow(@mock_accessor).to receive(:get_value).with('SOFTWARE\\Microsoft\\Microsoft SQL Server\\verhere\\Tools\\ClientSetup', 'Path').and_return 'howdy'
+    end
+
+    subject { wrapper.sql_tool 'verhere' }
+
+    it { is_expected.to eq 'howdy' }
   end
 
-  it 'should retrieve the Visual Studio path properly' do
-    result = @windowPathsWrapper.send(:visual_studio, 'verhere')
-    result.should == 'hi'
-    @key.should == 'SOFTWARE\\Microsoft\\VisualStudio\\verhere'
-    @value.should == 'InstallDir'
+  describe '#visual_studio' do
+    before do
+      allow(@mock_accessor).to receive(:get_value).with('SOFTWARE\\Microsoft\\VisualStudio\\verhere', 'InstallDir').and_return 'howdy'
+    end
+
+    subject { wrapper.visual_studio 'verhere' }
+
+    it { is_expected.to eq 'howdy' }
   end
 
-  it 'should retrieve .NET runtime path properly' do
-    result = @windowPathsWrapper.send(:dotnet, 'verhere')
-    result.should == 'hi'
-    @key.should == 'SOFTWARE\\Microsoft\\NET Framework Setup\\NDP\\verhere'
-    @value.should == 'InstallPath'
-  end
+  describe '#dotnet' do
+    before do
+      allow(@mock_accessor).to receive(:get_value).with('SOFTWARE\\Microsoft\\NET Framework Setup\\NDP\\verhere', 'InstallPath').and_return 'howdy'
+    end
 
-  it 'should retrieve the path of subinacl' do
-    # arrange
-    allow(@mock_msi_searcher).to receive(:get_component_path).with('{D3EE034D-5B92-4A55-AA02-2E6D0A6A96EE}','{C2BC2826-FDDC-4A61-AA17-B3928B0EDA38}').and_return('path\to\subinacl.exe')
+    subject { wrapper.dotnet 'verhere' }
 
-    # act
-    result = @windowPathsWrapper.send(:subinacl_path)
-
-    # assert
-    result.should == 'path\to\subinacl.exe'
+    it { is_expected.to eq 'howdy' }
   end
 end

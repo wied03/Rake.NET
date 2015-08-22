@@ -5,22 +5,22 @@ describe BradyW::Subinacl do
     @should_deletes = []
     @file_index = 0
     allow(BradyW::TempFileNameGenerator).to receive(:random_filename) { |base, ext|
-      file =
-          case base
-            when 'run_subinacl_with_output_redirect'
-              "#{base}#{ext}"
-            when 'subinacl_log'
-              "#{base}#{ext}"
-            else
-              raise "Unknown extension #{extension}"
-          end
-      @should_deletes << file
-      file
-    }
+                                              file =
+                                                  case base
+                                                    when 'run_subinacl_with_output_redirect'
+                                                      "#{base}#{ext}"
+                                                    when 'subinacl_log'
+                                                      "#{base}#{ext}"
+                                                    else
+                                                      raise "Unknown extension #{extension}"
+                                                  end
+                                              @should_deletes << file
+                                              file
+                                            }
     # Need to examine the batch file as part of our tests
     allow(FileUtils).to receive(:rm) { |file|
-      File.delete file if file != 'run_subinacl_with_output_redirect.bat'
-    }
+                          File.delete file if file != 'run_subinacl_with_output_redirect.bat'
+                        }
     @commands = []
     ENV['PRESERVE_TEMP'] = nil
     allow(File).to receive(:expand_path) { |f| "/some/base/dir/#{f}" }
@@ -29,7 +29,6 @@ describe BradyW::Subinacl do
   after :each do
     @should_deletes.each { |f| File.delete f if (f && File.exists?(f)) }
   end
-
 
   def generate_subinacl_output(opts)
     "Done:        0, Modified        0, Failed        #{opts[:failure_count_to_indicate]}, Syntax errors        #{opts[:syntax_error_count_to_indicate]}"
@@ -43,6 +42,20 @@ describe BradyW::Subinacl do
       writer << "\r"
       writer << "Current object #{options[:object_failure]} will not be processed\r" if options[:object_failure]
     end
+  end
+
+  subject(:task) { BradyW::Subinacl.new }
+
+  describe '#subinacl_path' do
+    before do
+      mock_msi_searcher = instance_double BradyW::MsiFileSearcher
+      allow(BradyW::MsiFileSearcher).to receive(:new).and_return(mock_msi_searcher)
+      allow(mock_msi_searcher).to receive(:get_component_path).with('{D3EE034D-5B92-4A55-AA02-2E6D0A6A96EE}', '{C2BC2826-FDDC-4A61-AA17-B3928B0EDA38}').and_return('path\to\subinacl.exe')
+    end
+
+    subject { task.send(:subinacl_path) }
+
+    it { is_expected.to eq 'path\to\subinacl.exe' }
   end
 
   it 'should run Subinacl properly when no spaces are in path' do

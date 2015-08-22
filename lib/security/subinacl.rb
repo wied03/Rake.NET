@@ -1,10 +1,8 @@
 require_relative '../basetask'
 require_relative '../util/param_quotes'
-require_relative '../binary_locator/windowspaths'
 
 module BradyW
   class Subinacl < BaseTask
-    include WindowsPaths
     include ParamQuotes
 
     attr_accessor :service_to_grant_access_to
@@ -18,7 +16,7 @@ module BradyW
       log_file_name = BradyW::TempFileNameGenerator.random_filename 'subinacl_log', '.txt'
       # Need to use binary mode to avoid CRLF/Windows issues since it's picky about batch files
       File.open temp_batch_file_name, 'wb' do |file|
-        file << exe_path_with_redirection(params,log_file_name)
+        file << exe_path_with_redirection(params, log_file_name)
       end
 
       log_file_already_written = false
@@ -51,13 +49,22 @@ module BradyW
 
     private
 
+    # Fetched the path of Subinacl 5.2.3790 if it's installed
+    SUBINACL_PRODUCT_CODE = '{D3EE034D-5B92-4A55-AA02-2E6D0A6A96EE}'
+    SUBINACL_EXE_COMPONENT_CODE = '{C2BC2826-FDDC-4A61-AA17-B3928B0EDA38}'
+
+    def subinacl_path
+      component_locator = BradyW::MsiFileSearcher.new
+      component_locator.get_component_path SUBINACL_PRODUCT_CODE, SUBINACL_EXE_COMPONENT_CODE
+    end
+
     def write_log_to_console(filename)
       send_log_file_contents_to_console(:log_file_name => filename) do |line|
         yield line
       end
     end
 
-    def exe_path_with_redirection(params,log_file_name)
+    def exe_path_with_redirection(params, log_file_name)
       path = quoted(windows_friendly_path(File.expand_path(log_file_name)))
       "\"#{subinacl_path}\" #{params.join(' ')} 1> #{path} 2>&1"
     end
