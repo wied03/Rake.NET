@@ -1,22 +1,25 @@
 require 'spec_helper'
 
 describe BradyW::DotNetInstallerExecute do
+  include_context :executable_test
+  include_context :io_helper
+
   before :each do
     @should_deletes = []
     @file_index = 0
     allow(BradyW::TempFileNameGenerator).to receive(:random_filename) { |base, ext|
-      file =
-          case base
-            when 'msi_log'
-              'msi_log.txt'
-            when 'dnet_log'
-              'dnet_log.txt'
-            else
-              raise "Unknown extension #{extension}"
-          end
-      @should_deletes << file
-      file
-    }
+                                              file =
+                                                  case base
+                                                    when 'msi_log'
+                                                      'msi_log.txt'
+                                                    when 'dnet_log'
+                                                      'dnet_log.txt'
+                                                    else
+                                                      raise "Unknown extension #{extension}"
+                                                  end
+                                              @should_deletes << file
+                                              file
+                                            }
     @commands = []
     ENV['PRESERVE_TEMP'] = nil
   end

@@ -26,6 +26,8 @@ RSpec::Matchers.define :have_same_config_as do |e|
 end
 
 describe BradyW::JsTest do
+  include_context :executable_test
+
   before(:each) do
     ENV['CCNetProject'] = nil
   end

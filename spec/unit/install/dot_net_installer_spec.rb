@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe BradyW::DotNetInstaller do
+  include_context :executable_test
+
   before :each do
     @should_deletes = %w(generated_name_1.xml generated_name_2.xml)
     allow(BswTech::DnetInstallUtil).to receive(:dot_net_installer_base_path).and_return('path/to/dnetinstaller')

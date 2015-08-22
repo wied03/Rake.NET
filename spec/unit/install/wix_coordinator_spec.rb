@@ -1,4 +1,5 @@
 require 'spec_helper'
+require_relative '../build/msbuild_helpers'
 
 module BradyW
   class BaseTask < Rake::TaskLib
@@ -13,12 +14,18 @@ class TestTask < BradyW::BaseTask
 end
 
 describe BradyW::WixCoordinator do
+  include_context :executable_test
+  include_context :msbuild_helpers
+
+  let(:msb_paths) do
+    {
+        '12.0' => '/path/to'
+    }
+  end
+
   before :each do
     stub_const 'BswTech::DnetInstallUtil::PARAFFIN_EXE', 'path/to/paraffin.exe'
     allow(BswTech::DnetInstallUtil).to receive(:dot_net_installer_base_path).and_return('path/to/dnetinstaller')
-    @mock_accessor = BradyW::RegistryAccessor.new
-    # No dependency injection framework required :)
-    allow(BradyW::RegistryAccessor).to receive(:new).and_return(@mock_accessor)
   end
 
   after :each do
@@ -355,7 +362,7 @@ describe BradyW::WixCoordinator do
     # DEBUG is needed for preprocessor variables
   end
 
-  it 'should allow MSBuild properties like .NET version, etc. to be passed along' do
+  it 'should allow MSBuild properties to be passed along' do
     # arrange
     ms_build_mock = BradyW::MSBuild.new
     allow(BradyW::MSBuild).to receive(:new) do |&block|
@@ -369,12 +376,12 @@ describe BradyW::WixCoordinator do
       t.wix_project_directory = 'MyWixProject'
       t.upgrade_code = '6c6bbe03-e405-4e6e-84ac-c5ef16f243e7'
       t.properties = {:setting1 => 'the setting', :setting2 => 'the setting 2'}
-      t.msbuild_configure = lambda { |m| m.dotnet_bin_version = :v4_0 }
+      t.msbuild_configure = lambda { |m| m.path = '22.0' }
       t.installer_referencer_bin = 'somedir'
     end
 
     # assert
-    ms_build_mock.dotnet_bin_version.should == :v4_0
+    ms_build_mock.path.should == '22.0'
   end
 
   it 'should not allow the top level release_mode flag to be overridden by properties since we need to interpret the config for defineConstants' do
@@ -442,7 +449,6 @@ describe BradyW::WixCoordinator do
       t.properties = {:setting1 => 'the setting', :setting2 => 'the setting 2'}
       t.installer_referencer_bin = 'somedir'
     end
-    allow(ms_build_mock).to receive(:dotnet).and_return('path/to/')
     FileUtils.touch 'MyWixProject/paraffin/binaries.PARAFFIN'
     FileUtils.touch 'MyWixProject/dnetinstaller.xml'
     commands = []
@@ -456,7 +462,7 @@ describe BradyW::WixCoordinator do
     commands[4].should include 'symlink' # create
     commands[3].should == '"path/to/paraffin.exe" -update "MyWixProject/paraffin/binaries.wxs" -verbose -ReportIfDifferent'
     commands[2].should include 'symlink' # delete
-    commands[1].should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:setting1="the setting" /property:setting2="the setting 2" /property:DefineConstants="ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;setting1=the setting;setting2=the setting 2;TRACE" MyWixProject/MyWixProject.wixproj'
+    commands[1].should == '/path/to/MSBuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:setting1="the setting" /property:setting2="the setting 2" /property:DefineConstants="ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;setting1=the setting;setting2=the setting 2;TRACE" MyWixProject/MyWixProject.wixproj'
     commands[0].should include '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"MyWixProject/dnetinstall'
     commands[0].should include '/o:"MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
   end
@@ -479,7 +485,6 @@ describe BradyW::WixCoordinator do
       t.properties = {:setting1 => 'the setting', :setting2 => 'the setting 2'}
       t.installer_referencer_bin = 'somedir'
     end
-    allow(ms_build_mock).to receive(:dotnet).and_return('path/to/')
     FileUtils.touch 'MyWixProject/paraffin/binaries.PARAFFIN'
     FileUtils.touch 'MyWixProject/dnetinstaller.xml'
     commands = []
@@ -494,7 +499,7 @@ describe BradyW::WixCoordinator do
     commands[4].should include 'symlink' # create
     commands[3].should == '"path/to/paraffin.exe" -update "MyWixProject/paraffin/binaries.wxs" -verbose -ReportIfDifferent'
     commands[2].should include 'symlink' # delete
-    commands[1].should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:setting1="the setting" /property:setting2="the setting 2" /property:DefineConstants="ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;setting1=the setting;setting2=the setting 2;TRACE" MyWixProject/MyWixProject.wixproj'
+    commands[1].should == '/path/to/MSBuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:setting1="the setting" /property:setting2="the setting 2" /property:DefineConstants="ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;setting1=the setting;setting2=the setting 2;TRACE" MyWixProject/MyWixProject.wixproj'
     commands[0].should include '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"MyWixProject/dnetinstall'
     commands[0].should include '/o:"MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
   end
@@ -518,7 +523,6 @@ describe BradyW::WixCoordinator do
       t.properties = {:setting1 => 'the setting', :setting2 => 'the setting 2'}
       t.installer_referencer_bin = 'somedir'
     end
-    allow(ms_build_mock).to receive(:dotnet).and_return('path/to/')
     FileUtils.touch 'MyWixProject/paraffin/binaries.PARAFFIN'
     FileUtils.touch 'MyWixProject/dnetinstaller.xml'
     commands = []
@@ -533,7 +537,7 @@ describe BradyW::WixCoordinator do
     commands[4].should include 'symlink' # create
     commands[3].should == '"path/to/paraffin.exe" -update "MyWixProject/paraffin/binaries.wxs" -verbose -ReportIfDifferent'
     commands[2].should include 'symlink' # delete
-    commands[1].should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:setting1="the setting" /property:setting2="the setting 2" /property:DefineConstants="ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;setting1=the setting;setting2=the setting 2;TRACE" MyWixProject/MyWixProject.wixproj'
+    commands[1].should == '/path/to/MSBuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:setting1="the setting" /property:setting2="the setting 2" /property:DefineConstants="ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;setting1=the setting;setting2=the setting 2;TRACE" MyWixProject/MyWixProject.wixproj'
     commands[0].should include '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"MyWixProject/dnetinstall'
     commands[0].should include '/o:"MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'
   end
@@ -578,7 +582,6 @@ describe BradyW::WixCoordinator do
       t.description = 'The description'
       t.installer_referencer_bin = 'somedir'
     end
-    allow(ms_build_mock).to receive(:dotnet).and_return('path/to/')
     FileUtils.touch 'MyWixProject/paraffin/binaries.PARAFFIN'
     FileUtils.touch 'MyWixProject/dnetinstaller.xml'
 
@@ -593,7 +596,7 @@ describe BradyW::WixCoordinator do
     commands[2].should include 'symlink' # create
     commands[3].should == '"path/to/paraffin.exe" -update "MyWixProject/paraffin/binaries.wxs" -verbose -ReportIfDifferent'
     commands[4].should include 'symlink' # delete
-    commands[5].should == 'path/to/msbuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:DefineConstants="ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;TRACE" MyWixProject/MyWixProject.wixproj'
+    commands[5].should == '/path/to/MSBuild.exe /property:Configuration=Release /property:TargetFrameworkVersion=v4.5 /property:ProductVersion=1.0.0.0 /property:UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7 /property:DefineConstants="ProductVersion=1.0.0.0;UpgradeCode=6c6bbe03-e405-4e6e-84ac-c5ef16f243e7;TRACE" MyWixProject/MyWixProject.wixproj'
     commands[6].should == '"windowskit/path/bin/x64/signtool.exe" sign /n "The Subject" /t http://timestamp.verisign.com/scripts/timestamp.dll /d "The description" /a "MyWixProject/bin/Release/MyWixProject.msi"'
     commands[7].should include '"path/to/dnetinstaller/Bin/InstallerLinker.exe" /c:"MyWixProject/dnetinstall'
     commands[7].should include '/o:"MyWixProject/bin/Release/MyWixProject 1.0.0.0.exe" /t:"path/to/dnetinstaller/Bin/dotNetInstaller.exe"'

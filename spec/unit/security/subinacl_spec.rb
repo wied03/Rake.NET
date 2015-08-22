@@ -1,6 +1,9 @@
 require 'spec_helper'
 
 describe BradyW::Subinacl do
+  include_context :executable_test
+  include_context :io_helper
+
   before(:each) do
     @should_deletes = []
     @file_index = 0

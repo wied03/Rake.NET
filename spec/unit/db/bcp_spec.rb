@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe BradyW::BCP do
+  include_context :config_helper
+
   before(:each) do
     def @config.db_name
       'regulardb'
@@ -89,8 +91,8 @@ describe BradyW::BCP do
 
   it 'Handles delimiter interference Properly' do
     def @config.db_general_authmode
-          :winauth
-        end
+      :winauth
+    end
 
     task = BradyW::BCP.new do |bcp|
       bcp.files = FileList['data/bcp/delimInData.csv']

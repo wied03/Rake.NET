@@ -6,6 +6,8 @@ def testdata
 end
 
 describe BradyW::Sqlcmd do
+  include_context :config_helper
+
   RSpec::Matchers.define :have_sql_property do |expected|
     match do |actual|
       group = Regexp.new('.*-v (.+) -').match(actual).captures[0]

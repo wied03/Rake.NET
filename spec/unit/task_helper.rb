@@ -39,6 +39,8 @@ RSpec.shared_context :executable_test do
     end
   end
 
+  RSpec::Matchers.alias_matcher :execute_bins, :execute_bin
+
   RSpec::Matchers.define :execute_with_params do |matcher|
     include RegexStuff
 
@@ -52,32 +54,7 @@ RSpec.shared_context :executable_test do
     end
   end
 
-  # File dependent tests, so we always baseline ourselves in the test directory
-  before(:all) do
-    @current = pwd
-    cd File.expand_path(File.dirname(__FILE__))
-  end
-
-  after(:all) do
-    cd @current
-  end
-
   before do
     BradyW::BaseTask.clear_shell_stack
-    @config = BradyW::BaseConfig.new
-    class MockConfig
-      include Singleton
-      attr_accessor :values
-    end
-
-    # Force only our base class to be returned
-    allow(BradyW::Config).to receive(:instance).and_return(MockConfig.instance)
-    MockConfig.instance.values = @config
-  end
-
-  def read_file_in_bin_mode(filename)
-    File.open(filename, 'rb') do |file|
-      file.readlines
-    end
   end
 end

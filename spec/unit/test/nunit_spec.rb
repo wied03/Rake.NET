@@ -1,6 +1,9 @@
 require 'spec_helper'
 
 describe BradyW::Nunit do
+  include_context :executable_test
+  include_context :io_helper
+
   let(:stub_rm) { true }
   before(:each) do
     ENV['nunit_filelist'] = nil

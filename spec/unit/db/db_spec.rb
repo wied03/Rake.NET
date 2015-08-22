@@ -1,11 +1,15 @@
 require 'spec_helper'
 
 describe BradyW::Database do
+  include_context :config_helper
+
   before(:each) do
     @db = BradyW::Database.new
+
     def @config.db_name
       'regulardb'
     end
+
     def @config.project_prefix
       'PRE'
     end
@@ -19,6 +23,7 @@ describe BradyW::Database do
     def @config.db_name
       '@prefix@-@thismachinehostname@'
     end
+
     @db.name.should == 'PRE-'+Socket.gethostname
   end
 
@@ -42,6 +47,7 @@ describe BradyW::Database do
     def @config.db_general_user
       '@prefix@-@thismachinehostname@'
     end
+
     @db.user.should == 'PRE-'+Socket.gethostname
   end
 
@@ -75,7 +81,7 @@ describe BradyW::Database do
     end
 
     def @config.db_general_authmode
-          :winauth
+      :winauth
     end
 
     def @config.db_connect_string_winauth
