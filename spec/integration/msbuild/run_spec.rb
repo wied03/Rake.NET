@@ -26,9 +26,30 @@ describe BradyW::MSBuild do
   end
 
   let(:project_dir) { File.join(File.dirname(__FILE__), 'RakeDotNet') }
+  let(:project_gemfile) { File.join(project_dir, 'Gemfile') }
+
+  class_variable_set :@@bundle_installed, []
+  def self.bundle_install_complete_for(path)
+    # initializer above does not set an array first
+    class_variable_get(:@@bundle_installed) << path
+  end
+
+  def self.bundle_installed?(path)
+    class_variable_get(:@@bundle_installed).include? path
+  end
 
   before do
     Dir.chdir(project_dir) do
+      # lock file is not versioned
+      if self.class.bundle_installed?(project_gemfile)
+        puts "\nSkipping bundle install for #{project_gemfile} because it has been done already\n"
+      else
+        FileUtils.rm_rf 'Gemfile.lock'
+        Bundler.clean_system 'bundle install'
+        @success = $?.success?
+        raise 'Bundle install error' unless @success
+        self.class.bundle_install_complete_for project_gemfile
+      end
       Bundler.clean_system "bundle exec rake #{[*rake_targets].join ' '}"
       @success = $?.success?
     end
