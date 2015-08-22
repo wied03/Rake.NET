@@ -63,7 +63,9 @@ describe BradyW::MSBuild do
   context 'specific MSB version' do
     context 'float' do
       context 'no spaces in path' do
-        pending 'write this'
+        let(:task_block) { lambda { |t| t.path = 3.5 } }
+        
+        it { is_expected.to execute_commands eq 'C:\\Windows\\Microsoft.NET\\Framework\\v3.5\\MSBuild.exe /property:Configuration=Debug /property:TargetFrameworkVersion=v4.5' }
       end
 
       context 'valid' do
