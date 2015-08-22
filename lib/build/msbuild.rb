@@ -15,7 +15,7 @@ module BradyW
     attr_accessor :targets
 
     # *Optional* Which MSBuild version to use. By default, will use latest version installed (typically in C:\Program Files (x86)\MSBuild\14.0\Bin)
-    # If you supply a Float (e.g. 14.0, 13.0), then that MSBuild version will be used. If you supply a string, then that absolute path will be used
+    # If you supply a Float (e.g. 14.0, 13.0), then that MSBuild version will be used. If you supply a string, then that absolute path will be used. String should include the .exe
     attr_accessor :path
 
     # *Optional* Solution file to build
@@ -37,7 +37,7 @@ module BradyW
       super parameters
       @build_config ||= :Debug
       @registry_accessor = BradyW::RegistryAccessor.new
-      @resolved_path = path
+      @resolved_path = get_path
     end
 
     private
@@ -46,8 +46,7 @@ module BradyW
       params = targets
       params << merged_properties.map { |key, val| param_fslash_colon('property', property_kv(key, val)) }
       params_flat = params.join ' '
-      command = quoted_for_spaces File.join(@resolved_path, 'MSBuild.exe')
-      shell "#{command} #{params_flat}#{solution}"
+      shell "#{@resolved_path} #{params_flat}#{solution}"
     end
 
     def compile_version
@@ -87,18 +86,23 @@ module BradyW
       @registry_accessor.get_sub_keys('SOFTWARE\\Microsoft\\MSBuild\\ToolsVersions').map { |v| v.to_f }
     end
 
-    def path
+    def get_path
       all_versions = get_msbuild_versions.sort.reverse
       version_to_use = if @path
                          number = @path.to_f
-                         if number
+                         if number != 0.0
                            raise "You requested version #{number} but that version is not installed. Installed versions are #{all_versions}" unless all_versions.include?(number)
                            number
+                         else
+                           raise "You requested to use #{@path} but that file does not exist!" unless File.exist?(@path)
+                           @path
                          end
                        else
                          all_versions.first
                        end
-      get_msbuild_path version_to_use
+      return quoted_for_spaces(version_to_use) if version_to_use.is_a? String
+      containing_dir = get_msbuild_path version_to_use
+      quoted_for_spaces(File.join(containing_dir, 'MSBuild.exe'))
     end
   end
 end

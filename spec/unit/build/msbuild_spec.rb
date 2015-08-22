@@ -91,12 +91,24 @@ describe BradyW::MSBuild do
 
     context 'string' do
       context 'file path' do
+        let(:task_block) { lambda { |t| t.path = 'C:\\some_path\\MSBuild.exe' } }
+
         context 'valid' do
-          pending 'write this'
+          before do
+            allow(File).to receive(:exist?).with('C:\\some_path\\MSBuild.exe').and_return true
+          end
+
+          it { is_expected.to execute_commands eq 'C:\\some_path\\MSBuild.exe /property:Configuration=Debug /property:TargetFrameworkVersion=v4.5' }
         end
 
         context 'invalid' do
-          pending 'write this'
+          before do
+            allow(File).to receive(:exist?).with('C:\\some_path\\MSBuild.exe').and_return false
+          end
+
+          subject { lambda { task } }
+
+          it { is_expected.to raise_exception 'You requested to use C:\\some_path\\MSBuild.exe but that file does not exist!' }
         end
       end
 
