@@ -111,14 +111,8 @@ describe BradyW::MSBuild do
   end
 
   describe 'clean' do
-    let(:test_filename) { File.join(project_dir, 'ClassLibrary1/bin/Debug/ClassLibrary1.dll') }
-
     before do
-      FileUtils.touch test_filename
-    end
-
-    after do
-      FileUtils.rm_rf test_filename
+      run_rake_targets :build
     end
 
     let(:rake_targets) { :clean }
