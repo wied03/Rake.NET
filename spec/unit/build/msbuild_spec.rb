@@ -61,21 +61,23 @@ describe BradyW::MSBuild do
   end
 
   context 'specific MSB version' do
+    let(:task_block) { lambda { |t| t.path = msb_version } }
+
     context 'float' do
       context 'no spaces in path' do
-        let(:task_block) { lambda { |t| t.path = 3.5 } }
+        let(:msb_version) { 3.5 }
 
         it { is_expected.to execute_commands eq 'C:\\Windows\\Microsoft.NET\\Framework\\v3.5\\MSBuild.exe /property:Configuration=Debug /property:TargetFrameworkVersion=v4.5' }
       end
 
       context 'valid' do
-        let(:task_block) { lambda { |t| t.path = 12.0 } }
+        let(:msb_version) { 12.0 }
 
         it { is_expected.to execute_commands eq '"C:\\Program Files (x86)\\MSBuild\\12.0\\bin\\MSBuild.exe" /property:Configuration=Debug /property:TargetFrameworkVersion=v4.5' }
       end
 
       context 'version not installed' do
-        let(:task_block) { lambda { |t| t.path = 22.2 } }
+        let(:msb_version) { 22.2 }
 
         subject { lambda { task } }
 
@@ -84,14 +86,14 @@ describe BradyW::MSBuild do
     end
 
     context 'integer' do
-      let(:task_block) { lambda { |t| t.path = 12 } }
+      let(:msb_version) { 12 }
 
       it { is_expected.to execute_commands eq '"C:\\Program Files (x86)\\MSBuild\\12.0\\bin\\MSBuild.exe" /property:Configuration=Debug /property:TargetFrameworkVersion=v4.5' }
     end
 
     context 'string' do
       context 'file path' do
-        let(:task_block) { lambda { |t| t.path = 'C:\\some_path\\MSBuild.exe' } }
+        let(:msb_version) { 'C:\\some_path\\MSBuild.exe' }
 
         context 'valid' do
           before do
@@ -114,13 +116,13 @@ describe BradyW::MSBuild do
 
       context 'number as string' do
         context 'valid' do
-          let(:task_block) { lambda { |t| t.path = '12.0' } }
+          let(:msb_version) { '12.0' }
 
           it { is_expected.to execute_commands eq '"C:\\Program Files (x86)\\MSBuild\\12.0\\bin\\MSBuild.exe" /property:Configuration=Debug /property:TargetFrameworkVersion=v4.5' }
         end
 
         context 'invalid' do
-          let(:task_block) { lambda { |t| t.path = '22.2' } }
+          let(:msb_version) { '22.2' }
 
           subject { lambda { task } }
 
@@ -131,28 +133,27 @@ describe BradyW::MSBuild do
   end
 
   context 'properties' do
+    let(:task_block) { lambda { |t| t.properties = build_props } }
+
     context 'value includes spaces' do
-      let(:task_block) { lambda { |t| t.properties = {:prop1 => 'the value'} } }
+      let(:build_props) { {:prop1 => 'the value'} }
 
       it { is_expected.to execute_commands eq '"C:\\Program Files (x86)\\MSBuild\\14.0\\bin\\MSBuild.exe" /property:Configuration=Debug /property:TargetFrameworkVersion=v4.5 /property:prop1="the value"' }
     end
 
     context 'value includes semicolons' do
-      let(:task_block) { lambda { |t| t.properties = {:prop1 => 'the;value'} } }
+      let(:build_props) { {:prop1 => 'the;value'} }
 
       it { is_expected.to execute_commands eq '"C:\\Program Files (x86)\\MSBuild\\14.0\\bin\\MSBuild.exe" /property:Configuration=Debug /property:TargetFrameworkVersion=v4.5 /property:prop1="the;value"' }
     end
 
     context 'custom properties that are also defaults' do
-      let(:task_block) do
-        lambda do |t|
-          t.properties = {
-              Configuration: 'myconfig',
-              prop2: 'prop2val'
-          }
-          t.build_config = :Release
-        end
-      end
+      let(:build_props) {
+        {
+            Configuration: 'myconfig',
+            prop2: 'prop2val'
+        }
+      }
 
       it { is_expected.to execute_commands eq '"C:\\Program Files (x86)\\MSBuild\\14.0\\bin\\MSBuild.exe" /property:Configuration=myconfig /property:TargetFrameworkVersion=v4.5 /property:prop2=prop2val' }
     end
@@ -167,14 +168,16 @@ describe BradyW::MSBuild do
   end
 
   context 'build config' do
+    let(:task_block) { lambda { |t| t.build_config = build_config } }
+
     context 'explicit debug' do
-      let(:task_block) { lambda { |t| t.build_config = :Debug } }
+      let(:build_config) { :Debug }
 
       it { is_expected.to execute_commands eq '"C:\\Program Files (x86)\\MSBuild\\14.0\\bin\\MSBuild.exe" /property:Configuration=Debug /property:TargetFrameworkVersion=v4.5' }
     end
 
     context 'release' do
-      let(:task_block) { lambda { |t| t.build_config = :Release } }
+      let(:build_config) { :Release }
 
       it { is_expected.to execute_commands eq '"C:\\Program Files (x86)\\MSBuild\\14.0\\bin\\MSBuild.exe" /property:Configuration=Release /property:TargetFrameworkVersion=v4.5' }
     end
