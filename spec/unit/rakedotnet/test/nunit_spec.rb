@@ -217,7 +217,7 @@ describe BradyW::Nunit do
   it 'should allow the user to specify an assembly file list on the rake command line' do
     # arrange
     # just using this glob to make sure we are properly converting it to a FileList
-    ENV['nunit_filelist'] = 'test/nun*_spec.rb'
+    ENV['nunit_filelist'] = '*_spec.rb'
     task = BradyW::Nunit.new do |test|
       test.files = %w(file1.dll file2.dll)
     end
@@ -226,7 +226,7 @@ describe BradyW::Nunit do
     task.exectaskpublic
 
     # assert
-    task.executedPop.should == "\"C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe\" /labels /noxml /framework=4.5 /timeout=35000 test/nunit_spec.rb"
+    task.executedPop.should == "\"C:/Program Files (x86)/NUnit 2.6.3/bin/nunit-console.exe\" /labels /noxml /framework=4.5 /timeout=35000 nunit_spec.rb"
   end
 
   it 'should work with normal security mode explicitly specified' do

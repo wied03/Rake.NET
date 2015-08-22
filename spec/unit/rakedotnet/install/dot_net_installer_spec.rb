@@ -3,14 +3,18 @@ require 'spec_helper'
 describe BradyW::DotNetInstaller do
   include_context :executable_test
 
+  def data_file_path(filename)
+    File.join('data', filename)
+  end
+
   before :each do
     @should_deletes = %w(generated_name_1.xml generated_name_2.xml)
     allow(BswTech::DnetInstallUtil).to receive(:dot_net_installer_base_path).and_return('path/to/dnetinstaller')
     @file_index = 0
     allow(BradyW::TempFileNameGenerator).to receive(:from_existing_file) {
-      @file_index += 1
-      "generated_name_#{@file_index}.xml"
-    }
+                                              @file_index += 1
+                                              "generated_name_#{@file_index}.xml"
+                                            }
     ENV['PRESERVE_TEMP'] = nil
   end
 
@@ -21,7 +25,7 @@ describe BradyW::DotNetInstaller do
   it 'should render a proper command line' do
     # arrange
     task = BradyW::DotNetInstaller.new do |t|
-      t.xml_config = 'data/dot_net_installer/input.xml'
+      t.xml_config = data_file_path 'input.xml'
       t.output = 'somedir/Our.File.Exe'
     end
 
@@ -36,9 +40,9 @@ describe BradyW::DotNetInstaller do
   it 'should work properly with a specified manifest file' do
     # arrange
     task = BradyW::DotNetInstaller.new do |t|
-      t.xml_config = 'data/dot_net_installer/input.xml'
+      t.xml_config = data_file_path 'input.xml'
       t.output = 'somedir/Our.File.Exe'
-      t.manifest = 'data/dot_net_installer/input_manifest.xml'
+      t.manifest = data_file_path 'input_manifest.xml'
     end
 
     # act
@@ -60,7 +64,7 @@ describe BradyW::DotNetInstaller do
   it 'should handle symbols as token values' do
     # arrange
     task = BradyW::DotNetInstaller.new do |t|
-      t.xml_config = 'data/dot_net_installer/input.xml'
+      t.xml_config = data_file_path 'input.xml'
       t.output = 'somedir/Our.File.Exe'
       t.tokens = {:token1 => 'value1',
                   :token2 => :some_value}
@@ -74,7 +78,7 @@ describe BradyW::DotNetInstaller do
     task.exectaskpublic
 
     # assert
-    expected = IO.readlines('data/dot_net_installer/expected_output_symbol.xml')
+    expected = IO.readlines(data_file_path 'expected_output_symbol.xml')
     actual = IO.readlines(@should_delete)
     actual.should == expected
   end
@@ -84,7 +88,7 @@ describe BradyW::DotNetInstaller do
     # Leave the temp file so we can compare it
     ENV['PRESERVE_TEMP'] = 'true'
     task = BradyW::DotNetInstaller.new do |t|
-      t.xml_config = 'data/dot_net_installer/input.xml'
+      t.xml_config = data_file_path 'input.xml'
       t.output = 'somedir/Our.File.Exe'
       t.tokens = {:token1 => 'value1',
                   :token2 => 'value2'}
@@ -94,7 +98,7 @@ describe BradyW::DotNetInstaller do
     task.exectaskpublic
 
     # assert
-    expected = IO.readlines('data/dot_net_installer/expected_output.xml')
+    expected = IO.readlines(data_file_path 'expected_output.xml')
     actual = IO.readlines(@should_deletes[0])
     actual.should == expected
   end
@@ -104,8 +108,8 @@ describe BradyW::DotNetInstaller do
     # Leave the temp file so we can compare it
     ENV['PRESERVE_TEMP'] = 'true'
     task = BradyW::DotNetInstaller.new do |t|
-      t.xml_config = 'data/dot_net_installer/input.xml'
-      t.manifest = 'data/dot_net_installer/input_manifest.xml'
+      t.xml_config = data_file_path 'input.xml'
+      t.manifest = data_file_path 'input_manifest.xml'
       t.output = 'somedir/Our.File.Exe'
       t.tokens = {:token1 => 'value1',
                   :token2 => 'value2'}
@@ -115,7 +119,7 @@ describe BradyW::DotNetInstaller do
     task.exectaskpublic
 
     # assert
-    expected = IO.readlines('data/dot_net_installer/expected_manifest.xml')
+    expected = IO.readlines(data_file_path 'expected_manifest.xml')
     actual = IO.readlines(@should_deletes[1])
     actual.should == expected
   end
@@ -123,7 +127,7 @@ describe BradyW::DotNetInstaller do
   it 'should remove the temporarily generated core XML file' do
     # arrange
     task = BradyW::DotNetInstaller.new do |t|
-      t.xml_config = 'data/dot_net_installer/input.xml'
+      t.xml_config = data_file_path 'input.xml'
       t.output = 'somedir/Our.File.Exe'
     end
 
@@ -138,9 +142,9 @@ describe BradyW::DotNetInstaller do
   it 'should remove the temporarily generated manifest XML file' do
     # arrange
     task = BradyW::DotNetInstaller.new do |t|
-      t.xml_config = 'data/dot_net_installer/input.xml'
+      t.xml_config = data_file_path 'input.xml'
       t.output = 'somedir/Our.File.Exe'
-      t.manifest = 'data/dot_net_installer/input_manifest.xml'
+      t.manifest = data_file_path 'input_manifest.xml'
     end
 
     # act
@@ -155,9 +159,9 @@ describe BradyW::DotNetInstaller do
     # arrange
     ENV['PRESERVE_TEMP'] = 'true'
     task = BradyW::DotNetInstaller.new do |t|
-      t.xml_config = 'data/dot_net_installer/input.xml'
+      t.xml_config = data_file_path 'input.xml'
       t.output = 'somedir/Our.File.Exe'
-      t.manifest = 'data/dot_net_installer/input_manifest.xml'
+      t.manifest = data_file_path 'input_manifest.xml'
     end
 
     # act
@@ -171,9 +175,9 @@ describe BradyW::DotNetInstaller do
   it 'should remove the temporarily generated XML file even if an error occurs in the executable' do
     # arrange
     task = BradyW::DotNetInstaller.new do |t|
-      t.xml_config = 'data/dot_net_installer/input.xml'
+      t.xml_config = data_file_path 'input.xml'
       t.output = 'somedir/Our.File.Exe'
-      t.manifest = 'data/dot_net_installer/input_manifest.xml'
+      t.manifest = data_file_path 'input_manifest.xml'
     end
     allow(task).to receive(:shell).and_yield(nil, SimulateProcessFailure.new)
 

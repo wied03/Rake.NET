@@ -135,6 +135,7 @@ module BradyW
 
     def get_assemblies
       override = ENV['nunit_filelist']
+      puts "ov is #{override}"
       file_list = override ? FileList[override] : files
       files_unique = file_list.uniq
       files_unique.join(' ')
