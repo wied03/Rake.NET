@@ -1,26 +1,11 @@
-%w[
-  util/config
-
-  build/msbuild
-
-  db/database
-  db/bcp
-  db/sqlcmd
-
-  security/sign_tool
-  security/subinacl
-
-  install/paraffin/fragment_generator
-  install/paraffin/fragment_updater
-  install/dot_net_installer
-  install/dot_net_installer_execute
-  install/wix_coordinator
-
-  test/jstest
-  test/mstest
-  test/nunit
-
-  web/iis
-  web/minifyjs
-
-].each {|name| require_relative name}
+require 'rakedotnet/util/config'
+require 'rakedotnet/build/msbuild'
+require 'rakedotnet/db/database'
+require 'rakedotnet/security/sign_tool'
+require 'rakedotnet/security/subinacl'
+require 'rakedotnet/install/paraffin/fragment_generator'
+require 'rakedotnet/install/paraffin/fragment_updater'
+require 'rakedotnet/install/dot_net_installer'
+require 'rakedotnet/install/dot_net_installer_execute'
+require 'rakedotnet/install/wix_coordinator'
+require 'rakedotnet/test/nunit'
