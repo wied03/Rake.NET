@@ -101,7 +101,12 @@ describe BradyW::MSBuild do
 
   describe 'build' do
     before do
-      Dir.glob(File.join(project_dir, '**/*.dll')).each { |f| File.delete f }
+	  # clean nuget state
+	  FileUtils.rm_rf 'packages'
+      Dir.glob('**/*.dll').each do |f|
+		puts "Cleaning #{f}"
+		File.delete f
+	  end
     end
 
     let(:rake_targets) { :build }
