@@ -1,6 +1,6 @@
 $LOAD_PATH << './lib'
 require 'rake'
-require 'version'
+require 'rakedotnet/version'
 
 src='lib'
 testdir='spec'
