@@ -25,7 +25,7 @@ describe BradyW::MSBuild do
       end
     end
 
-    failure_message do |matcher|
+    failure_message do
       if matcher
         matcher.failure_message
       else
@@ -41,7 +41,7 @@ describe BradyW::MSBuild do
       end
     end
 
-    failure_message_when_negated do |matcher|
+    failure_message_when_negated do
       if matcher
         matcher.failure_message
       else
