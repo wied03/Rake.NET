@@ -1,6 +1,7 @@
 Thumbs.db
 *.obj
 *.exe
+!**/tools/*
 *.pdb
 *.user
 *.aps
@@ -28,9 +29,5 @@ _ReSharper*/
 *.ADR
 *.ADR.old
 ._*
-NuGet.exe
-# it's ok to hide nuget.config, but not NuGet.config
-nuget.config
 .DS_Store
-nuget_pkg_lnk
 packages
